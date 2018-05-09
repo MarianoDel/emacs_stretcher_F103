@@ -1,118 +1,82 @@
-#ifndef GTK_HARD_H_
-#define GTK_HARD_H_
+//---------------------------------------------
+// ##
+// ## @Author: Med
+// ## @Editor: Emacs - ggtags
+// ## @TAGS:   Global
+// ## @CPU:    STM32F103
+// ##
+// #### HARD.H #################################
+//---------------------------------------------
 
-#include "stm32f10x_rcc.h"
+#ifndef HARD_H_
+#define HARD_H_
+
+
+//----------- Defines For Configuration -------------
 
 //----- Board Configuration -------------------//
 //--- Hardware ------------------//
 #define HARDWARE_VERSION_2_1
 // #define HARDWARE_VERSION_2_0
+//--- Software ------------------//
 #define SOFTWARE_VERSION_1_2		//Agrega buzzer en la placa
 // #define SOFTWARE_VERSION_1_1			//Agrega posibilidad de usar antenas harcodeadas
 //#define SOFTWARE_VERSION_1_0
 
+//-------- Type of Program (depending on software version) ----------------
+// #define POWER_WITH_MANAGEMENT
+// #define ONLY_POWER_WITHOUT_MANAGEMENT
+#define INT_SPEED_RESPONSE
+
+
+//-------- Type of Program and Features ----------------
+//Si utiliza la proteccion con la int para cortar la corriente
+// #define USE_PROTECTION_WITH_INT
+
+//Si utiliza la proteccion de soft overcurrent o no
+// #define USE_SOFT_OVERCURRENT
+
+//Modo de uso de la USART (placa individual single - placa enganchada bus)
+// #define USART_IN_BUS
+// #define USART_SINGLE
+
+//-------- Kind of Reports Sended ----------------
+
+//-------- Others Configurations depending on the formers ------------
+
+//-------- Hysteresis Conf ------------------------
+
+//-------- PWM Conf ------------------------
+
+//-------- Clock frequency and Crystal selection ---
+//#define sysFREC48
+//#define sysFREC72_XTAL_8
+#define sysFREC72_XTAL_12
+
+//-------- End Of Defines For Configuration ------
+
+
+
+
+//--- Hardware & Software Messages ------------------//
 #ifdef HARDWARE_VERSION_2_0
 #define HARD "Hardware Version: 2.0\r\n"
 #endif
 #ifdef HARDWARE_VERSION_2_1
 #define HARD "Hardware Version: 2.1\r\n"
 #endif
-
-//--- Software ------------------//
-#ifdef SOFTWARE_VERSION_1_2
-#define SOFT "Software Version: 1.2\r\n"
-#endif
-#ifdef SOFTWARE_VERSION_1_1
-#define SOFT "Software Version: 1.1\r\n"
+#ifdef SOFTWARE_VERSION_2_2
+#define SOFT "Software Version: 2.2\r\n"
 #endif
 #ifdef SOFTWARE_VERSION_1_0
 #define SOFT "Software Version: 1.0\r\n"
 #endif
+#ifdef SOFTWARE_VERSION_1_1
+#define SOFT "Software Version: 1.1\r\n"
+#endif
+//--- End of Hardware & Software Messages ------------------//
 
-//--- Clock frequency and Crystal selection ---//
-//#define sysFREC48
-//#define sysFREC72_XTAL_8
-#define sysFREC72_XTAL_12
-//--- Voltage of the Powers Supply used ---//
-#define PSU_40		40
-#define PSU_200	200
-#define RSNUBBER_POWER_MAX		15
-#define resistance_discharge 1175
-#define capacitance_discharge 100 //uF
-#define tau_discharge 0.1175 //RC
 
-//----- End of Board Configuration ------------//
-
-//----- Use it whithout Antenna Board Configuration ----------//
-// #define WITHOUT_ANTENNA_BOARD_CH1
-// #define WITHOUT_ANTENNA_BOARD_CH2
-// #define WITHOUT_ANTENNA_BOARD_CH3
-// #define WITHOUT_ANTENNA_BOARD_CH4
-
-//valores decimales son enteros/100, 0.9 es 90
-// #define HARDCODE_R_INT_CH1	3
-// #define HARDCODE_R_DEC_CH1 0		//estos los divide por 10 y los suma al int
-// #define HARDCODE_L_INT_CH1 18
-// #define HARDCODE_L_DEC_CH1 0		//estos los divide por 10 y los suma al int
-// #define HARDCODE_I_INT_CH1 3
-// #define HARDCODE_I_DEC_CH1 5		//estos los divide por 10 y los suma al int
-
-#define HARDCODE_R_INT_CH1	42
-#define HARDCODE_R_DEC_CH1 80
-#define HARDCODE_L_INT_CH1 400
-#define HARDCODE_L_DEC_CH1 0
-#define HARDCODE_I_INT_CH1 0
-#define HARDCODE_I_DEC_CH1 90
-
-// #define HARDCODE_R_INT_CH1	42
-// #define HARDCODE_R_DEC_CH1 8
-// #define HARDCODE_L_INT_CH1 400
-// #define HARDCODE_L_DEC_CH1 0
-// #define HARDCODE_I_INT_CH1 1		//de 0.9 en adelante no va con 3 3 3 6 de senial
-// #define HARDCODE_I_DEC_CH1 0
-
-#define HARDCODE_R_INT_CH2	42
-#define HARDCODE_R_DEC_CH2 80
-#define HARDCODE_L_INT_CH2 400
-#define HARDCODE_L_DEC_CH2 0
-#define HARDCODE_I_INT_CH2 0
-#define HARDCODE_I_DEC_CH2 90
-
-// #define HARDCODE_R_INT_CH2	42
-// #define HARDCODE_R_DEC_CH2 8
-// #define HARDCODE_L_INT_CH2 400
-// #define HARDCODE_L_DEC_CH2 0
-// #define HARDCODE_I_INT_CH2 1
-// #define HARDCODE_I_DEC_CH2 0
-
-#define HARDCODE_R_INT_CH3	47
-#define HARDCODE_R_DEC_CH3 50
-#define HARDCODE_L_INT_CH3 500
-#define HARDCODE_L_DEC_CH3 0
-#define HARDCODE_I_INT_CH3 0
-#define HARDCODE_I_DEC_CH3 80
-
-// #define HARDCODE_R_INT_CH3	47
-// #define HARDCODE_R_DEC_CH3 5
-// #define HARDCODE_L_INT_CH3 500
-// #define HARDCODE_L_DEC_CH3 0
-// #define HARDCODE_I_INT_CH3 1
-// #define HARDCODE_I_DEC_CH3 0
-
-#define HARDCODE_R_INT_CH4	49
-#define HARDCODE_R_DEC_CH4 0
-#define HARDCODE_L_INT_CH4 350
-#define HARDCODE_L_DEC_CH4 0
-#define HARDCODE_I_INT_CH4 0
-#define HARDCODE_I_DEC_CH4 80
-
-// #define HARDCODE_R_INT_CH4	49
-// #define HARDCODE_R_DEC_CH4 0
-// #define HARDCODE_L_INT_CH4 350
-// #define HARDCODE_L_DEC_CH4 0
-// #define HARDCODE_I_INT_CH4 1
-// #define HARDCODE_I_DEC_CH4 0
-//----- End of Use it whithout Antenna Board Configuration ---//
 
 
 enum resultados
