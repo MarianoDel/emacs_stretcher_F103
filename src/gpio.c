@@ -1,10 +1,12 @@
 #include <stm32f10x.h>
-#include <stm32f10x_gpio.h>
+// #include <stm32f10x_gpio.h>
 #include <stm32f10x_rcc.h>
 
-#include "GTK_Hard.h"
-#include "timer.h"
+#include "hard.h"
+// #include "timer.h"
 #include "stm32f10x_flash.h"
+
+#include "stm32f10x_conf.h"
 
 
 //--- Module Externals ---------------
@@ -17,6 +19,7 @@ extern unsigned short buzzer_timeout;
 tBuzzer buzzer_state = BUZZER_INIT;
 unsigned char buzz_multiple = 0;
 #endif
+
 
 //************************************************************************************//
 void RCC_Config (void){
@@ -87,6 +90,10 @@ void Tamper_Config(void)
 	GPIOB->BSRR = 0x00002000;
 }
 
+
+
+
+
 //------- GPIO REGISTERS ----------//
 //
 //	GPIOx->CRL	pin 7 - 0
@@ -94,26 +101,29 @@ void Tamper_Config(void)
 //	CNF0  MODE0
 //	GPIOx->CRH	pin 15 - 8
 //
+//      En hexa me queda cada nibble es igual a la configuracion de ese pin
+//      nibble0 configura completo pin0
+//
 //	MODEx 00 Input (reset)
 //	MODEx 01 Output 10MHz
 //	MODEx 10 Output 2MHz
 //	MODEx 11 Output 50MHz
 //
 //	Input Mode
-//  CNFx 00 Analog
-//  CNFx 01 Floating (reset)
-//  CNFx 10 Input (pull up / dwn)
-//  CNFx 11 Reserved
+//      CNFx 00 Analog
+//      CNFx 01 Floating (reset)
+//      CNFx 10 Input (pull up / dwn)
+//      CNFx 11 Reserved
 //
 //	Output Mode
-//  CNFx 00 Push Pull
-//  CNFx 01 Open Drain
-//  CNFx 10 Alternate func Push Pull
-//  CNFx 11 Alternate func Open Drain
+//      CNFx 00 Push Pull
+//      CNFx 01 Open Drain
+//      CNFx 10 Alternate func Push Pull
+//      CNFx 11 Alternate func Open Drain
 
 
 //--- Leds ---//
-void Led_Config()
+void Led_Config(void)
 {
 
 	unsigned long temp;
@@ -140,25 +150,18 @@ void Led_Config()
 	temp |= 0x00200000;
 	GPIOC->CRH = temp;
 
-	//--- GPIOB pin 0 ---//
-	//--- GPIOB pin 1 ---//
-	//--- GPIOB pin 2 ---//
-	temp = GPIOB->CRL;
-	temp &= 0xFFFFF000;
-	temp |= 0x00000222;
+        //--- Configuro los leds en PB5 - PB7 ---//
+        temp = GPIOB->CRL;
+	temp &= 0x000FFFFF;
+	temp |= 0x22200000;
 	GPIOB->CRL = temp;
 
-	//--- GPIOB pin 12 ---//
-	//--- GPIOB pin 13 ---//
+        //--- Configuro los leds en PB8 - PB9 ---//        
 	temp = GPIOB->CRH;
-	temp &= 0xFF00FFFF;
-	temp |= 0x00220000;
+	temp &= 0xFFFFFF00;
+	temp |= 0x00000022;
 	GPIOB->CRH = temp;
 
-	//--- Apagado de leds ---//
-	LED1_OFF;
-	LED2_OFF;
-	//LED3_OFF;
 }
 
 void Led1Toggle(void){

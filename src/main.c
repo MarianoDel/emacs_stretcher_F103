@@ -11,6 +11,7 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include "stm32f10x.h"
+#include "hard.h"
 
 // #include "GTK_Hard.h"
 // #include "timer.h"
@@ -76,15 +77,44 @@ unsigned char channel_4_pause = 0;
 
 int main (void)
 {
-    while (1);
 
-// 	unsigned char i = 0;
+	unsigned long ii = 0;
 // 	unsigned char counter_keep_alive = 0;
 // 	//Configuracion de clock.
-	RCC_Config ();
+	// RCC_Config ();
 
 // 	//Configuracion led. & Enabled Channels
-// 	Led_Config();
+	Led_Config();
+
+        L_ZONA_ON;
+        L_ALARMA_ON;
+        L_SERV_ON;
+        L_NETLIGHT_ON;
+        L_WIFI_ON;
+
+        while (1)
+        {
+            for (ii = 0; ii < 0x1FFFF; ii++)
+            {
+                L_ZONA_ON;
+                L_ALARMA_ON;
+                L_SERV_ON;
+                L_NETLIGHT_ON;
+                L_WIFI_ON;
+            }
+
+            for (ii = 0; ii < 0xFFFF; ii++)
+            {
+                L_ZONA_OFF;
+                L_ALARMA_OFF;
+                L_SERV_OFF;
+                L_NETLIGHT_OFF;
+                L_WIFI_OFF;
+            }
+        }
+        
+
+        
 
 // 	//Timer 1ms -- Wait_ms()
 // 	TIM7_Init();

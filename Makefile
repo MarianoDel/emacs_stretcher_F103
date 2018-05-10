@@ -65,7 +65,7 @@ UADEFS =
 
 # Sources Files
 SRC  = ./src/main.c
-# SRC += ./src/GTK_Estructura.c
+SRC += ./src/gpio.c
 # SRC += ./src/GTK_Hard.c
 # SRC += ./src/GTK_Signal.c
 # #SRC += ./src/pantallas.c
@@ -79,6 +79,10 @@ SRC  = ./src/main.c
 SRC += ./startup_src/system_stm32f10x.c
 SRC += ./startup_src/syscalls.c
 SRC += ./cmsis_core/core_cm3.c
+
+## Libs que tuveque integrar
+SRC += ./startup_src/stm32f10x_rcc.c
+SRC += ./startup_src/stm32f10x_flash.c
 
 # List ASM source files here
 ASRC = ./startup_src/startup_stm32f10x_hd.s

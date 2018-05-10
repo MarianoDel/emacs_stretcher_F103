@@ -50,8 +50,8 @@
 
 //-------- Clock frequency and Crystal selection ---
 //#define sysFREC48
-//#define sysFREC72_XTAL_8
-#define sysFREC72_XTAL_12
+#define sysFREC72_XTAL_8
+// #define sysFREC72_XTAL_12
 
 //-------- End Of Defines For Configuration ------
 
@@ -118,6 +118,31 @@ enum bool
 #define LED3_OFF GPIOB->BSRR = 0x00001000
 #define LED3_ON GPIOB->BSRR = 0x10000000
 
+//--- PB9 ---//
+#define L_ZONA ((GPIOB->ODR & 0x0200) != 0)
+#define L_ZONA_ON GPIOB->BSRR = 0x00000200
+#define L_ZONA_OFF GPIOB->BSRR = 0x02000000
+
+//--- PB8 ---//
+#define L_ALARMA ((GPIOB->ODR & 0x0100) != 0)
+#define L_ALARMA_ON GPIOB->BSRR = 0x00000100
+#define L_ALARMA_OFF GPIOB->BSRR = 0x01000000
+
+//--- PB7 ---//
+#define L_SERV ((GPIOB->ODR & 0x0080) != 0)
+#define L_SERV_ON GPIOB->BSRR = 0x00000080
+#define L_SERV_OFF GPIOB->BSRR = 0x00800000
+
+//--- PB6 ---//
+#define L_NETLIGHT ((GPIOB->ODR & 0x0040) != 0)
+#define L_NETLIGHT_ON GPIOB->BSRR = 0x00000040
+#define L_NETLIGHT_OFF GPIOB->BSRR = 0x00400000
+
+//--- PB5 ---//
+#define L_WIFI ((GPIOB->ODR & 0x0020) != 0)
+#define L_WIFI_ON GPIOB->BSRR = 0x00000020
+#define L_WIFI_OFF GPIOB->BSRR = 0x00200000
+
 //--- PB0 ---//
 #define ENA_CH1 ((GPIOB->ODR & 0x0001) != 0)
 #define ENA_CH1_ON GPIOB->BSRR = 0x00000001
@@ -145,21 +170,21 @@ enum bool
 #endif
 
 //--- RCC clkEnable ---//
-#define RCC_GPIOA_clk (RCC->APB2ENR & 0x00000004)
-#define RCC_GPIOA_clkEnable RCC->APB2ENR |= 0x00000004
-#define RCC_GPIOA_clkDisable RCC->APB2ENR &= ~0x00000004
+// #define RCC_GPIOA_clk (RCC->APB2ENR & 0x00000004)
+// #define RCC_GPIOA_clkEnable RCC->APB2ENR |= 0x00000004
+// #define RCC_GPIOA_clkDisable RCC->APB2ENR &= ~0x00000004
 
-#define RCC_GPIOB_clk (RCC->APB2ENR & 0x00000008)
-#define RCC_GPIOB_clkEnable RCC->APB2ENR |= 0x00000008
-#define RCC_GPIOB_clkDisable RCC->APB2ENR &= ~0x00000008
+// #define RCC_GPIOB_clk (RCC->APB2ENR & 0x00000008)
+// #define RCC_GPIOB_clkEnable RCC->APB2ENR |= 0x00000008
+// #define RCC_GPIOB_clkDisable RCC->APB2ENR &= ~0x00000008
 
-#define RCC_GPIOC_clk (RCC->APB2ENR & 0x00000010)
-#define RCC_GPIOC_clkEnable RCC->APB2ENR |= 0x00000010
-#define RCC_GPIOC_clkDisable RCC->APB2ENR &= ~0x00000010
+// #define RCC_GPIOC_clk (RCC->APB2ENR & 0x00000010)
+// #define RCC_GPIOC_clkEnable RCC->APB2ENR |= 0x00000010
+// #define RCC_GPIOC_clkDisable RCC->APB2ENR &= ~0x00000010
 
-#define RCC_GPIOD_clk (RCC->APB2ENR & 0x00000020)
-#define RCC_GPIOD_clkEnable RCC->APB2ENR |= 0x00000020
-#define RCC_GPIOD_clkDisable RCC->APB2ENR &= ~0x00000020
+// #define RCC_GPIOD_clk (RCC->APB2ENR & 0x00000020)
+// #define RCC_GPIOD_clkEnable RCC->APB2ENR |= 0x00000020
+// #define RCC_GPIOD_clkDisable RCC->APB2ENR &= ~0x00000020
 
 #define RCC_AFIO_CLK (RCC->APB2ENR & 0x00000001)
 #define RCC_AFIO_CLKEN RCC->APB2ENR |= 0x00000001
@@ -245,7 +270,7 @@ typedef enum
 //--- Clock ---//
 void RCC_Config (void);
 //--- Leds ---//
-void Led_Config();
+void Led_Config(void);
 void Led1Toggle(void);
 void Led2Toggle(void);
 void Led3Toggle(void);
