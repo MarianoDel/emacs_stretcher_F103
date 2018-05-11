@@ -48,10 +48,10 @@
 
 //-------- PWM Conf ------------------------
 
-//-------- Clock frequency and Crystal selection ---
-//#define sysFREC48
-#define sysFREC72_XTAL_8
-// #define sysFREC72_XTAL_12
+//-------- Oscillator and Crystal selection (Freq in startup_clocksh) ---
+#define HSI_INTERNAL_RC
+// #define HSE_CRYSTAL_OSC
+
 
 //-------- End Of Defines For Configuration ------
 
@@ -170,21 +170,21 @@ enum bool
 #endif
 
 //--- RCC clkEnable ---//
-// #define RCC_GPIOA_clk (RCC->APB2ENR & 0x00000004)
-// #define RCC_GPIOA_clkEnable RCC->APB2ENR |= 0x00000004
-// #define RCC_GPIOA_clkDisable RCC->APB2ENR &= ~0x00000004
+#define RCC_GPIOA_clk (RCC->APB2ENR & 0x00000004)
+#define RCC_GPIOA_clkEnable RCC->APB2ENR |= 0x00000004
+#define RCC_GPIOA_clkDisable RCC->APB2ENR &= ~0x00000004
 
-// #define RCC_GPIOB_clk (RCC->APB2ENR & 0x00000008)
-// #define RCC_GPIOB_clkEnable RCC->APB2ENR |= 0x00000008
-// #define RCC_GPIOB_clkDisable RCC->APB2ENR &= ~0x00000008
+#define RCC_GPIOB_clk (RCC->APB2ENR & 0x00000008)
+#define RCC_GPIOB_clkEnable RCC->APB2ENR |= 0x00000008
+#define RCC_GPIOB_clkDisable RCC->APB2ENR &= ~0x00000008
 
-// #define RCC_GPIOC_clk (RCC->APB2ENR & 0x00000010)
-// #define RCC_GPIOC_clkEnable RCC->APB2ENR |= 0x00000010
-// #define RCC_GPIOC_clkDisable RCC->APB2ENR &= ~0x00000010
+#define RCC_GPIOC_clk (RCC->APB2ENR & 0x00000010)
+#define RCC_GPIOC_clkEnable RCC->APB2ENR |= 0x00000010
+#define RCC_GPIOC_clkDisable RCC->APB2ENR &= ~0x00000010
 
-// #define RCC_GPIOD_clk (RCC->APB2ENR & 0x00000020)
-// #define RCC_GPIOD_clkEnable RCC->APB2ENR |= 0x00000020
-// #define RCC_GPIOD_clkDisable RCC->APB2ENR &= ~0x00000020
+#define RCC_GPIOD_clk (RCC->APB2ENR & 0x00000020)
+#define RCC_GPIOD_clkEnable RCC->APB2ENR |= 0x00000020
+#define RCC_GPIOD_clkDisable RCC->APB2ENR &= ~0x00000020
 
 #define RCC_AFIO_CLK (RCC->APB2ENR & 0x00000001)
 #define RCC_AFIO_CLKEN RCC->APB2ENR |= 0x00000001

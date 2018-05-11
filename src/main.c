@@ -14,7 +14,8 @@
 #include "hard.h"
 
 // #include "GTK_Hard.h"
-// #include "timer.h"
+#include "timer.h"
+#include "gpio.h"
 // #include "uart.h"
 // #include "pwm.h"
 // #include "adc.h"
@@ -36,12 +37,14 @@ volatile unsigned short timeRun = TIME_RUN_DEF;
 volatile unsigned char flagMuestreo = 0;
 volatile unsigned char take_current_samples = 0;
 
-//--- Externals para armar se�ales y comprobar el TIM5 en el inicio del programa
+//--- Externals para armar seniales y comprobar el TIM5 en el inicio del programa
 volatile unsigned int session_warming_up_channel_1_stage_time = 0;
 
 //--- Externals para el BUZZER
 unsigned short buzzer_timeout = 0;
 
+//--- Externals de los timers
+volatile unsigned short wait_ms_var;
 
 // //Estructuras.
 // session_typedef session_slot_aux;
@@ -73,45 +76,72 @@ unsigned char channel_4_pause = 0;
 
 /* Globals ------------------------------------------------------------------*/
 
-// void SystemInit (void);		//dumb function en otro momento inicializaba clock aca
+
+//--- FUNCIONES DEL MODULO ---//
+void TimingDelay_Decrement(void);
+
 
 int main (void)
 {
-
-	unsigned long ii = 0;
+    unsigned char i = 0;
+    unsigned long ii = 0;
 // 	unsigned char counter_keep_alive = 0;
 // 	//Configuracion de clock.
-	// RCC_Config ();
+    // RCC_Config ();
 
-// 	//Configuracion led. & Enabled Channels
-	Led_Config();
-
-        L_ZONA_ON;
-        L_ALARMA_ON;
-        L_SERV_ON;
-        L_NETLIGHT_ON;
-        L_WIFI_ON;
-
-        while (1)
+    //Configuracion systick    
+    if (SysTick_Config(72000))
+    {
+        while (1)	/* Capture error */
         {
-            for (ii = 0; ii < 0x1FFFF; ii++)
-            {
-                L_ZONA_ON;
-                L_ALARMA_ON;
-                L_SERV_ON;
-                L_NETLIGHT_ON;
-                L_WIFI_ON;
-            }
-
-            for (ii = 0; ii < 0xFFFF; ii++)
-            {
+            if (L_ZONA)
                 L_ZONA_OFF;
-                L_ALARMA_OFF;
-                L_SERV_OFF;
-                L_NETLIGHT_OFF;
-                L_WIFI_OFF;
+            else
+                L_ZONA_ON;
+
+            for (i = 0; i < 255; i++)
+            {
+                asm (	"nop \n\t"
+                        "nop \n\t"
+                        "nop \n\t" );
             }
         }
+    }
+        
+
+// 	//Configuracion led. & Enabled Channels
+    Led_Config();
+
+    //enciendo TIM7
+    TIM7_Init();
+
+    L_ZONA_ON;
+    L_ALARMA_ON;
+    L_SERV_ON;
+    L_NETLIGHT_ON;
+    // L_WIFI_ON;
+
+    while (1)
+    {
+        if (L_ZONA)
+        {
+            L_ZONA_OFF;
+            L_ALARMA_OFF;
+            L_SERV_OFF;
+            L_NETLIGHT_OFF;
+            // L_WIFI_OFF;
+        }
+        else
+        {
+            L_ZONA_ON;
+            L_ALARMA_ON;
+            L_SERV_ON;
+            L_NETLIGHT_ON;
+            // L_WIFI_ON;
+        }
+
+        Wait_ms(20);
+    }
         
 
         
@@ -264,8 +294,27 @@ int main (void)
 // 	}
 }
 
-//Dumb Function for compativility
-// void SystemInit (void)
-// {
+//--- End of Main ---//
 
-// }
+
+void TimingDelay_Decrement(void)
+{
+    if (wait_ms_var)
+        wait_ms_var--;
+
+    // if (timer_standby)
+    //     timer_standby--;
+
+    // if (timer_filters)
+    //     timer_filters--;
+    
+    // if (timer_led)
+    //     timer_led--;
+
+    // if (timer_led_pwm < 0xFFFF)
+    //     timer_led_pwm ++;
+    
+}
+
+//--- end of file ---//
+

@@ -1,76 +1,76 @@
-#include <stm32f10x.h>
-// #include <stm32f10x_gpio.h>
-#include <stm32f10x_rcc.h>
+//---------------------------------------------
+// ##
+// ## @Author: Med
+// ## @Editor: Emacs - ggtags
+// ## @TAGS:   Global
+// ## @CPU:    STM32F103
+// ##
+// #### GPIO.C ################################
+//---------------------------------------------
 
+/* Includes ------------------------------------------------------------------*/
+#include "stm32f10x.h"
 #include "hard.h"
-// #include "timer.h"
-#include "stm32f10x_flash.h"
-
-#include "stm32f10x_conf.h"
 
 
-//--- Module Externals ---------------
-#ifdef SOFTWARE_VERSION_1_2
-extern unsigned short buzzer_timeout;
-#endif
+/* Externals ------------------------------------------------------------------*/
 
-//--- Module Globals ---------------
-#ifdef SOFTWARE_VERSION_1_2
-tBuzzer buzzer_state = BUZZER_INIT;
-unsigned char buzz_multiple = 0;
-#endif
 
+/* Globals ------------------------------------------------------------------*/
+
+
+/* Module Functions -----------------------------------------------------------*/
 
 //************************************************************************************//
-void RCC_Config (void){
+// void RCC_Config (void){
 
-	//Configuracion clock.
-	RCC_DeInit();
+// 	//Configuracion clock.
+// 	RCC_DeInit();
 
-	//---- HSEON ----//
-	RCC_HSEConfig(RCC_HSE_ON);
-	while (!RCC_WaitForHSEStartUp());
+// 	//---- HSEON ----//
+// 	RCC_HSEConfig(RCC_HSE_ON);
+// 	while (!RCC_WaitForHSEStartUp());
 
-	// First set the flash latency to work with our clock
-	//	000 Zero wait state, if 0  MHz < SYSCLK <= 24 MHz
-	//	001 One wait state, if  24 MHz < SYSCLK <= 48 MHz
-	//	010 Two wait states, if 48 MHz < SYSCLK <= 72 MHz
+// 	// First set the flash latency to work with our clock
+// 	//	000 Zero wait state, if 0  MHz < SYSCLK <= 24 MHz
+// 	//	001 One wait state, if  24 MHz < SYSCLK <= 48 MHz
+// 	//	010 Two wait states, if 48 MHz < SYSCLK <= 72 MHz
 
-#ifdef sysFREC48
-	  FLASH_SetLatency(FLASH_Latency_1);
-	  RCC_PLLConfig(RCC_PLLSource_HSE_Div1, RCC_PLLMul_6);
-#endif
-#ifdef sysFREC72_XTAL_8
-   FLASH_SetLatency(FLASH_Latency_2);
-   RCC_PLLConfig(RCC_PLLSource_HSE_Div1, RCC_PLLMul_9);
-   //RCC_PLLConfig(RCC_PLLSource_HSE_Div1, RCC_PLLMul_6);
-#endif
-#ifdef sysFREC72_XTAL_12
-   FLASH_SetLatency(FLASH_Latency_2);
-   //RCC_PLLConfig(RCC_PLLSource_HSE_Div1, RCC_PLLMul_9);
-   RCC_PLLConfig(RCC_PLLSource_HSE_Div1, RCC_PLLMul_6);
-#endif
+// #ifdef sysFREC48
+// 	  FLASH_SetLatency(FLASH_Latency_1);
+// 	  RCC_PLLConfig(RCC_PLLSource_HSE_Div1, RCC_PLLMul_6);
+// #endif
+// #ifdef sysFREC72_XTAL_8
+//    FLASH_SetLatency(FLASH_Latency_2);
+//    RCC_PLLConfig(RCC_PLLSource_HSE_Div1, RCC_PLLMul_9);
+//    //RCC_PLLConfig(RCC_PLLSource_HSE_Div1, RCC_PLLMul_6);
+// #endif
+// #ifdef sysFREC72_XTAL_12
+//    FLASH_SetLatency(FLASH_Latency_2);
+//    //RCC_PLLConfig(RCC_PLLSource_HSE_Div1, RCC_PLLMul_9);
+//    RCC_PLLConfig(RCC_PLLSource_HSE_Div1, RCC_PLLMul_6);
+// #endif
 
-   	RCC_PLLCmd(ENABLE);
+//    	RCC_PLLCmd(ENABLE);
 
-	while (RCC_GetFlagStatus(RCC_FLAG_PLLRDY) == RESET);
+// 	while (RCC_GetFlagStatus(RCC_FLAG_PLLRDY) == RESET);
 
-	RCC_SYSCLKConfig(RCC_SYSCLKSource_PLLCLK);
-	while (RCC_GetSYSCLKSource() != 0x08);
+// 	RCC_SYSCLKConfig(RCC_SYSCLKSource_PLLCLK);
+// 	while (RCC_GetSYSCLKSource() != 0x08);
 
-	//CLK AHB. Max 72MHz.
-	RCC_HCLKConfig(RCC_SYSCLK_Div1);
+// 	//CLK AHB. Max 72MHz.
+// 	RCC_HCLKConfig(RCC_SYSCLK_Div1);
 
-	//CLK APB1. Max 36MHZ.
-	RCC_PCLK1Config(RCC_HCLK_Div2);
+// 	//CLK APB1. Max 36MHZ.
+// 	RCC_PCLK1Config(RCC_HCLK_Div2);
 
-	//CLK APB2 Max 72MHz.
-	//RCC_PCLK2Config(RCC_HCLK_Div2);
-	RCC_PCLK2Config(RCC_HCLK_Div1);
+// 	//CLK APB2 Max 72MHz.
+// 	//RCC_PCLK2Config(RCC_HCLK_Div2);
+// 	RCC_PCLK2Config(RCC_HCLK_Div1);
 
-	//NVIC_PriorityGroupConfig(NVIC_PriorityGroup_4);
-	//NVIC_SetPriority(SysTick_IRQn, 0);
-}
+// 	//NVIC_PriorityGroupConfig(NVIC_PriorityGroup_4);
+// 	//NVIC_SetPriority(SysTick_IRQn, 0);
+// }
 
 //--- Tamper config ---//
 void Tamper_Config(void)
@@ -198,116 +198,3 @@ void Led3Toggle(void)
 }
 */
 
-#ifdef SOFTWARE_VERSION_1_2
-void BuzzerCommands(unsigned char command, unsigned char multiple)
-{
-    buzzer_state = command;
-    buzz_multiple = multiple;
-}
-
-void UpdateBuzzer (void)
-{
-    switch (buzzer_state)
-    {
-        case BUZZER_INIT:
-            break;
-
-        case BUZZER_MULTIPLE_SHORT:
-            if (buzz_multiple > 0)
-            {
-                BUZZER_ON;
-                buzzer_state++;
-                buzzer_timeout = TIM_BIP_SHORT;
-            }
-            else
-                buzzer_state = BUZZER_TO_STOP;
-            break;
-
-        case BUZZER_MULTIPLE_SHORTA:
-            if (!buzzer_timeout)
-            {
-                buzzer_state++;
-                BUZZER_OFF;
-                buzzer_timeout = TIM_BIP_SHORT_WAIT;
-            }
-            break;
-
-        case BUZZER_MULTIPLE_SHORTB:
-            if (!buzzer_timeout)
-            {
-                if (buzz_multiple)
-                    buzz_multiple--;
-
-                buzzer_state = BUZZER_MULTIPLE_SHORT;
-            }
-            break;
-
-        case BUZZER_MULTIPLE_HALF:
-            if (buzz_multiple > 0)
-            {
-                BUZZER_ON;
-                buzzer_state++;
-                buzzer_timeout = TIM_BIP_HALF;
-            }
-            else
-                buzzer_state = BUZZER_TO_STOP;
-            break;
-
-        case BUZZER_MULTIPLE_HALFA:
-            if (!buzzer_timeout)
-            {
-                buzzer_state++;
-                BUZZER_OFF;
-                buzzer_timeout = TIM_BIP_HALF_WAIT;
-            }
-            break;
-
-        case BUZZER_MULTIPLE_HALFB:
-            if (!buzzer_timeout)
-            {
-                if (buzz_multiple)
-                    buzz_multiple--;
-
-                buzzer_state = BUZZER_MULTIPLE_HALF;
-            }
-            break;
-
-        case BUZZER_MULTIPLE_LONG:
-            if (buzz_multiple > 0)
-            {
-                BUZZER_ON;
-                buzzer_state++;
-                buzzer_timeout = TIM_BIP_LONG;
-            }
-            else
-                buzzer_state = BUZZER_TO_STOP;
-            break;
-
-        case BUZZER_MULTIPLE_LONGA:
-            if (!buzzer_timeout)
-            {
-                buzzer_state++;
-                BUZZER_OFF;
-                buzzer_timeout = TIM_BIP_LONG_WAIT;
-            }
-            break;
-
-        case BUZZER_MULTIPLE_LONGB:
-            if (!buzzer_timeout)
-            {
-                if (buzz_multiple)
-                    buzz_multiple--;
-
-                buzzer_state = BUZZER_MULTIPLE_LONG;
-            }
-            break;
-
-        case BUZZER_TO_STOP:
-        default:
-            BUZZER_OFF;
-            buzzer_state = BUZZER_INIT;
-            break;
-    }
-}
-
-#endif
