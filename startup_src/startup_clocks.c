@@ -125,6 +125,12 @@ void SystemInit (void)
     //me aseguro que el PLL este deshabilitado
     RCC->CR &= ~RCC_CR_PLLON;
 
+    //ajuste fino del clk HSI (internal RC)
+    //en RCC->CR; HSITRIM[7:3] user trim value, HSICAL[15:8] es factiry default (read only)
+    //todo a 0 aumenta baja freq (mas chico menos freq)
+    RCC->CR &= ~RCC_CR_HSITRIM;
+    RCC->CR |= 0x000000F8;
+    
     /* Enable Prefetch Buffer */
     FLASH->ACR |= FLASH_ACR_PRFTBE;
 
