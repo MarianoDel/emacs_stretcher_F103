@@ -26,7 +26,13 @@
 
 
 /* Externals ------------------------------------------------------------------*/
-//--- Externals para enviar errores en UART
+//--- Externals para avisar data ready en usart
+volatile unsigned char usart1_have_data;
+volatile unsigned char usart2_have_data;
+volatile unsigned char usart3_have_data;
+volatile unsigned char usart4_have_data;
+volatile unsigned char usart5_have_data;
+
 char buffSendErr[64];
 
 //--- Externals para enviar keepalive por UART
@@ -121,6 +127,9 @@ int main (void)
     L_NETLIGHT_ON;
     // L_WIFI_ON;
 
+    //enciendo usart3
+    Usart3Config();
+
     while (1)
     {
         if (L_ZONA)
@@ -140,7 +149,9 @@ int main (void)
             // L_WIFI_ON;
         }
 
-        Wait_ms(20);
+        Usart3Send("HOLA!!!\n");
+
+        Wait_ms(2000);
     }
         
 

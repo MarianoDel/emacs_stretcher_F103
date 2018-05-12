@@ -126,8 +126,8 @@ void SystemInit (void)
     RCC->CR &= ~RCC_CR_PLLON;
 
     //ajuste fino del clk HSI (internal RC)
-    //en RCC->CR; HSITRIM[7:3] user trim value, HSICAL[15:8] es factiry default (read only)
-    //todo a 0 aumenta baja freq (mas chico menos freq)
+    //en RCC->CR; HSITRIM[7:3] user trim value, HSICAL[15:8] es factoy default (read only)
+    //todo a 0 baja freq (mas chico menos freq)
     RCC->CR &= ~RCC_CR_HSITRIM;
     RCC->CR |= 0x000000F8;
     

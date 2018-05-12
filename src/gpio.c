@@ -156,10 +156,11 @@ void Led_Config(void)
 	temp |= 0x22200000;
 	GPIOB->CRL = temp;
 
-        //--- Configuro los leds en PB8 - PB9 ---//        
+        //--- Configuro los leds en PB8 - PB9 ---//
+        //PB10 y PB11 alternative
 	temp = GPIOB->CRH;
-	temp &= 0xFFFFFF00;
-	temp |= 0x00000022;
+	temp &= 0xFFFF0000;
+	temp |= 0x0000AA22;
 	GPIOB->CRH = temp;
 
 }
