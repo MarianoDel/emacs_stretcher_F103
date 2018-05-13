@@ -11,6 +11,7 @@
 /* Includes ------------------------------------------------------------------*/
 #include "usart.h"
 #include "stm32f10x.h"
+#include "hard.h"
   
 #include <stdio.h>
 #include <string.h>
@@ -418,17 +419,17 @@ void USART3_IRQHandler (void)
     {
         dummy = USART3->DR & 0x0FF;
 
+        // if (L_SERV)
+        //     L_SERV_OFF;
+        // else
+        //     L_SERV_ON;
+        
         if (prx3 < &rx3buff[SIZEOF_RXDATA - 1])
         {
             if ((dummy == '\n') || (dummy == '\r') || (dummy == 26))		//26 es CTRL-Z
             {
                 *prx3 = '\0';
                 usart3_have_data = 1;
-                // if (LED)
-                // 	LED_OFF;
-                // else
-                // 	LED_ON;
-
             }
             else
             {
@@ -443,6 +444,11 @@ void USART3_IRQHandler (void)
     /* USART in Transmit mode -------------------------------------------------*/
     if (USART3->CR1 & USART_CR1_TXEIE)
     {
+        // if (L_SERV)
+        //     L_SERV_OFF;
+        // else
+        //     L_SERV_ON;
+
         if (USART3->SR & USART_SR_TXE)
         {
             if ((ptx3 < &tx3buff[SIZEOF_TXDATA]) && (ptx3 < ptx3_pckt_index))

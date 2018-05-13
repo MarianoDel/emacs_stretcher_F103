@@ -10,6 +10,7 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include "stm32f10x.h"
+#include "gpio.h"
 #include "hard.h"
 
 
@@ -126,42 +127,44 @@ void Tamper_Config(void)
 void Led_Config(void)
 {
 
-	unsigned long temp;
+    unsigned long temp;
 
-	//--- GPIOB & GPIOC ---//
-	//--- Clock ---//
-	if (!RCC_GPIOB_clk)
-		RCC_GPIOB_clkEnable;
+    //--- GPIOB & GPIOC ---//
+    //--- Clock ---//
+    if (!RCC_GPIOB_CLK)
+        RCC_GPIOB_CLKEN;
 
-	if (!RCC_GPIOC_clk)
-		RCC_GPIOC_clkEnable;
+    if (!RCC_GPIOC_CLK)
+        RCC_GPIOC_CLKEN;
 
-	//--- Config pines ---//
-	//--- GPIOC pin 0 ---//
-	//--- GPIOC pin 1 ---//
-	temp = GPIOC->CRL;
-	temp &= 0xFFFFFF00;
-	temp |= 0x00000022;
-	GPIOC->CRL = temp;
+    //--- Config pines ---//
+    //--- GPIOC pin 0 ---//
+    //--- GPIOC pin 1 ---//
+    temp = GPIOC->CRL;
+    temp &= 0xFFFFFF00;
+    temp |= 0x00000022;
+    GPIOC->CRL = temp;
 
-	//--- GPIOC pin 13 ---//
-	temp = GPIOC->CRH;
-	temp &= 0xFF0FFFFF;
-	temp |= 0x00200000;
-	GPIOC->CRH = temp;
+    //--- GPIOC pin 13 ---//
+    temp = GPIOC->CRH;
+    temp &= 0xFF0FFFFF;
+    temp |= 0x00200000;
+    GPIOC->CRH = temp;
 
-        //--- Configuro los leds en PB5 - PB7 ---//
-        temp = GPIOB->CRL;
-	temp &= 0x000FFFFF;
-	temp |= 0x22200000;
-	GPIOB->CRL = temp;
+    //--- Configuro los leds en PB5 - PB7 ---//
+    temp = GPIOB->CRL;
+    temp &= 0x000FFFFF;
+    temp |= 0x22200000;
+    GPIOB->CRL = temp;
 
-        //--- Configuro los leds en PB8 - PB9 ---//
-        //PB10 y PB11 alternative
-	temp = GPIOB->CRH;
-	temp &= 0xFFFF0000;
-	temp |= 0x0000AA22;
-	GPIOB->CRH = temp;
+    //--- Configuro los leds en PB8 - PB9 ---//
+    //PB10 y PB11 alternative
+    temp = GPIOB->CRH;
+    temp &= 0xFFFF0000;
+    // temp |= 0x0000AA22;    //con PB10 USART3_TX y PB11 USART3_RX
+    temp |= 0x00008A22;    //con PB10 USART3_TX y PB11 input pdwn para USART3_RX    
+    // temp |= 0x00002022;    // PB11 prueba salida USART3_RX
+    GPIOB->CRH = temp;
 
 }
 

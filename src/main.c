@@ -91,6 +91,7 @@ int main (void)
 {
     unsigned char i = 0;
     unsigned long ii = 0;
+    char local_buff [64];
 // 	unsigned char counter_keep_alive = 0;
 // 	//Configuracion de clock.
     // RCC_Config ();
@@ -121,40 +122,69 @@ int main (void)
     //enciendo TIM7
     TIM7_Init();
 
-    L_ZONA_ON;
-    L_ALARMA_ON;
-    L_SERV_ON;
-    L_NETLIGHT_ON;
+    // L_ZONA_ON;
+    // L_ALARMA_ON;
+    // L_SERV_ON;
+    // L_NETLIGHT_ON;
     // L_WIFI_ON;
 
     //enciendo usart3
     Usart3Config();
 
+    //---- Prueba Leds ----------
+    // while (1)
+    // {
+    //     if (L_ZONA)
+    //     {
+    //         // RX_PIN_ON;
+    //         L_ZONA_OFF;
+    //         L_ALARMA_OFF;
+    //         L_SERV_OFF;
+    //         L_NETLIGHT_OFF;
+    //         // L_WIFI_OFF;
+    //     }
+    //     else
+    //     {
+    //         // RX_PIN_OFF;
+    //         L_ZONA_ON;
+    //         L_ALARMA_ON;
+    //         L_SERV_ON;
+    //         L_NETLIGHT_ON;
+    //         // L_WIFI_ON;
+    //     }
+
+
+
+    //     Wait_ms(2000);
+    // }
+    //---- Fin Prueba Leds ----------
+
+    //---- Prueba Usart3 ----------
     while (1)
     {
-        if (L_ZONA)
-        {
-            L_ZONA_OFF;
-            L_ALARMA_OFF;
-            L_SERV_OFF;
-            L_NETLIGHT_OFF;
-            // L_WIFI_OFF;
-        }
-        else
-        {
-            L_ZONA_ON;
-            L_ALARMA_ON;
-            L_SERV_ON;
-            L_NETLIGHT_ON;
-            // L_WIFI_ON;
-        }
-
+        // Wait_ms(2000);
+        L_ALARMA_OFF;
         Usart3Send("HOLA!!!\n");
+        Wait_ms(100);
 
-        Wait_ms(2000);
+        if (usart3_have_data)
+        {
+            usart3_have_data = 0;
+            L_ALARMA_ON;
+            ReadUsart3Buffer(local_buff, 64);
+            if (strcmp((const char *) "HOLA!!!", local_buff) == 0)
+                L_ZONA_ON;
+            else
+                L_ZONA_OFF;
+
+            Wait_ms(100);
+            L_ALARMA_OFF;
+            L_ZONA_OFF;
+            Wait_ms(1900);
+        }
     }
-        
-
+    //---- Fin Prueba Usart3 ----------
+            
         
 
 // 	//Timer 1ms -- Wait_ms()
