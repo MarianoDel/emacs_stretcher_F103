@@ -23,7 +23,8 @@
 //reduciria el codigo generado por el compilador
 
 //---- Common Defines --------------------
-#define USART_PCKL1_9600        0x0EA6
+// #define USART_PCKL1_9600        0x0EA6    //con xtal
+#define USART_PCKL1_9600        0x0DD3    //con rc interno da 9060, corrijo
 #define USART_PCKL2_9600        0x1D4C
 
 #define USART1_9600        USART_PCKL2_9600

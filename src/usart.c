@@ -63,7 +63,7 @@ volatile unsigned char tx5buff[SIZEOF_TXDATA];
 volatile unsigned char rx5buff[SIZEOF_RXDATA];
 
 
-
+volatile unsigned short dummy = 0;
 
 
 /* Module Exported Functions -----------------------------------------------------------*/
@@ -412,20 +412,17 @@ unsigned char ReadUsart3Buffer (unsigned char * bout, unsigned short max_len)
 
 void USART3_IRQHandler (void)
 {
-    unsigned char dummy;
+    // unsigned short dummy;
 
     /* USART in Receive mode --------------------------------------------------*/
     if (USART3->SR & USART_SR_RXNE)
     {
-        dummy = USART3->DR & 0x0FF;
+        dummy = (unsigned short) USART3->DR & 0x01FF;
 
-        // if (L_SERV)
-        //     L_SERV_OFF;
-        // else
-        //     L_SERV_ON;
-        
         if (prx3 < &rx3buff[SIZEOF_RXDATA - 1])
         {
+            // USART3->DR = (unsigned char) dummy;    //para debug
+
             if ((dummy == '\n') || (dummy == '\r') || (dummy == 26))		//26 es CTRL-Z
             {
                 *prx3 = '\0';

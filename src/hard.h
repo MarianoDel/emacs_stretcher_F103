@@ -19,9 +19,9 @@
 #define HARDWARE_VERSION_2_1
 // #define HARDWARE_VERSION_2_0
 //--- Software ------------------//
-#define SOFTWARE_VERSION_1_2		//Agrega buzzer en la placa
-// #define SOFTWARE_VERSION_1_1			//Agrega posibilidad de usar antenas harcodeadas
-//#define SOFTWARE_VERSION_1_0
+// #define SOFTWARE_VERSION_1_2		
+// #define SOFTWARE_VERSION_1_1	     //habla contra pc o rpi con nuevo protocolo camilla
+#define SOFTWARE_VERSION_1_0        //habla contra rpi con programa magneto y traduce a micros potencia
 
 //-------- Type of Program (depending on software version) ----------------
 // #define POWER_WITH_MANAGEMENT
@@ -78,6 +78,13 @@
 
 
 
+//--- Exported constants ---//
+typedef enum {
+	resp_ok = 0,
+	resp_not_own,
+	resp_error
+
+} resp_t;
 
 enum resultados
 {

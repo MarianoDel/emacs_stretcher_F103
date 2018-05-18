@@ -111,6 +111,8 @@ void Tamper_Config(void)
 //	MODEx 11 Output 50MHz
 //
 //	Input Mode
+//      las funciones alternativas de los pines estan directamente conectadad al
+//      periferico en el modo input
 //      CNFx 00 Analog
 //      CNFx 01 Floating (reset)
 //      CNFx 10 Input (pull up / dwn)

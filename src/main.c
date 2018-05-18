@@ -16,7 +16,8 @@
 // #include "GTK_Hard.h"
 #include "timer.h"
 #include "gpio.h"
-// #include "uart.h"
+#include "comms_from_rasp.h"
+#include "usart.h"
 // #include "pwm.h"
 // #include "adc.h"
 // #include "GTK_Estructura.h"
@@ -160,31 +161,69 @@ int main (void)
     //---- Fin Prueba Leds ----------
 
     //---- Prueba Usart3 ----------
+    // while (1)
+    // {
+    //     // Wait_ms(2000);
+    //     L_ALARMA_OFF;
+    //     Usart3Send("HOLA!!!\n");
+    //     Wait_ms(100);
+
+    //     if (usart3_have_data)
+    //     {
+    //         usart3_have_data = 0;
+    //         L_ALARMA_ON;
+    //         ReadUsart3Buffer(local_buff, 64);
+    //         if (strcmp((const char *) "HOLA!!!", local_buff) == 0)
+    //             L_ZONA_ON;
+    //         else
+    //             L_ZONA_OFF;
+
+    //         Wait_ms(100);
+    //         L_ALARMA_OFF;
+    //         L_ZONA_OFF;
+    //         Wait_ms(1900);
+    //     }
+    // }
+    //---- Fin Prueba Usart3 ----------
+
+    //---- Prueba Usart3 Contra PC ----------
     while (1)
     {
-        // Wait_ms(2000);
-        L_ALARMA_OFF;
-        Usart3Send("HOLA!!!\n");
-        Wait_ms(100);
-
-        if (usart3_have_data)
-        {
-            usart3_have_data = 0;
-            L_ALARMA_ON;
-            ReadUsart3Buffer(local_buff, 64);
-            if (strcmp((const char *) "HOLA!!!", local_buff) == 0)
-                L_ZONA_ON;
-            else
-                L_ZONA_OFF;
-
-            Wait_ms(100);
-            L_ALARMA_OFF;
-            L_ZONA_OFF;
-            Wait_ms(1900);
-        }
+        UpdateRaspberryMessages();
     }
-    //---- Fin Prueba Usart3 ----------
-            
+    //---- Fin Prueba Usart3 loop en terminal ----------
+
+    //---- Prueba Usart3 loop en terminal ----------
+    // while (1)
+    // {
+    //     if (usart3_have_data)
+    //     {
+    //         usart3_have_data = 0;
+    //         L_ALARMA_ON;
+    //         ReadUsart3Buffer(local_buff, 64);
+    //         Wait_ms(1000);
+    //         i = strlen(local_buff);
+    //         if (i < 62)
+    //         {
+    //             local_buff[i] = '\n';
+    //             local_buff[i+1] = '\0';
+    //             Usart3Send(local_buff);
+    //         }
+    //         L_ALARMA_OFF;
+    //     }
+    // }
+    //---- Fin Prueba Usart3 loop en terminal ----------
+
+    //---- Prueba Usart3 envia caracter solo 'd' ----------
+    // while (1)
+    // {
+    //     unsigned char snd = 'd';
+    //     Usart3SendUnsigned(&snd, 1);
+    //     // USART3->DR = 'd';
+    //     Wait_ms(100);
+    // }
+    //---- Fin Prueba Usart3 envia caracter solo 'd' ----------
+    
         
 
 // 	//Timer 1ms -- Wait_ms()

@@ -75,6 +75,8 @@ SRC += ./src/timer.c
 # SRC += ./src/pwm.c
 # SRC += ./src/flash_program.c
 # SRC += ./src/adc.c
+SRC += ./src/comms_from_rasp.c
+SRC += ./src/treatment_signals.c
 
 ## Core Support
 SRC += ./startup_src/syscalls.c
