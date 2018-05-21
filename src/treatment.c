@@ -6,11 +6,11 @@
 // ## @TAGS:   Global
 // ## @CPU:    STM32F103
 // ##
-// #### TREATMENT_SIGNALS.C ###############################
+// #### TREATMENT.C ###############################
 //---------------------------------------------------------
 
 /* Includes ------------------------------------------------------------------*/
-#include "treatment_signals.h"
+#include "treatment.h"
 
 #include <string.h>
 #include <stdlib.h>
@@ -164,6 +164,7 @@ void TreatmentGetAllConf (char * tosend)
     sprintf(buf, "time in s: %d\n", treatment_conf.treatment_time);
     strcat(tosend, buf);
 }
+
 resp_t TreatmentTranslateOldMsg (char * msg)
 {
     resp_t resp = resp_error;
@@ -243,7 +244,7 @@ resp_t TreatmentTranslateOldMsg (char * msg)
     return resp_ok;
 }
 
-//verifica que se cumplan con todos los parametros para poder enviar una señal coherente
+//verifica que se cumplan con todos los parametros para poder enviar una senial coherente
 resp_t TreatmentAssertParams (void)
 {
     resp_t resp = resp_error;

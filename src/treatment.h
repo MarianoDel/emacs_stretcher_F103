@@ -6,12 +6,12 @@
 // ## @TAGS:   Global
 // ## @CPU:    STM32F103
 // ##
-// #### TREATMENT_SIGNALS.H ############################################
+// #### TREATMENT.H ############################################
 //---------------------------------------------------------
 
 /* Define to prevent recursive inclusion -------------------------------------*/
-#ifndef __TREATMENT_SIGNALS_H_
-#define __TREATMENT_SIGNALS_H_
+#ifndef __TREATMENT_H_
+#define __TREATMENT_H_
 #include "hard.h"		//para respuestas
 
 

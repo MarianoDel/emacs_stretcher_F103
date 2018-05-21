@@ -93,6 +93,7 @@ int main (void)
     unsigned char i = 0;
     unsigned long ii = 0;
     char local_buff [64];
+    treatment_t main_state = TREATMENT_STANDBY;
 // 	unsigned char counter_keep_alive = 0;
 // 	//Configuracion de clock.
     // RCC_Config ();
@@ -223,7 +224,97 @@ int main (void)
     //     Wait_ms(100);
     // }
     //---- Fin Prueba Usart3 envia caracter solo 'd' ----------
-    
+
+    //---- Programa Principal ----------
+    while (1)
+    {
+        switch (main_state)
+        {
+            case TREATMENT_STANDBY:
+
+                if (comms_messages & COMM_CONF_CHANGE)
+                {
+                    PowerSendConf();
+                    comms_messages &= ~COMM_CONF_CHANGE;
+                }
+
+                if (comms_messages & COMM_START_TREAT)
+                {
+                    //me piden por el puerto que arranque el tratamiento
+                    if (TreatmentAssertParams() == resp_error)
+                    {
+                        RPI_Send("ERROR\r\n");
+                        comms_messages &= ~COMM_START_TREAT;
+                    }
+                    else
+                    {
+                        PowerSendStart();
+                        main_state = TREATMENT_STARTING;                        
+                    }
+                }
+                break;
+
+            case TREATMENT_STARTING:
+                secs_end_treatment = TreatmentGetTime();
+                secs_in_treatment = 0;
+                secs_elapsed_up_to_now = 0;
+                main_state = TREATMENT_RUNNING;
+                break;
+
+            case TREATMENT_RUNNING:
+
+                if (comms_messages & COMM_PAUSE_TREAT)
+                {
+                    comms_messages &= ~COMM_PAUSE_TREAT;
+                    PowerSendStop();
+                    main_state = TREATMENT_PAUSED;
+                    secs_elapsed_up_to_now = secs_in_treatment;
+                }
+
+                if ((comms_messages & COMM_STOP_TREAT) ||
+                    (secs_in_treatment >= secs_end_treatment))
+                {
+                    //termine el tratamiento
+                    comms_messages &= ~COMM_STOP_TREAT;                 
+                    PowerSendStop();
+                    main_state = TREATMENT_STOPPING;
+                }
+                break;
+
+            case TREATMENT_PAUSED:
+
+                if (comms_messages & COMM_START_TREAT)
+                {
+                    comms_messages &= ~COMM_START_TREAT;
+                    secs_in_treatment = secs_elapsed_up_to_now;
+                    PowerSendStart();
+                    main_state = TREATMENT_RUNNING;
+                }
+
+                if (comms_messages & COMM_STOP_TREAT)
+                {
+                    //estaba en pausa y me mandaron stop
+                    comms_messages &= ~COMM_STOP_TREAT;                 
+                    PowerSendStop();
+                    main_state = TREATMENT_STOPPING;
+                }                
+                break;
+                
+            case TREATMENT_STOPPING:
+                main_state = TREATMENT_STANDBY;
+                break;
+
+            default:
+                main_state = TREATMENT_STANDBY;
+                break;
+        }            
+
+        
+        //reviso comunicacion con raspberry
+        UpdateRaspberryMessages();
+    }
+    //---- Fin Programa Pricipal ----------
+
         
 
 // 	//Timer 1ms -- Wait_ms()
