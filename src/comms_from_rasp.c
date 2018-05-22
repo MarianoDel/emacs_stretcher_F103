@@ -14,15 +14,15 @@
 
 #include "comms_from_rasp.h"
 #include "usart.h"
-#include "treatment_signals.h"
+#include "treatment.h"
 
 #include <string.h>
 
 
-#define RPI_Send(X)    Usart3Send(X)
 
 /* Externals ------------------------------------------------------------------*/
 extern volatile unsigned char usart3_have_data;
+extern unsigned short comms_messages;
 
 
 
@@ -47,7 +47,6 @@ void UpdateRaspberryMessages (void)
         L_ALARMA_OFF;
     }
 }
-
 
 
 static void RaspBerry_Messages (char * msg)
@@ -81,144 +80,6 @@ static void RaspBerry_Messages (char * msg)
         }
     }
 
-//     else if (!strncmp(msg, (const char *)"get_antenna_con,", (sizeof("get_antenna_con,") - 1)))
-//     {
-//         //0 si no tengo, 1 si esta 1, 2 si est 2 "ant_con,0,2,0,0\r\n"
-//         /*
-//           sprintf((const char *)&buffUART1rx2[0], "ant_con,0,2,0,0\r\n",
-//           antenna.resistance_int,
-//           antenna.resistance_dec,
-//           antenna.inductance_int,
-//           antenna.inductance_dec,
-//           antenna.current_limit_int,
-//           antenna.current_limit_dec,
-//           antenna.temp_max_int,
-//           antenna.temp_max_dec);
-//           UART_PC_Send(buffUART1rx2);
-//           buffUART1rx2[0] = '\0';
-//         */
-//         UART_PC_Send((char *) "ant_con,0,2,0,0\r\n");
-//         buffUART1rx2[0] = '\0';
-//     }
-
-//     else if (!strncmp(msg, (const char *)"get_antenna,", (sizeof("get_antenna,") - 1)))
-//     {
-//         //--- Get antenna parameters ---//
-//         Session_Get_Antenna (&session_ch_1, 1, &antenna);
-//         //strcpy((const char *)&buffUART1rx2[0], (const char *)"ant0,");
-//         //sprintf((const char *)&buffUART1rx2[0], "ant0,%03d.%02d,%03d.%02d,%03d.%02d,%03d.%02d,1\r\n",
-//         sprintf((char *)&buffUART1rx2[0], "ant0,%03d.%02d,%03d.%02d,%03d.%02d,%03d.%02d,1\r\n",
-//                 antenna.resistance_int,
-//                 antenna.resistance_dec,
-//                 antenna.inductance_int,
-//                 antenna.inductance_dec,
-//                 antenna.current_limit_int,
-//                 antenna.current_limit_dec,
-//                 antenna.temp_max_int,
-//                 antenna.temp_max_dec);
-
-//         //UART_PC_Send((const char *) buffUART1rx2);
-//         UART_PC_Send((char *) buffUART1rx2);
-//         buffUART1rx2[0] = '\0';
-
-//         Session_Get_Antenna (&session_ch_2, 1, &antenna);
-//         //strcpy((const char *)&buffUART1rx2[0], (const char *)"ant0,");
-//         sprintf((char *)&buffUART1rx2[0], "ant0,%03d.%02d,%03d.%02d,%03d.%02d,%03d.%02d,2\r\n",
-//                 antenna.resistance_int,
-//                 antenna.resistance_dec,
-//                 antenna.inductance_int,
-//                 antenna.inductance_dec,
-//                 antenna.current_limit_int,
-//                 antenna.current_limit_dec,
-//                 antenna.temp_max_int,
-//                 antenna.temp_max_dec);
-
-//         //UART_PC_Send((const char *) buffUART1rx2);
-//         UART_PC_Send((char *) buffUART1rx2);
-//         buffUART1rx2[0] = '\0';
-
-//         Session_Get_Antenna (&session_ch_3, 1, &antenna);
-//         //strcpy((const char *)&buffUART1rx2[0], (const char *)"ant0,");
-//         sprintf((char *)&buffUART1rx2[0], "ant0,%03d.%02d,%03d.%02d,%03d.%02d,%03d.%02d,3\r\n",
-//                 antenna.resistance_int,
-//                 antenna.resistance_dec,
-//                 antenna.inductance_int,
-//                 antenna.inductance_dec,
-//                 antenna.current_limit_int,
-//                 antenna.current_limit_dec,
-//                 antenna.temp_max_int,
-//                 antenna.temp_max_dec);
-
-//         UART_PC_Send((char *) buffUART1rx2);
-//         buffUART1rx2[0] = '\0';
-
-//         Session_Get_Antenna (&session_ch_4, 1, &antenna);
-//         //strcpy((const char *)&buffUART1rx2[0], (const char *)"ant0,");
-//         sprintf((char *)&buffUART1rx2[0], "ant0,%03d.%02d,%03d.%02d,%03d.%02d,%03d.%02d,4\r\n",
-//                 antenna.resistance_int,
-//                 antenna.resistance_dec,
-//                 antenna.inductance_int,
-//                 antenna.inductance_dec,
-//                 antenna.current_limit_int,
-//                 antenna.current_limit_dec,
-//                 antenna.temp_max_int,
-//                 antenna.temp_max_dec);
-
-//         UART_PC_Send((char *) buffUART1rx2);
-//         buffUART1rx2[0] = '\0';
-
-//         if (Get_Antenna_Name(CH1, (char *) &buffUART1rx2[0]) != 0)
-//         {
-//             UART_PC_Send((char *) (const char *) "ant_name,1,");
-//             UART_PC_Send((char *) buffUART1rx2);
-//             UART_PC_Send((char *) (const char *) "\r\n");
-//         }
-
-//         if (Get_Antenna_Name(CH2, (char *) &buffUART1rx2[0]) != 0)
-//         {
-//             UART_PC_Send((char *) (const char *) "ant_name,2,");
-//             UART_PC_Send((char *) buffUART1rx2);
-//             UART_PC_Send((char *) (const char *) "\r\n");
-//         }
-
-//         if (Get_Antenna_Name(CH3, (char *) &buffUART1rx2[0]) != 0)
-//         {
-//             UART_PC_Send((char *) (const char *) "ant_name,3,");
-//             UART_PC_Send((char *) buffUART1rx2);
-//             UART_PC_Send((char *) (const char *) "\r\n");
-//         }
-
-//         if (Get_Antenna_Name(CH4, (char *) &buffUART1rx2[0]) != 0)
-//         {
-//             UART_PC_Send((char *) (const char *) "ant_name,4,");
-//             UART_PC_Send((char *) buffUART1rx2);
-//             UART_PC_Send((char *) (const char *) "\r\n");
-//         }
-
-//         buffUART1rx2[0] = '\0';
-//     }
-
-//     else if (!strncmp(msg, (const char *)"antenna,", (sizeof("antenna,") - 1)))
-//     {
-
-//         if (((buffUART1rx2[28] - 48) > 0) && ((buffUART1rx2[28] - 48) < 4) && (buffUART1rx2[27] == ','))
-//         {
-//             antenna.resistance_int = 	(buffUART1rx2[8] - 48) * 100 + (buffUART1rx2[9] - 48) * 10 + (buffUART1rx2[10] - 48);
-//             antenna.resistance_dec = 	(buffUART1rx2[12] - 48) * 10 + (buffUART1rx2[13] - 48);
-//             antenna.inductance_int = 	(buffUART1rx2[15] - 48) * 100 + (buffUART1rx2[16] - 48) * 10 + (buffUART1rx2[17] - 48);
-//             antenna.inductance_dec = 	(buffUART1rx2[19] - 48) * 10 + (buffUART1rx2[20] - 48);
-//             antenna.current_limit_int = (buffUART1rx2[22] - 48) * 10 + (buffUART1rx2[23] - 48);
-//             antenna.current_limit_dec = (buffUART1rx2[25] - 48) * 10 + (buffUART1rx2[26] - 48);
-
-//             //--- Save antenna parameters ---//
-//             Session_Set_Antenna (&session_slot_aux, (buffUART1rx2[28] - 48), &antenna);
-
-//             UART_PC_Send((char *)"OK\r\n");
-//         }
-//         else
-//             UART_PC_Send((char *)"ERROR\r\n");
-//     }
-    //example. signal,100,100,0000,0003,0003,0003,0006,0000,0000,1
     else if (!strncmp(msg, (const char *)"signal,", (sizeof("signal,") - 1)))
     {
         //signal,%03d,%03d,0%x%x%d,%04d,%04d,%04d,%04d,%04d,%04d,1\r\n",
@@ -335,17 +196,16 @@ static void RaspBerry_Messages (char * msg)
 
     else if (!strncmp(msg, (const char *)"stop,", (sizeof("stop,") - 1)))
     {
-        // Session_Channel_1_Stop();
-        // Session_Channel_2_Stop();
-        // Session_Channel_3_Stop();
-        // Session_Channel_4_Stop();
-
-        RPI_Send((const char *)"OK\r\n");
+        comms_messages |= COMM_STOP_TREAT;
+        
+        // RPI_Send((const char *)"OK\r\n");
     }
 
     else if (!strncmp(msg, (const char *)"pause,", (sizeof("pause,") - 1)))
     {
-        RPI_Send((const char *)"OK\r\n");
+        comms_messages |= COMM_PAUSE_TREAT;
+        
+        // RPI_Send((const char *)"OK\r\n");
     }
     
     else if (!strncmp(msg, (const char *)"reset", (sizeof("reset") - 1)))
@@ -357,15 +217,9 @@ static void RaspBerry_Messages (char * msg)
 
     else if (!strncmp(msg,(const char *)"start,", (sizeof("start,") - 1)))
     {
-        // Session_Channel_1_Start();
-        // Session_Channel_2_Start();
-        // Session_Channel_3_Start();
-        // Session_Channel_4_Start();
+        comms_messages |= COMM_START_TREAT;
 
-        // ResetCheckGlobalErrors ();
-        // Current_Limit_Counter_Reset ();
-
-        RPI_Send((char *)"OK\r\n");
+        // RPI_Send((char *)"OK\r\n");
     }
 
 

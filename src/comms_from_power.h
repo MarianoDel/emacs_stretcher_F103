@@ -25,8 +25,9 @@
 
 
 //--- Exported functions ---//
-
-
-
+void UpdatePowerMessages (void);
+void PowerSendConf (void);
+void PowerSendStart( void );
+void PowerSendStop( void );
 
 #endif

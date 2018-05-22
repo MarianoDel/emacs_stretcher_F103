@@ -16,10 +16,16 @@
 
 
 //---- Configurations Defines --------------------
-
+#define RPI_Send(X)    Usart3Send(X)
 
 
 //---- Common Defines --------------------
+#define COMM_NONE_TREAT     0x0000
+#define COMM_START_TREAT    0x0001
+#define COMM_STOP_TREAT     0x0002
+#define COMM_PAUSE_TREAT    0x0004
+#define COMM_CONF_CHANGE    0x0008
+
 
 
 

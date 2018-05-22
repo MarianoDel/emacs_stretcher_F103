@@ -54,11 +54,12 @@ typedef struct {
 
 typedef enum {
     TREATMENT_STANDBY = 0,
-	TREATMENT_RUNNING,
-	TREATMENT_PAUSED,
-	TREATMENT_WITH_ERROR,
-	TREATMENT_STOPPING,
-	TREATMENT_STOPPING2
+    TREATMENT_STARTING,
+    TREATMENT_RUNNING,
+    TREATMENT_PAUSED,
+    TREATMENT_WITH_ERROR,
+    TREATMENT_STOPPING,
+    TREATMENT_STOPPING2
 
 } treatment_t;
 
@@ -107,9 +108,13 @@ error_t TreatmentGetErrorStatus (void);
 void TreatmentSetErrorStatus (error_t);
 
 resp_t TreatmentSetSignalType (signal_type_t);
+signal_type_t TreatmentGetSignalType (void);
 resp_t TreatmentSetFrequency (frequency_t);
+frequency_t TreatmentGetFrequency (void);
 resp_t TreatmentSetPower (unsigned char);
+unsigned char TreatmentGetPower (void);
 resp_t TreatmentSetTime (unsigned char, unsigned char, unsigned char);
+unsigned short TreatmentGetTime (void);
 void TreatmentGetAllConf (char *);
 resp_t TreatmentTranslateOldMsg (char *);
 resp_t TreatmentAssertParams (void);

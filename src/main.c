@@ -13,17 +13,13 @@
 #include "stm32f10x.h"
 #include "hard.h"
 
-// #include "GTK_Hard.h"
+#include "treatment.h"
 #include "timer.h"
 #include "gpio.h"
 #include "comms_from_rasp.h"
+#include "comms_from_power.h"
 #include "usart.h"
-// #include "pwm.h"
-// #include "adc.h"
-// #include "GTK_Estructura.h"
-// #include "GTK_Signal.h"
-// #include "flash_program.h"
-// #include "GTK_Errors.h"
+
 
 
 /* Externals ------------------------------------------------------------------*/
@@ -34,6 +30,7 @@ volatile unsigned char usart3_have_data;
 volatile unsigned char usart4_have_data;
 volatile unsigned char usart5_have_data;
 
+unsigned short comms_messages = 0;
 char buffSendErr[64];
 
 //--- Externals para enviar keepalive por UART
@@ -82,7 +79,10 @@ unsigned char channel_3_pause = 0;
 unsigned char channel_4_pause = 0;
 
 /* Globals ------------------------------------------------------------------*/
-
+volatile unsigned short secs_in_treatment = 0;
+volatile unsigned short millis = 0;
+unsigned short secs_end_treatment;
+unsigned short secs_elapsed_up_to_now;
 
 //--- FUNCIONES DEL MODULO ---//
 void TimingDelay_Decrement(void);
@@ -256,7 +256,7 @@ int main (void)
 
             case TREATMENT_STARTING:
                 secs_end_treatment = TreatmentGetTime();
-                secs_in_treatment = 0;
+                secs_in_treatment = 1;    //con 1 arranca el timer
                 secs_elapsed_up_to_now = 0;
                 main_state = TREATMENT_RUNNING;
                 break;
@@ -312,6 +312,9 @@ int main (void)
         
         //reviso comunicacion con raspberry
         UpdateRaspberryMessages();
+
+        //reviso comunicacion con potencias
+        UpdatePowerMessages();
     }
     //---- Fin Programa Pricipal ----------
 
@@ -473,6 +476,17 @@ void TimingDelay_Decrement(void)
     if (wait_ms_var)
         wait_ms_var--;
 
+    if (secs_in_treatment)
+    {
+        if (millis < 1000)
+            millis++;
+        else
+        {
+            secs_in_treatment++;
+            millis = 0;
+        }
+    }
+    
     // if (timer_standby)
     //     timer_standby--;
 

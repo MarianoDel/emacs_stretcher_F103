@@ -103,6 +103,11 @@ resp_t TreatmentSetSignalType (signal_type_t a)
     return resp_ok;
 }
 
+signal_type_t TreatmentGetSignalType (void)
+{
+    return treatment_conf.treatment_signal.signal;
+}
+
 resp_t TreatmentSetFrequency (frequency_t a)
 {
     if (treatment_state != TREATMENT_STANDBY)
@@ -115,6 +120,11 @@ resp_t TreatmentSetFrequency (frequency_t a)
         treatment_conf.treatment_signal.frequency = a;
 
     return resp_ok;
+}
+
+frequency_t TreatmentGetFrequency (void)
+{
+    return treatment_conf.treatment_signal.frequency;
 }
 
 resp_t TreatmentSetPower (unsigned char a)
@@ -132,6 +142,11 @@ resp_t TreatmentSetPower (unsigned char a)
     return resp_ok;
 }
 
+unsigned char TreatmentGetPower (void)
+{
+    return treatment_conf.treatment_signal.power;
+}
+
 resp_t TreatmentSetTime (unsigned char h, unsigned char m, unsigned char s)
 {
     resp_t resp = resp_error;
@@ -147,6 +162,11 @@ resp_t TreatmentSetTime (unsigned char h, unsigned char m, unsigned char s)
     treatment_conf.treatment_time += s;
     
     return resp_ok;
+}
+
+unsigned short TreatmentGetTime (void)
+{
+    return treatment_conf.treatment_time;
 }
 
 void TreatmentGetAllConf (char * tosend)
