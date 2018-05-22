@@ -57,7 +57,7 @@ typedef enum {
     TREATMENT_STARTING,
     TREATMENT_RUNNING,
     TREATMENT_PAUSED,
-    TREATMENT_WITH_ERROR,
+    TREATMENT_WITH_ERRORS,
     TREATMENT_STOPPING,
     TREATMENT_STOPPING2
 
@@ -98,15 +98,9 @@ typedef enum
 
 #define SIZEOF_OVERCURRENT_BUFF			8
 
-#define FlushErrorStatus() SetErrorStatus(ERROR_FLUSH_MASK)
+
 
 //--- Exported functions ---//
-treatment_t TreatmentGetState (void);
-resp_t TreatmentStart (void);
-void TreatmentStop (void);
-error_t TreatmentGetErrorStatus (void);
-void TreatmentSetErrorStatus (error_t);
-
 resp_t TreatmentSetSignalType (signal_type_t);
 signal_type_t TreatmentGetSignalType (void);
 resp_t TreatmentSetFrequency (frequency_t);

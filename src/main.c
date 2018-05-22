@@ -18,6 +18,7 @@
 #include "gpio.h"
 #include "comms_from_rasp.h"
 #include "comms_from_power.h"
+#include "comms.h"
 #include "usart.h"
 
 
@@ -48,7 +49,8 @@ volatile unsigned int session_warming_up_channel_1_stage_time = 0;
 unsigned short buzzer_timeout = 0;
 
 //--- Externals de los timers
-volatile unsigned short wait_ms_var;
+volatile unsigned short wait_ms_var = 0;
+volatile unsigned short comms_timeout = 0;
 
 // //Estructuras.
 // session_typedef session_slot_aux;
@@ -279,6 +281,19 @@ int main (void)
                     PowerSendStop();
                     main_state = TREATMENT_STOPPING;
                 }
+
+                if ((comms_messages & COMM_ERROR_OVERCURRENT) ||
+                    (comms_messages & COMM_ERROR_NO_CURRENT) ||
+                    (comms_messages & COMM_ERROR_SOFT_OVERCURRENT) ||
+                    (comms_messages & COMM_ERROR_OVERTEMP) ||
+                    (comms_messages & COMM_NO_COMM_CH1) ||
+                    (comms_messages & COMM_NO_COMM_CH2) ||
+                    (comms_messages & COMM_NO_COMM_CH3))                    
+                {
+                    PowerSendStop();
+                    RaspBerry_Report_Errors();
+                    main_state = TREATMENT_WITH_ERRORS;
+                }
                 break;
 
             case TREATMENT_PAUSED:
@@ -302,6 +317,10 @@ int main (void)
                 
             case TREATMENT_STOPPING:
                 main_state = TREATMENT_STANDBY;
+                break;
+
+            case TREATMENT_WITH_ERRORS:
+
                 break;
 
             default:
@@ -476,6 +495,9 @@ void TimingDelay_Decrement(void)
     if (wait_ms_var)
         wait_ms_var--;
 
+    if (comms_timeout)
+        comms_timeout--;
+    
     if (secs_in_treatment)
     {
         if (millis < 1000)

@@ -13,6 +13,7 @@
 #include "hard.h"
 
 #include "comms_from_rasp.h"
+#include "comms.h"
 #include "usart.h"
 #include "treatment.h"
 
@@ -320,6 +321,9 @@ static void RaspBerry_Messages (char * msg)
 
 }
 
+void RaspBerry_Report_Errors (void)
+{
+}
 
 static void SendAllConf (void)
 {

@@ -21,84 +21,20 @@
 //--- VARIABLES EXTERNAS ---//
 
 //--- VARIABLES GLOBALES ---//
-treatment_t treatment_state = TREATMENT_STANDBY;
 treatment_conf_t treatment_conf;
 unsigned char global_error = 0;
 
-
-
-
-
 //--- FUNCIONES DEL MODULO ---//
-treatment_t TreatmentGetState (void)
-{
-    return treatment_state;
-}
 
-resp_t TreatmentStart (void)
-{
-    if (treatment_state == TREATMENT_STANDBY)
-    {
-        if ((TreatmentAssertParams() == resp_ok) && (TreatmentGetErrorStatus() == ERROR_OK))
-        {
-            treatment_state = TREATMENT_RUNNING;
-            return resp_ok;
-        }
-    }
-    return resp_error;
-}
-
-void TreatmentStop (void)
-{
-    if (treatment_state != TREATMENT_STANDBY)
-        treatment_state = TREATMENT_STOPPING;
-}
-
-error_t TreatmentGetErrorStatus (void)
-{
-    error_t error = ERROR_OK;
-
-    if (global_error & ERROR_OVERTEMP_MASK)
-        error = ERROR_OVERTEMP;
-    else if (global_error & ERROR_OVERCURRENT_MASK)
-        error = ERROR_OVERCURRENT;
-    else if (global_error & ERROR_NO_CURRENT_MASK)
-        error = ERROR_NO_CURRENT;
-    else if (global_error & ERROR_SOFT_OVERCURRENT_MASK)
-        error = ERROR_SOFT_OVERCURRENT;
-
-    return error;
-}
-
-void TreatmentSetErrorStatus (error_t e)
-{
-    if (e == ERROR_FLUSH_MASK)
-        global_error = 0;
-    else
-    {
-        if (e == ERROR_OVERTEMP)
-            global_error |= ERROR_OVERTEMP_MASK;
-        if (e == ERROR_OVERCURRENT)
-            global_error |= ERROR_OVERCURRENT_MASK;
-        if (e == ERROR_SOFT_OVERCURRENT)
-            global_error |= ERROR_SOFT_OVERCURRENT_MASK;
-        if (e == ERROR_NO_CURRENT)
-            global_error |= ERROR_NO_CURRENT_MASK;
-    }
-}
-
-//TODO: PONER UNA TRABA DE SETEOS PARA NO CAMBIAR NADA CORRIENDO
-//recibe tipo de senial
 resp_t TreatmentSetSignalType (signal_type_t a)
 {
-    if (treatment_state != TREATMENT_STANDBY)
-        return resp_error;
-
     if ((a == SQUARE_SIGNAL) ||
         (a == TRIANGULAR_SIGNAL) ||
         (a == SINUSOIDAL_SIGNAL))
 
         treatment_conf.treatment_signal.signal = a;
+    else
+        return resp_error;
 
     return resp_ok;
 }
@@ -110,14 +46,13 @@ signal_type_t TreatmentGetSignalType (void)
 
 resp_t TreatmentSetFrequency (frequency_t a)
 {
-    if (treatment_state != TREATMENT_STANDBY)
-        return resp_error;
-
     if ((a == TEN_HZ) ||
         (a == THIRTY_HZ) ||
         (a == SIXTY_HZ))
 
         treatment_conf.treatment_signal.frequency = a;
+    else
+        return resp_error;
 
     return resp_ok;
 }
@@ -129,9 +64,6 @@ frequency_t TreatmentGetFrequency (void)
 
 resp_t TreatmentSetPower (unsigned char a)
 {
-    if (treatment_state != TREATMENT_STANDBY)
-        return resp_error;
-
     if (a > 100)
         treatment_conf.treatment_signal.power = 100;
     else if (a < 10)
@@ -149,13 +81,8 @@ unsigned char TreatmentGetPower (void)
 
 resp_t TreatmentSetTime (unsigned char h, unsigned char m, unsigned char s)
 {
-    resp_t resp = resp_error;
-    
-    if (treatment_state != TREATMENT_STANDBY)
-        return resp;
-
     if ((h > 1) || (m > 60) || (s > 60))
-        return resp;
+        return resp_error;
 
     treatment_conf.treatment_time = h * 3600;
     treatment_conf.treatment_time += m * 60;
