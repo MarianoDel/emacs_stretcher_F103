@@ -14,9 +14,10 @@
 
 #include "comms_from_power.h"
 #include "usart.h"
-#include "treatment_signals.h"
+#include "treatment.h"
 
 #include <string.h>
+#include <stdio.h>
 
 
 #define Power_Send(X)    Usart2Send(X)
@@ -47,7 +48,7 @@ const char s_start_treatment [] = {"start treatment"};
 const char s_stop_treatment [] = {"stop treatment"};
 const char s_status [] = {"status"};
 const char s_flush_errors [] = {"flush errors"};
-const char s_getall [] = {"get all conf"};
+// const char s_getall [] = {"get all conf"};
 
 
 /* Module Private Functions -----------------------------------------------------------*/
@@ -79,7 +80,7 @@ void PowerSendConf (void)
         sprintf (buff, "%s %s %s\n",s_chf, s_set_signal, s_square);
     else if (sig == TRIANGULAR_SIGNAL)
         sprintf (buff, "%s %s %s\n",s_chf, s_set_signal, s_triangular);
-    else (sig == SINUSOIDAL_SIGNAL)
+    else //(sig == SINUSOIDAL_SIGNAL)
         sprintf (buff, "%s %s %s\n",s_chf, s_set_signal, s_sinusoidal);
     
     Power_Send(buff);
@@ -87,9 +88,9 @@ void PowerSendConf (void)
     freq = TreatmentGetFrequency ();
     if (freq == TEN_HZ)
         sprintf (buff, "%s %s %s\n",s_chf, s_frequency, s_ten_hz);
-    else if (sig == THIRTY_HZ)
+    else if (freq == THIRTY_HZ)
         sprintf (buff, "%s %s %s\n",s_chf, s_frequency, s_thirty_hz);
-    else (sig == SIXTY_HZ)
+    else //(sig == SIXTY_HZ)
         sprintf (buff, "%s %s %s\n",s_chf, s_frequency, s_sixty_hz);
     
     Power_Send(buff);
@@ -114,3 +115,29 @@ void PowerSendStop( void )
 }
 
 
+static void Power_Messages (char * msg)
+{
+    if (!strncmp(msg, (const char *)"OK", (sizeof("OK") - 1)))
+    {
+    }
+
+    else if (!strncmp(msg, (const char *)"NOK", (sizeof("NOK") - 1)))
+    {
+    }
+
+    else if (!strncmp(msg, (const char *)"Error: Overcurrent", (sizeof("Error: Overcurrent") - 1)))
+    {
+    }
+
+    else if (!strncmp(msg, (const char *)"Error: No current", (sizeof("Error: No current") - 1)))
+    {
+    }
+
+    else if (!strncmp(msg, (const char *)"Error: Soft Overcurrent", (sizeof("Error: Soft Overcurrent") - 1)))
+    {
+    }
+
+    else if (!strncmp(msg, (const char *)"Error: Overtemp", (sizeof("Error: Overtemp") - 1)))
+    {
+    }
+}

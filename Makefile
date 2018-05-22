@@ -76,6 +76,7 @@ SRC += ./src/timer.c
 # SRC += ./src/flash_program.c
 # SRC += ./src/adc.c
 SRC += ./src/comms_from_rasp.c
+SRC += ./src/comms_from_power.c
 SRC += ./src/treatment.c
 
 ## Core Support
