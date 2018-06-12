@@ -124,83 +124,64 @@ void Tamper_Config(void)
 //      CNFx 10 Alternate func Push Pull
 //      CNFx 11 Alternate func Open Drain
 
-
-//--- Leds ---//
-void Led_Config(void)
+//-- GPIO Configuration --------------------
+void GpioInit (void)
 {
-
     unsigned long temp;
 
-    //--- GPIOB & GPIOC ---//
-    //--- Clock ---//
+    //--- GPIO Clocks ---//
+    if (!RCC_GPIOA_CLK)
+        RCC_GPIOA_CLKEN;
+
     if (!RCC_GPIOB_CLK)
         RCC_GPIOB_CLKEN;
 
     if (!RCC_GPIOC_CLK)
         RCC_GPIOC_CLKEN;
 
-    //--- Config pines ---//
-    //--- GPIOC pin 0 ---//
-    //--- GPIOC pin 1 ---//
-    temp = GPIOC->CRL;
-    temp &= 0xFFFFFF00;
-    temp |= 0x00000022;
-    GPIOC->CRL = temp;
+    if (!RCC_GPIOD_CLK)
+        RCC_GPIOD_CLKEN;
 
-    //--- GPIOC pin 13 ---//
-    temp = GPIOC->CRH;
+    //--- GPIOA Low Side ------------------//
+    temp = GPIOA->CRL;    //PA2-PA3 Alternative (Usart2)
+    temp &= 0xFFFF00FF;
+    temp |= 0x0000A200;
+    GPIOA->CRL = temp;
+
+    //--- GPIOA High Side ------------------//
+    temp = GPIOA->CRH;    //PA9-PA10 Alternative (Usart1)
+    temp &= 0xFFFFF00F;
+    temp |= 0x000008A0;
+    GPIOA->CRH = temp;
+
+    //--- GPIOB Low Side -------------------//
+    temp = GPIOB->CRL;    //PB5 output
     temp &= 0xFF0FFFFF;
     temp |= 0x00200000;
-    GPIOC->CRH = temp;
-
-    //--- Configuro los leds en PB5 - PB7 ---//
-    temp = GPIOB->CRL;
-    temp &= 0x000FFFFF;
-    temp |= 0x22200000;
     GPIOB->CRL = temp;
 
-    //--- Configuro los leds en PB8 - PB9 ---//
-    //PB10 y PB11 alternative
-    temp = GPIOB->CRH;
-    temp &= 0xFFFF0000;
-    // temp |= 0x0000AA22;    //con PB10 USART3_TX y PB11 USART3_RX
-    temp |= 0x00008A22;    //con PB10 USART3_TX y PB11 input pdwn para USART3_RX    
-    // temp |= 0x00002022;    // PB11 prueba salida USART3_RX
-    GPIOB->CRH = temp;
+    //--- GPIOB High Side -------------------//
+    temp = GPIOB->CRH;    //PB10-PB11 Alternative (Usart3); PB13-PB15 output
+    temp &= 0x000F00FF;
+    temp |= 0x22208A00;
+    GPIOB->CRH = temp;    
+    
+    //--- GPIOC Low Side -------------------//
+    temp = GPIOC->CRL;    //PC0-PC1 output; PC6-PC7 output
+    temp &= 0x00FFFF00;
+    temp |= 0x22000022;
+    GPIOC->CRL = temp;
+
+    //--- GPIOC High Side -------------------//    
+    temp = GPIOC->CRH;    //PC8-PC9 Input; PC10-PC11 Alternative (Uart4); PC12 Alterantive (Uart5)
+    temp &= 0xFFF00000;
+    temp |= 0x000A8A88;
+    GPIOC->CRH = temp;
+
+    //--- GPIOD Low Side -------------------//
+    temp = GPIOD->CRL;    //PD2 Alterantive (Uart5)
+    temp &= 0xFFFFF0FF;    
+    temp |= 0x00000A00;
+    GPIOD->CRL = temp;
 
 }
-
-void Led1Toggle(void){
-
-	if(LED1){
-
-		LED1_OFF;
-	}
-	else {
-
-		LED1_ON;
-	}
-}
-
-void Led2Toggle(void){
-
-	if(LED2){
-
-		LED2_OFF;
-	}
-	else {
-
-		LED2_ON;
-	}
-}
-
-/*
-void Led3Toggle(void)
-{
-	if(LED3)
-		LED3_OFF;
-	else
-		LED3_ON;
-}
-*/
-

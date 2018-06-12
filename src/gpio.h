@@ -107,6 +107,6 @@
 /* Includes ------------------------------------------------------------------*/
 
 //--- Exported Functions ------------------------------
-void Led_Config(void);
+void GpioInit(void);
 
 #endif

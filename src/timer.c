@@ -29,10 +29,10 @@ void TIM7_IRQHandler (void)	//1mS
     if (TIM7->SR & 0x01)
         TIM7->SR = 0x00;    //bajar flag
 
-    if (L_WIFI)
-        L_WIFI_OFF;
+    if (LED2)
+        LED2_OFF;
     else
-        L_WIFI_ON;
+        LED2_ON;
     
 }
 

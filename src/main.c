@@ -105,10 +105,10 @@ int main (void)
     {
         while (1)	/* Capture error */
         {
-            if (L_ZONA)
-                L_ZONA_OFF;
+            if (LED1)
+                LED1_OFF;
             else
-                L_ZONA_ON;
+                LED1_ON;
 
             for (i = 0; i < 255; i++)
             {
@@ -121,47 +121,14 @@ int main (void)
         
 
 // 	//Configuracion led. & Enabled Channels
-    Led_Config();
+    GpioInit();
 
     //enciendo TIM7
     TIM7_Init();
 
-    // L_ZONA_ON;
-    // L_ALARMA_ON;
-    // L_SERV_ON;
-    // L_NETLIGHT_ON;
-    // L_WIFI_ON;
+    //enciendo usart1 para raspberry
+    Usart1Config();
 
-    //enciendo usart3
-    Usart3Config();
-
-    //---- Prueba Leds ----------
-    // while (1)
-    // {
-    //     if (L_ZONA)
-    //     {
-    //         // RX_PIN_ON;
-    //         L_ZONA_OFF;
-    //         L_ALARMA_OFF;
-    //         L_SERV_OFF;
-    //         L_NETLIGHT_OFF;
-    //         // L_WIFI_OFF;
-    //     }
-    //     else
-    //     {
-    //         // RX_PIN_OFF;
-    //         L_ZONA_ON;
-    //         L_ALARMA_ON;
-    //         L_SERV_ON;
-    //         L_NETLIGHT_ON;
-    //         // L_WIFI_ON;
-    //     }
-
-
-
-    //     Wait_ms(2000);
-    // }
-    //---- Fin Prueba Leds ----------
 
     //---- Prueba Usart3 ----------
     // while (1)
@@ -291,7 +258,7 @@ int main (void)
                     (comms_messages & COMM_NO_COMM_CH3))                    
                 {
                     PowerSendStop();
-                    RaspBerry_Report_Errors();
+                    RaspBerry_Report_Errors(&comms_messages);
                     main_state = TREATMENT_WITH_ERRORS;
                 }
                 break;
@@ -337,6 +304,155 @@ int main (void)
     }
     //---- Fin Programa Pricipal ----------
 
+//------- PROGRAMA P1 STRETCHER -----//
+#ifdef STRETCHER_P1_LIKE_F103
+    
+    //---- Programa Principal ----------
+
+//     //--- PRUEBA DISPLAY LCD ---
+//     EXTIOff ();
+
+//     //TODO: enviar tipo de programa al puerto serie    
+//     USART2Config();
+//     USART1Config();
+//     Wait_ms(1000);
+
+// // #ifdef STRETCHER_P1
+//     Usart1Send((char *) (const char *) "\r\nKirno Stretcher over P1 like F103\r\n");
+//     Usart1Send((char *) (const char *) "HW Ver: 1.3\n");
+//     Usart1Send((char *) (const char *) "SW Ver: 1.0\n");
+// // #endif
+    
+    while (1)
+    {
+        switch (main_state)
+        {
+            case TREATMENT_STANDBY:
+
+                if (comms_messages & COMM_CONF_CHANGE)
+                {
+                    comms_messages &= ~COMM_CONF_CHANGE;
+                    if (TreatmentAssertParams() == resp_ok)    //si tengo todo lo envio
+                        PowerSendConf();                        
+                }
+
+                if (comms_messages & COMM_START_TREAT)
+                {
+                    //me piden por el puerto que arranque el tratamiento
+                    comms_messages &= ~COMM_START_TREAT;
+                    if (TreatmentAssertParams() == resp_error)
+                    {
+                        RPI_Send("ERROR\r\n");
+                    }
+                    else
+                    {
+                        RPI_Send("OK\r\n");
+                        PowerSendStart();
+                        main_state = TREATMENT_STARTING;                        
+                    }
+                }
+                break;
+
+            case TREATMENT_STARTING:
+                secs_end_treatment = TreatmentGetTime();
+                secs_in_treatment = 1;    //con 1 arranca el timer
+                secs_elapsed_up_to_now = 0;
+                PowerCommunicationStackReset();
+                main_state = TREATMENT_RUNNING;
+                break;
+
+            case TREATMENT_RUNNING:
+                PowerCommunicationStack();    //me comunico con las potencias para conocer el estado
+
+                if (comms_messages & COMM_PAUSE_TREAT)
+                {
+                    comms_messages &= ~COMM_PAUSE_TREAT;
+                    RPI_Send("OK\r\n");
+                    PowerSendStop();
+                    main_state = TREATMENT_PAUSED;
+                    secs_elapsed_up_to_now = secs_in_treatment;
+                }
+
+                if (comms_messages & COMM_STOP_TREAT)
+                {
+                    comms_messages &= ~COMM_STOP_TREAT;
+                    //termine el tratamiento
+                    RPI_Send("OK\r\n");
+                    PowerSendStop();
+                    main_state = TREATMENT_STOPPING;
+                }
+                
+                if (secs_in_treatment >= secs_end_treatment)
+                {
+                    //termine el tratamiento
+                    // comms_messages &= ~COMM_STOP_TREAT;                 
+                    PowerSendStop();
+                    main_state = TREATMENT_STOPPING;
+                }
+
+                if ((comms_messages & COMM_ERROR_OVERCURRENT) ||
+                    (comms_messages & COMM_ERROR_NO_CURRENT) ||
+                    (comms_messages & COMM_ERROR_SOFT_OVERCURRENT) ||
+                    (comms_messages & COMM_ERROR_OVERTEMP) ||
+                    (comms_messages & COMM_NO_COMM_CH1) ||
+                    (comms_messages & COMM_NO_COMM_CH2) ||
+                    (comms_messages & COMM_NO_COMM_CH3))                    
+                {
+                    PowerSendStop();
+                    LED_ON;
+                    RaspBerry_Report_Errors(&comms_messages);
+                    LED_OFF;
+                    main_state = TREATMENT_WITH_ERRORS;
+                    sprintf (buff, "treat err, msg: 0x%04x\r\n", comms_messages);
+                    RPI_Send(buff);
+                }
+                break;
+
+            case TREATMENT_PAUSED:
+
+                if (comms_messages & COMM_START_TREAT)
+                {
+                    comms_messages &= ~COMM_START_TREAT;
+                    secs_in_treatment = secs_elapsed_up_to_now;
+                    RPI_Send("OK\r\n");
+                    PowerSendStart();
+                    main_state = TREATMENT_RUNNING;
+                }
+
+                if (comms_messages & COMM_STOP_TREAT)
+                {
+                    //estaba en pausa y me mandaron stop
+                    comms_messages &= ~COMM_STOP_TREAT;
+                    RPI_Send("OK\r\n");
+                    PowerSendStop();
+                    main_state = TREATMENT_STOPPING;
+                }                
+                break;
+                
+            case TREATMENT_STOPPING:
+                sprintf (buff, "treat end, msg: 0x%04x\r\n", comms_messages);
+                RPI_Send(buff);
+                main_state = TREATMENT_STANDBY;
+                break;
+
+            case TREATMENT_WITH_ERRORS:
+
+                break;
+
+            default:
+                main_state = TREATMENT_STANDBY;
+                break;
+        }            
+
+        
+        //reviso comunicacion con raspberry
+        UpdateRaspberryMessages();
+
+        //reviso comunicacion con potencias
+        UpdatePowerMessages();
+    }
+    //---- Fin Programa Pricipal ----------
+#endif    //end of Stretcher
         
 
 // 	//Timer 1ms -- Wait_ms()

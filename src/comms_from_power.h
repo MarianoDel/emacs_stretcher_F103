@@ -16,6 +16,10 @@
 
 
 //---- Configurations Defines --------------------
+#define Power_Send(X)    Usart2Send(X)
+#define power_have_data    usart2_have_data
+#define ReadPowerBuffer(X,Y)    ReadUsart2Buffer(X,Y)
+
 typedef enum {
     ASK_CH1 = 0,
     WAIT_ANSWER_CH1,
@@ -30,6 +34,7 @@ typedef enum {
 
 //---- Common Defines --------------------
 #define MAX_NO_COMM_ERRORS        15
+#define POWER_COMMS_TT            1000
 
 
 
@@ -38,5 +43,7 @@ void UpdatePowerMessages (void);
 void PowerSendConf (void);
 void PowerSendStart( void );
 void PowerSendStop( void );
+void PowerCommunicationStack (void);
+void PowerCommunicationStackReset (void);
 
 #endif

@@ -16,8 +16,9 @@
 
 //----- Board Configuration -------------------//
 //--- Hardware ------------------//
-#define HARDWARE_VERSION_2_1
-// #define HARDWARE_VERSION_2_0
+#define HARDWARE_VERSION_2_0
+// #define HARDWARE_VERSION_1_0        //esto seria una placa P1 en realidad
+// #define HARDWARE_VERSION_2_1        //esto seria una placa magneto chico
 //--- Software ------------------//
 // #define SOFTWARE_VERSION_1_2		
 // #define SOFTWARE_VERSION_1_1	     //habla contra pc o rpi con nuevo protocolo camilla
@@ -103,6 +104,7 @@ enum bool
 
 
 //--- Configuracion de leds ---//
+#ifdef HARDWARE_VERSION_2_0
 //--- PC0 ---//
 #define LED1 ((GPIOC->ODR & 0x0001) == 0)
 #define LED1_OFF GPIOC->BSRR = 0x00000001
@@ -113,17 +115,85 @@ enum bool
 #define LED2_OFF GPIOC->BSRR = 0x00000002
 #define LED2_ON GPIOC->BSRR = 0x00020000
 
-//--- PC13 ---//
+//PA0, PA1 NC
+
+//PA2
+//PA3    Usart2
+
+//PA4, PA5, PA6, PA7  NC
+
+//PC4    Analog
+//PC5    Analog
+
+//PB0, PB1, PB2 NC
+
+//PB10
+//PB11    Usart3
+
+//PB12    NC
+
+//--- PB13 ---//
+#define OUT5 ((GPIOB->ODR & 0x2000) == 0)
+#define OUT5_OFF GPIOB->BSRR = 0x00002000
+#define OUT5_ON GPIOB->BSRR = 0x20000000
+
+//--- PB14 ---//
+#define OUT4 ((GPIOB->ODR & 0x4000) == 0)
+#define OUT4_OFF GPIOB->BSRR = 0x00004000
+#define OUT4_ON GPIOB->BSRR = 0x40000000
+
+//--- PB15 ---//
+#define OUT1 ((GPIOB->ODR & 0x8000) == 0)
+#define OUT1_OFF GPIOB->BSRR = 0x00008000
+#define OUT1_ON GPIOB->BSRR = 0x80000000
+
+//--- PC6 ---//
+#define OUT2 ((GPIOC->ODR & 0x0040) != 0)
+#define OUT2_ON GPIOC->BSRR = 0x00000040
+#define OUT2_OFF GPIOC->BSRR = 0x00400000
+
+//--- PC7 ---//
+#define OUT3 ((GPIOC->ODR & 0x0080) != 0)
+#define OUT3_ON GPIOC->BSRR = 0x00000080
+#define OUT3_OFF GPIOC->BSRR = 0x00800000
+
+//--- PC8 ---//
+#define IN2 ((GPIOC->IDR & 0x0100) != 0)
+
+//--- PC9 ---//
+#define IN1 ((GPIOC->IDR & 0x0200) != 0)
+
+//--- PA8 ---//
+#define IN0 ((GPIOA->IDR & 0x0100) != 0)
+
+//PA9
+//PA10    Usart1
+
+//PA11, PA12, PA13, PA14, PA15    NC
+
+//PC10
+//PC11    Uart4
+
+//PC12
+//PD2    Uart5
+
+//PB3, PB4    NC
+
+//--- PB5 ---//
+#define SW_RX_TX ((GPIOB->ODR & 0x0020) != 0)
+#define SW_RX_TX_ON GPIOB->BSRR = 0x00000020
+#define SW_RX_TX_OFF GPIOB->BSRR = 0x00200000
+
+//PB6, PB7, PB8, PB9    NC
+
+#endif //HARDWARE_VERSION_2_0
+
+
 #ifdef HARDWARE_VERSION_2_1
+//--- PC13 ---//
 #define BUZZER ((GPIOC->ODR & 0x2000) != 0)
 #define BUZZER_ON GPIOC->BSRR = 0x00002000
 #define BUZZER_OFF GPIOC->BSRR = 0x20000000
-#endif
-
-//--- PB12 ---//
-#define LED3 ((GPIOB->ODR & 0x1000) == 0)
-#define LED3_OFF GPIOB->BSRR = 0x00001000
-#define LED3_ON GPIOB->BSRR = 0x10000000
 
 //--- PB11 prueba salida por USART3_RX ---//
 #define RX_PIN ((GPIOB->ODR & 0x0800) != 0)
@@ -171,15 +241,11 @@ enum bool
 #define ENA_CH3_OFF GPIOB->BSRR = 0x00040000
 
 //--- PB13 ---//
-#ifdef HARDWARE_VERSION_2_0
-#define ENA_CH4 LED3
-#define ENA_CH4_ON LED3_OFF
-#define ENA_CH4_OFF LED3_ON
-#else
 #define ENA_CH4 ((GPIOB->ODR & 0x2000) != 0)
 #define ENA_CH4_ON GPIOB->BSRR = 0x00002000
 #define ENA_CH4_OFF GPIOB->BSRR = 0x20000000
-#endif
+
+#endif    //HARDWARE_VERSION_2_1
 
 //--- RCC clkEnable ---//
 
