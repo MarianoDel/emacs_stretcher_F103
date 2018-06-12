@@ -130,6 +130,23 @@ int main (void)
     Usart1Config();
 
 
+    //-- Welcome Messages --------------------
+    Usart1Send("\nGausstek Stretcher Board -- powered by: Kirno Technology\n");
+    Wait_ms(100);
+#ifdef HARD
+    Usart1Send(HARD);
+    Wait_ms(100);    
+#else
+#error	"No Hardware defined in hard.h file"
+#endif
+
+#ifdef SOFT
+    Usart1Send(SOFT);
+    Wait_ms(100);    
+#else
+#error	"No Soft Version defined in hard.h file"
+#endif
+
     //---- Prueba Usart3 ----------
     // while (1)
     // {
@@ -156,12 +173,13 @@ int main (void)
     // }
     //---- Fin Prueba Usart3 ----------
 
-    //---- Prueba Usart3 Contra PC ----------
+    //---- Prueba contra PC o Raspberry ----------
     while (1)
     {
         UpdateRaspberryMessages();
     }
-    //---- Fin Prueba Usart3 loop en terminal ----------
+    //---- Fin Prueba contra PC o Raspberry ----------    
+
 
     //---- Prueba Usart3 loop en terminal ----------
     // while (1)

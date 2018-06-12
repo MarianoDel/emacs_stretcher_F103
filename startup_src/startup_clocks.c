@@ -129,7 +129,9 @@ void SystemInit (void)
     //en RCC->CR; HSITRIM[7:3] user trim value, HSICAL[15:8] es factoy default (read only)
     //todo a 0 baja freq (mas chico menos freq)
     RCC->CR &= ~RCC_CR_HSITRIM;
-    RCC->CR |= 0x000000F8;
+    RCC->CR |= 0x000000F8;    //max freq
+    // RCC->CR |= 0x00000000;    //min freq
+    
     
     /* Enable Prefetch Buffer */
     FLASH->ACR |= FLASH_ACR_PRFTBE;

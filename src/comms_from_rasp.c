@@ -43,10 +43,10 @@ void UpdateRaspberryMessages (void)
     if (rpi_have_data)
     {
         rpi_have_data = 0;
-        // L_ALARMA_ON;
+        LED1_ON;
         ReadRPIBuffer((unsigned char *) local_rasp_buff, SIZEOF_RXDATA);
         RaspBerry_Messages(local_rasp_buff);
-        // L_ALARMA_OFF;
+        LED1_OFF;
     }
 }
 
