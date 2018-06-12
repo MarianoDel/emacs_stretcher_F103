@@ -25,9 +25,11 @@
 #define SOFTWARE_VERSION_1_0        //habla contra rpi con programa magneto y traduce a micros potencia
 
 //-------- Type of Program (depending on software version) ----------------
-// #define POWER_WITH_MANAGEMENT
-// #define ONLY_POWER_WITHOUT_MANAGEMENT
-#define INT_SPEED_RESPONSE
+// #define MAGNETO_NORMAL
+#define GATEWAY_TO_POWER1
+// #define GATEWAY_TO_POWER2
+// #define GATEWAY_TO_POWER3
+
 
 
 //-------- Type of Program and Features ----------------

@@ -71,8 +71,6 @@ volatile unsigned short dummy = 0;
 //---- USART1 Functions ----
 void Usart1Config(void)
 {
-    unsigned int temp;
-    
     //---- Clk USART1 ----
     if (!RCC_USART1_CLK)
         RCC_USART1_CLKEN;
@@ -204,8 +202,6 @@ void USART1_IRQHandler (void)
 //---- USART2 Functions ----
 void Usart2Config(void)
 {
-    unsigned int temp;
-    
     //---- Clk USART2 ----
     if (!RCC_USART2_CLK)
         RCC_USART2_CLKEN;
@@ -337,8 +333,6 @@ void USART2_IRQHandler (void)
 //---- USART3 Functions ----
 void Usart3Config(void)
 {
-    unsigned int temp;
-    
     //---- Clk USART3 ----
     if (!RCC_USART3_CLK)
         RCC_USART3_CLKEN;
@@ -472,8 +466,6 @@ void USART3_IRQHandler (void)
 //---- UART4 Functions ----
 void Uart4Config(void)
 {
-    unsigned int temp;
-    
     //---- Clk UART4 ----
     if (!RCC_UART4_CLK)
         RCC_UART4_CLKEN;
@@ -605,8 +597,6 @@ void UART4_IRQHandler (void)
 //---- UART5 Functions ----
 void Uart5Config(void)
 {
-    unsigned int temp;
-    
     //---- Clk UART5 ----
     if (!RCC_UART5_CLK)
         RCC_UART5_CLKEN;
