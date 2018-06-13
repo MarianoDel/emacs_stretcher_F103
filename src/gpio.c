@@ -22,56 +22,6 @@
 
 /* Module Functions -----------------------------------------------------------*/
 
-//************************************************************************************//
-// void RCC_Config (void){
-
-// 	//Configuracion clock.
-// 	RCC_DeInit();
-
-// 	//---- HSEON ----//
-// 	RCC_HSEConfig(RCC_HSE_ON);
-// 	while (!RCC_WaitForHSEStartUp());
-
-// 	// First set the flash latency to work with our clock
-// 	//	000 Zero wait state, if 0  MHz < SYSCLK <= 24 MHz
-// 	//	001 One wait state, if  24 MHz < SYSCLK <= 48 MHz
-// 	//	010 Two wait states, if 48 MHz < SYSCLK <= 72 MHz
-
-// #ifdef sysFREC48
-// 	  FLASH_SetLatency(FLASH_Latency_1);
-// 	  RCC_PLLConfig(RCC_PLLSource_HSE_Div1, RCC_PLLMul_6);
-// #endif
-// #ifdef sysFREC72_XTAL_8
-//    FLASH_SetLatency(FLASH_Latency_2);
-//    RCC_PLLConfig(RCC_PLLSource_HSE_Div1, RCC_PLLMul_9);
-//    //RCC_PLLConfig(RCC_PLLSource_HSE_Div1, RCC_PLLMul_6);
-// #endif
-// #ifdef sysFREC72_XTAL_12
-//    FLASH_SetLatency(FLASH_Latency_2);
-//    //RCC_PLLConfig(RCC_PLLSource_HSE_Div1, RCC_PLLMul_9);
-//    RCC_PLLConfig(RCC_PLLSource_HSE_Div1, RCC_PLLMul_6);
-// #endif
-
-//    	RCC_PLLCmd(ENABLE);
-
-// 	while (RCC_GetFlagStatus(RCC_FLAG_PLLRDY) == RESET);
-
-// 	RCC_SYSCLKConfig(RCC_SYSCLKSource_PLLCLK);
-// 	while (RCC_GetSYSCLKSource() != 0x08);
-
-// 	//CLK AHB. Max 72MHz.
-// 	RCC_HCLKConfig(RCC_SYSCLK_Div1);
-
-// 	//CLK APB1. Max 36MHZ.
-// 	RCC_PCLK1Config(RCC_HCLK_Div2);
-
-// 	//CLK APB2 Max 72MHz.
-// 	//RCC_PCLK2Config(RCC_HCLK_Div2);
-// 	RCC_PCLK2Config(RCC_HCLK_Div1);
-
-// 	//NVIC_PriorityGroupConfig(NVIC_PriorityGroup_4);
-// 	//NVIC_SetPriority(SysTick_IRQn, 0);
-// }
 
 //--- Tamper config ---//
 void Tamper_Config(void)
@@ -123,6 +73,10 @@ void Tamper_Config(void)
 //      CNFx 01 Open Drain
 //      CNFx 10 Alternate func Push Pull
 //      CNFx 11 Alternate func Open Drain
+//
+//      Pull-Up Pull-Dwn si el pin es Input el registro ODR coloca pull-up (1) o pull-dwn (0)
+//      GPIOx->ODR 0xNNNN, 1 bit por pin
+//
 
 //-- GPIO Configuration --------------------
 void GpioInit (void)
@@ -145,7 +99,7 @@ void GpioInit (void)
     //--- GPIOA Low Side ------------------//
     temp = GPIOA->CRL;    //PA2-PA3 Alternative (Usart2)
     temp &= 0xFFFF00FF;
-    temp |= 0x0000A200;
+    temp |= 0x00008A00;
     GPIOA->CRL = temp;
 
     //--- GPIOA High Side ------------------//
@@ -153,6 +107,13 @@ void GpioInit (void)
     temp &= 0xFFFFF00F;
     temp |= 0x000008A0;
     GPIOA->CRH = temp;
+
+    //--- GPIOA Pull-Up Pull-Dwn ------------------//
+    temp = GPIOA->ODR;    //PA3 pull-up
+    temp &= 0xFFF7;
+    temp |= 0x0008;
+    GPIOA->ODR = temp;
+    
 
     //--- GPIOB Low Side -------------------//
     temp = GPIOB->CRL;    //PB5 output
@@ -183,5 +144,7 @@ void GpioInit (void)
     temp &= 0xFFFFF0FF;    
     temp |= 0x00000A00;
     GPIOD->CRL = temp;
+
+    
 
 }

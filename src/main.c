@@ -102,7 +102,7 @@ int main (void)
     treatment_t main_state = TREATMENT_STANDBY;
 #endif
 
-#if ((defined GATEWAY_TO_POWER1) || (defined GATEWAY_TO_POWER2) || (defined GATEWAY_TO_POWER3))
+#ifdef GATEWAY_TO_POWER_BOARDS
     unsigned short bytes_readed = 0;
     char s_to_senda [100];
     char s_to_sendb [100];
@@ -146,7 +146,7 @@ int main (void)
     
 
     //-- Welcome Messages --------------------
-#if ((defined GATEWAY_TO_POWER1) || (defined GATEWAY_TO_POWER2) || (defined GATEWAY_TO_POWER3))
+#ifdef GATEWAY_TO_POWER_BOARDS
     Usart1Send("\nGateway to power side TEST!!!\n");
     Wait_ms(100);
 #endif    
@@ -232,7 +232,7 @@ int main (void)
     //     Wait_ms(100);
     // }
     //---- Fin Prueba Usart3 envia caracter solo 'd' ----------
-#ifdef GATEWAY_TO_POWER1
+#ifdef GATEWAY_TO_POWER_BOARDS
     while (1)
     {
         if (power_have_data)
@@ -267,7 +267,7 @@ int main (void)
         }
     }
 
-#endif //GATEWAY_TO_POWER1
+#endif //GATEWAY_TO_POWER_BOARDS
 
     //---- Programa Principal ----------
 #ifdef MAGNETO_NORMAL    
