@@ -44,7 +44,7 @@ void UpdateRaspberryMessages (void)
     {
         rpi_have_data = 0;
         LED1_ON;
-        ReadRPIBuffer((unsigned char *) local_rasp_buff, SIZEOF_RXDATA);
+        ReadRPIBuffer(local_rasp_buff, SIZEOF_RXDATA);
         RaspBerry_Messages(local_rasp_buff);
         LED1_OFF;
     }
@@ -163,7 +163,7 @@ static void RaspBerry_Messages (char * msg)
     
     else if (!strncmp(msg, (const char *)"reset", (sizeof("reset") - 1)))
     {
-        RPI_Send((const char *) "Restarting...\r\n");
+        RPI_Send((char *) "Restarting...\r\n");
         // Wait_ms(1000);
         // NVIC_SystemReset();
     }

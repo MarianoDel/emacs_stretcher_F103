@@ -8,8 +8,8 @@
 // #### TIMER.H ################################
 //---------------------------------------------
 
-#ifndef TIMER_H_
-#define TIMER_H_
+#ifndef _TIMER_H_
+#define _TIMER_H_
 
 #define EnableTimer6 TIM6->CR1 |= TIM_CR1_CEN
 #define DisableTimer6 TIM6->CR1 &= ~TIM_CR1_CEN
@@ -25,4 +25,4 @@ void TIM6_Init(void);
 void TIM2_Init(void);
 void Wait_ms (unsigned short);
 
-#endif /* TIMER_H_ */
+#endif /* _TIMER_H_ */

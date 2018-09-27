@@ -116,7 +116,7 @@ void Usart1SendUnsigned (unsigned char * send, unsigned char size)
     }
 }
 
-unsigned char ReadUsart1Buffer (unsigned char * bout, unsigned short max_len)
+unsigned char ReadUsart1Buffer (char * bout, unsigned short max_len)
 {
     unsigned int len;
 
@@ -247,7 +247,7 @@ void Usart2SendUnsigned (unsigned char * send, unsigned char size)
     }
 }
 
-unsigned char ReadUsart2Buffer (unsigned char * bout, unsigned short max_len)
+unsigned char ReadUsart2Buffer (char * bout, unsigned short max_len)
 {
     unsigned int len;
 

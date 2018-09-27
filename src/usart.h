@@ -61,13 +61,13 @@
 void Usart1Config (void);
 void Usart1Send (char *);
 void Usart1SendUnsigned (unsigned char *, unsigned char);
-unsigned char ReadUsart1Buffer (unsigned char *, unsigned short);
+unsigned char ReadUsart1Buffer (char *, unsigned short);
 void USART1_IRQHandler (void);
 
 void Usart2Config (void);
 void Usart2Send (char *);
 void Usart2SendUnsigned (unsigned char *, unsigned char);
-unsigned char ReadUsart2Buffer (unsigned char *, unsigned short);
+unsigned char ReadUsart2Buffer (char *, unsigned short);
 void USART2_IRQHandler (void);
 
 void Usart3Config (void);

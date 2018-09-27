@@ -72,7 +72,7 @@ void UpdatePowerMessages (void)
     {
         power_have_data = 0;
         // L_ALARMA_ON;
-        ReadPowerBuffer((unsigned char *) local_power_buff, SIZEOF_RXDATA);
+        ReadPowerBuffer(local_power_buff, SIZEOF_RXDATA);
         Power_Messages(local_power_buff);
         // L_ALARMA_OFF;
     }
@@ -176,7 +176,7 @@ void PowerCommunicationStack (void)
     {
         case ASK_CH1:
             it_was_feedback_ch = 0;
-            Power_Send((const char *) "ch1 status\n");
+            Power_Send((char *) "ch1 status\n");
             comms_timeout = POWER_COMMS_TT;
             power_comm_state++;
             break;
@@ -196,7 +196,7 @@ void PowerCommunicationStack (void)
 
         case ASK_CH2:
             it_was_feedback_ch = 0;            
-            Power_Send((const char *) "ch2 status\n");
+            Power_Send((char *) "ch2 status\n");
             comms_timeout = POWER_COMMS_TT;
             power_comm_state++;            
             break;
@@ -216,7 +216,7 @@ void PowerCommunicationStack (void)
 
         case ASK_CH3:
             it_was_feedback_ch = 0;            
-            Power_Send((const char *) "ch3 status\n");
+            Power_Send((char *) "ch3 status\n");
             comms_timeout = POWER_COMMS_TT;
             power_comm_state++;                        
             break;

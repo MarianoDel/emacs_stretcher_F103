@@ -87,6 +87,7 @@ volatile unsigned short secs_in_treatment = 0;
 volatile unsigned short millis = 0;
 unsigned short secs_end_treatment;
 unsigned short secs_elapsed_up_to_now;
+volatile unsigned char timer_100ms = 0;
 
 //--- FUNCIONES DEL MODULO ---//
 void TimingDelay_Decrement(void);
@@ -265,6 +266,13 @@ int main (void)
             else
                 LED1_ON;
         }
+
+        //envio sync cada 100ms continuo
+        if (!timer_100ms)
+        {
+            Power_Send_Unsigned((unsigned char *) ".", 1);
+            timer_100ms = 100;
+        }            
     }
 
 #endif //GATEWAY_TO_POWER_BOARDS
@@ -435,7 +443,9 @@ void TimingDelay_Decrement(void)
 
     // if (timer_led_pwm < 0xFFFF)
     //     timer_led_pwm ++;
-    
+
+    if (timer_100ms)
+        timer_100ms--;
 }
 
 //--- end of file ---//

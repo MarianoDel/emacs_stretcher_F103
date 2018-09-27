@@ -17,6 +17,7 @@
 
 //---- Configurations Defines --------------------
 #define Power_Send(X)    Usart2Send(X)
+#define Power_Send_Unsigned(X,Y)    Usart2SendUnsigned(X,Y)
 #define power_have_data    usart2_have_data
 #define ReadPowerBuffer(X,Y)    ReadUsart2Buffer(X,Y)
 
