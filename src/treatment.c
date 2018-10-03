@@ -57,6 +57,29 @@ resp_t TreatmentSetFrequency (frequency_t a)
     return resp_ok;
 }
 
+resp_t TreatmentChannelFlags (ch_in_treatment_t a)
+{
+    if (a == CH1_ENABLE)
+        treatment_conf.ch1_enable = 1;
+
+    if (a == CH2_ENABLE)
+        treatment_conf.ch2_enable = 1;
+
+    if (a == CH3_ENABLE)
+        treatment_conf.ch3_enable = 1;
+
+    if (a == CH1_DISABLE)
+        treatment_conf.ch1_enable = 0;
+
+    if (a == CH2_DISABLE)
+        treatment_conf.ch2_enable = 0;
+
+    if (a == CH3_DISABLE)
+        treatment_conf.ch3_enable = 0;
+    
+    return resp_ok;
+}
+
 frequency_t TreatmentGetFrequency (void)
 {
     return treatment_conf.treatment_signal.frequency;

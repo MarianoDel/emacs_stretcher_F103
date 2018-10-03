@@ -268,10 +268,10 @@ int main (void)
         }
 
         //envio sync cada 100ms continuo
-        if (!timer_100ms)
+        if (!timer_sync_xxx_ms)
         {
             Power_Send_Unsigned((unsigned char *) ".", 1);
-            timer_100ms = 100;
+            timer_sync_xxx_ms = 100;
         }            
     }
 
@@ -303,6 +303,7 @@ int main (void)
                     else
                     {
                         RPI_Send("OK\r\n");
+                        PowerSendConf();
                         PowerSendStart();
                         main_state = TREATMENT_STARTING;                        
                     }
@@ -444,8 +445,8 @@ void TimingDelay_Decrement(void)
     // if (timer_led_pwm < 0xFFFF)
     //     timer_led_pwm ++;
 
-    if (timer_100ms)
-        timer_100ms--;
+    if (timer_sync_xxx_ms)
+        timer_sync_xxx_ms--;
 }
 
 //--- end of file ---//

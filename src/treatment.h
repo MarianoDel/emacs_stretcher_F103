@@ -30,6 +30,16 @@ typedef enum {
 
 } frequency_t;
 
+typedef enum {
+	CH1_ENABLE = 1,
+	CH2_ENABLE,
+	CH3_ENABLE,
+	CH1_DISABLE,
+	CH2_DISABLE,
+	CH3_DISABLE
+
+} ch_in_treatment_t;
+
 //esta esta relacionada con F030 src/signal.h
 //si se modifica cambiar las dos!!!
 typedef struct {
@@ -49,6 +59,9 @@ typedef struct {
 typedef struct {
     signals_struct_t treatment_signal;
     unsigned short treatment_time;
+    unsigned char ch1_enable;
+    unsigned char ch2_enable;
+    unsigned char ch3_enable;    
     
 } treatment_conf_t;
 
@@ -112,7 +125,7 @@ unsigned short TreatmentGetTime (void);
 void TreatmentGetAllConf (char *);
 resp_t TreatmentTranslateOldMsg (char *);
 resp_t TreatmentAssertParams (void);
-
+resp_t TreatmentChannelFlags (ch_in_treatment_t);
 
 #endif
 //--- END OF FILE ---//

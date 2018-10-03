@@ -78,22 +78,164 @@ void UpdatePowerMessages (void)
     }
 }
 
-
+//TODO: revisar que haya canales habilitados antes de esto o que esta misma conteste con error
 void PowerSendConf (void)
 {
     char buff [128];
     signal_type_t sig;
     frequency_t freq;
+    unsigned char ch_state;
+    unsigned char ch_in_this_treatment = 0;
+    char s_signal_1 [20];
+    char s_signal_2 [20];
+    char s_signal_3 [20];
 
     sig = TreatmentGetSignalType ();
-    if (sig == SQUARE_SIGNAL)
-        sprintf (buff, "%s %s %s\n",s_chf, s_set_signal, s_square);
-    else if (sig == TRIANGULAR_SIGNAL)
-        sprintf (buff, "%s %s %s\n",s_chf, s_set_signal, s_triangular);
-    else //(sig == SINUSOIDAL_SIGNAL)
-        sprintf (buff, "%s %s %s\n",s_chf, s_set_signal, s_sinusoidal);
+    //la senial la mando defasada segun los canales que se vayan a utilizar
+    //los canales que entren en tratamiento
+
+    ch_state = TreatmentGetChannelsFlag();
+    if (ch_state & 0x01)
+        ch_in_this_treatment++;
+
+    if (ch_state & 0x02)
+        ch_in_this_treatment++;
+
+    if (ch_state & 0x04)
+        ch_in_this_treatment++;
     
-    Power_Send(buff);
+    if (sig == SQUARE_SIGNAL)
+    {
+        if (ch_in_this_treatment == 3)
+        {
+            strcpy (s_signal_1, s_square);
+            strcpy (s_signal_2, s_square_90);
+            strcpy (s_signal_3, s_square_180);
+        }
+
+        if (ch_in_this_treatment == 2)
+        {
+            if ((ch_state & 0x01) && (ch_state & 0x02))
+            {
+                strcpy (s_signal_1, s_square);
+                strcpy (s_signal_2, s_square_180);
+            }
+
+            if ((ch_state & 0x01) && (ch_state & 0x04))
+            {
+                strcpy (s_signal_1, s_square);
+                strcpy (s_signal_3, s_square_180);
+            }
+
+            if ((ch_state & 0x02) && (ch_state & 0x04))
+            {
+                strcpy (s_signal_2, s_square);
+                strcpy (s_signal_3, s_square_180);
+            }
+        }
+
+        if (ch_in_this_treatment == 1)
+        {
+            strcpy (s_signal_1, s_square);
+            strcpy (s_signal_2, s_square);
+            strcpy (s_signal_3, s_square);            
+        }
+    }
+
+    if (sig == TRIANGULAR_SIGNAL)
+    {
+        if (ch_in_this_treatment == 3)
+        {
+            strcpy (s_signal_1, s_triangular);
+            strcpy (s_signal_2, s_triangular_90);
+            strcpy (s_signal_3, s_triangular_180);
+        }
+
+        if (ch_in_this_treatment == 2)
+        {
+            if ((ch_state & 0x01) && (ch_state & 0x02))
+            {
+                strcpy (s_signal_1, s_triangular);
+                strcpy (s_signal_2, s_triangular_180);
+            }
+
+            if ((ch_state & 0x01) && (ch_state & 0x04))
+            {
+                strcpy (s_signal_1, s_triangular);
+                strcpy (s_signal_3, s_triangular_180);
+            }
+
+            if ((ch_state & 0x02) && (ch_state & 0x04))
+            {
+                strcpy (s_signal_2, s_triangular);
+                strcpy (s_signal_3, s_triangular_180);
+            }
+        }
+
+        if (ch_in_this_treatment == 1)
+        {
+            strcpy (s_signal_1, s_triangular);
+            strcpy (s_signal_2, s_triangular);
+            strcpy (s_signal_3, s_triangular);            
+        }
+    }
+
+    if (sig == SINUSOIDAL_SIGNAL)
+    {
+        if (ch_in_this_treatment == 3)
+        {
+            strcpy (s_signal_1, s_sinusoidal);
+            strcpy (s_signal_2, s_sinusoidal_90);
+            strcpy (s_signal_3, s_sinusoidal_180);
+        }
+
+        if (ch_in_this_treatment == 2)
+        {
+            if ((ch_state & 0x01) && (ch_state & 0x02))
+            {
+                strcpy (s_signal_1, s_sinusoidal);
+                strcpy (s_signal_2, s_sinusoidal_180);
+            }
+
+            if ((ch_state & 0x01) && (ch_state & 0x04))
+            {
+                strcpy (s_signal_1, s_sinusoidal);
+                strcpy (s_signal_3, s_sinusoidal_180);
+            }
+
+            if ((ch_state & 0x02) && (ch_state & 0x04))
+            {
+                strcpy (s_signal_2, s_sinusoidal);
+                strcpy (s_signal_3, s_sinusoidal_180);
+            }
+        }
+
+        if (ch_in_this_treatment == 1)
+        {
+            strcpy (s_signal_1, s_sinusoidal);
+            strcpy (s_signal_2, s_sinusoidal);
+            strcpy (s_signal_3, s_sinusoidal);            
+        }
+    }
+
+    //tengo todas la seniales cargadas con sus fases ahora envio los canales    
+    if (ch_state & 0x01)
+    {
+        sprintf (buff, "%s %s %s\n",s_ch1, s_set_signal, s_signal_1);
+        Power_Send(buff);            
+    }
+
+    if (ch_state & 0x02)
+    {
+        sprintf (buff, "%s %s %s\n",s_ch2, s_set_signal, s_signal_2);
+        Power_Send(buff);                        
+    }
+
+    if (ch_state & 0x04)
+    {
+        sprintf (buff, "%s %s %s\n",s_ch3, s_set_signal, s_signal_3);
+        Power_Send(buff);
+    }        
 
     freq = TreatmentGetFrequency ();
     if (freq == TEN_HZ)
