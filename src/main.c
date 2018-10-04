@@ -20,6 +20,7 @@
 #include "comms_from_power.h"
 #include "comms.h"
 #include "usart.h"
+#include "GTK_Signal.h"    //por definiciones de canales
 
 #include <stdio.h>
 
@@ -33,7 +34,12 @@ volatile unsigned char usart3_have_data;
 volatile unsigned char usart4_have_data;
 volatile unsigned char usart5_have_data;
 
-unsigned short comms_messages = 0;
+unsigned short comms_messages_1 = 0;
+unsigned short comms_messages_2 = 0;
+unsigned short comms_messages_3 = 0;
+unsigned short comms_messages_rpi = 0;
+
+
 char buffSendErr[64];
 
 //--- Externals para enviar keepalive por UART
@@ -87,7 +93,7 @@ volatile unsigned short secs_in_treatment = 0;
 volatile unsigned short millis = 0;
 unsigned short secs_end_treatment;
 unsigned short secs_elapsed_up_to_now;
-volatile unsigned char timer_100ms = 0;
+volatile unsigned char timer_sync_xxx_ms = 0;
 
 //--- FUNCIONES DEL MODULO ---//
 void TimingDelay_Decrement(void);
@@ -267,12 +273,14 @@ int main (void)
                 LED1_ON;
         }
 
+#ifdef USE_SYNC_ALL_PLACES        
         //envio sync cada 100ms continuo
         if (!timer_sync_xxx_ms)
         {
             Power_Send_Unsigned((unsigned char *) ".", 1);
             timer_sync_xxx_ms = 100;
-        }            
+        }
+#endif
     }
 
 #endif //GATEWAY_TO_POWER_BOARDS
@@ -285,17 +293,10 @@ int main (void)
         {
             case TREATMENT_STANDBY:
 
-                if (comms_messages & COMM_CONF_CHANGE)
-                {
-                    comms_messages &= ~COMM_CONF_CHANGE;
-                    if (TreatmentAssertParams() == resp_ok)    //si tengo todo lo envio
-                        PowerSendConf();                        
-                }
-
-                if (comms_messages & COMM_START_TREAT)
+                if (comms_messages_rpi & COMM_START_TREAT)
                 {
                     //me piden por el puerto que arranque el tratamiento
-                    comms_messages &= ~COMM_START_TREAT;
+                    comms_messages_rpi &= ~COMM_START_TREAT;
                     if (TreatmentAssertParams() == resp_error)
                     {
                         RPI_Send("ERROR\r\n");
@@ -321,65 +322,80 @@ int main (void)
             case TREATMENT_RUNNING:
                 PowerCommunicationStack();    //me comunico con las potencias para conocer el estado
 
-                if (comms_messages & COMM_PAUSE_TREAT)
+                if (comms_messages_rpi & COMM_PAUSE_TREAT)
                 {
-                    comms_messages &= ~COMM_PAUSE_TREAT;
+                    comms_messages_rpi &= ~COMM_PAUSE_TREAT;
                     RPI_Send("OK\r\n");
                     PowerSendStop();
                     main_state = TREATMENT_PAUSED;
                     secs_elapsed_up_to_now = secs_in_treatment;
                 }
 
-                if (comms_messages & COMM_STOP_TREAT)
+                if (comms_messages_rpi & COMM_STOP_TREAT)
                 {
-                    comms_messages &= ~COMM_STOP_TREAT;
+                    comms_messages_rpi &= ~COMM_STOP_TREAT;
                     //termine el tratamiento
                     RPI_Send("OK\r\n");
                     PowerSendStop();
                     main_state = TREATMENT_STOPPING;
                 }
-                
+
+                //me mandaron start???
+                if (comms_messages_rpi & COMM_START_TREAT)
+                {
+                    comms_messages_rpi &= ~COMM_START_TREAT;
+                    RPI_Send("ERROR\r\n");
+                }
+
                 if (secs_in_treatment >= secs_end_treatment)
                 {
                     //termine el tratamiento
-                    // comms_messages &= ~COMM_STOP_TREAT;                 
                     PowerSendStop();
+                    RPI_Send("ended ok\r\n");
                     main_state = TREATMENT_STOPPING;
                 }
 
-                if ((comms_messages & COMM_ERROR_OVERCURRENT) ||
-                    (comms_messages & COMM_ERROR_NO_CURRENT) ||
-                    (comms_messages & COMM_ERROR_SOFT_OVERCURRENT) ||
-                    (comms_messages & COMM_ERROR_OVERTEMP) ||
-                    (comms_messages & COMM_NO_COMM_CH1) ||
-                    (comms_messages & COMM_NO_COMM_CH2) ||
-                    (comms_messages & COMM_NO_COMM_CH3))                    
+                //reviso si hay algun canal con error
+                if ((comms_messages_1 & COMM_POWER_ERROR_MASK) ||
+                    (comms_messages_2 & COMM_POWER_ERROR_MASK) ||
+                    (comms_messages_3 & COMM_POWER_ERROR_MASK))
                 {
                     PowerSendStop();
                     LED1_ON;
-                    RaspBerry_Report_Errors(&comms_messages);
+                    if (comms_messages_1 & COMM_POWER_ERROR_MASK)
+                        RaspBerry_Report_Errors(CH1, &comms_messages_1);
+
+                    if (comms_messages_2 & COMM_POWER_ERROR_MASK)
+                        RaspBerry_Report_Errors(CH2, &comms_messages_2);
+
+                    if (comms_messages_3 & COMM_POWER_ERROR_MASK)
+                        RaspBerry_Report_Errors(CH3, &comms_messages_3);
+                    
                     LED1_OFF;
                     main_state = TREATMENT_WITH_ERRORS;
-                    sprintf (buff, "treat err, msg: 0x%04x\r\n", comms_messages);
+                    sprintf (buff, "treat err, ch1: 0x%04x, ch2: 0x%04x, ch3: 0x%04x\r\n",
+                             comms_messages_1,
+                             comms_messages_2,
+                             comms_messages_3);
+                    
                     RPI_Send(buff);
                 }
                 break;
 
             case TREATMENT_PAUSED:
-
-                if (comms_messages & COMM_START_TREAT)
+                if (comms_messages_rpi & COMM_START_TREAT)
                 {
-                    comms_messages &= ~COMM_START_TREAT;
+                    comms_messages_rpi &= ~COMM_START_TREAT;
                     secs_in_treatment = secs_elapsed_up_to_now;
                     RPI_Send("OK\r\n");
                     PowerSendStart();
                     main_state = TREATMENT_RUNNING;
                 }
 
-                if (comms_messages & COMM_STOP_TREAT)
+                if (comms_messages_rpi & COMM_STOP_TREAT)
                 {
                     //estaba en pausa y me mandaron stop
-                    comms_messages &= ~COMM_STOP_TREAT;
+                    comms_messages_rpi &= ~COMM_STOP_TREAT;
                     RPI_Send("OK\r\n");
                     PowerSendStop();
                     main_state = TREATMENT_STOPPING;
@@ -387,13 +403,25 @@ int main (void)
                 break;
                 
             case TREATMENT_STOPPING:
-                sprintf (buff, "treat end, msg: 0x%04x\r\n", comms_messages);
+                sprintf (buff, "treat end, ch1: 0x%04x, ch2: 0x%04x, ch3: 0x%04x\r\n",
+                         comms_messages_1,
+                         comms_messages_2,
+                         comms_messages_3);
+                    
                 RPI_Send(buff);
                 main_state = TREATMENT_STANDBY;
                 break;
 
             case TREATMENT_WITH_ERRORS:
-
+                Wait_ms(1000);
+                RPI_Send("STOP\r\n");
+                Wait_ms(1000);
+                RPI_Send("STOP\r\n");
+                Wait_ms(1000);
+                RPI_Send("Flushing errors\r\n");
+                Power_Send("chf flush errors\r\n");
+                Wait_ms(1000);
+                main_state = TREATMENT_STANDBY;
                 break;
 
             default:
@@ -407,6 +435,15 @@ int main (void)
 
         //reviso comunicacion con potencias
         UpdatePowerMessages();
+
+#ifdef USE_SYNC_ALL_PLACES        
+        //envio sync cada 100ms continuo
+        if (!timer_sync_xxx_ms)
+        {
+            Power_Send_Unsigned((unsigned char *) ".", 1);
+            timer_sync_xxx_ms = 100;
+        }
+#endif        
     }
 #endif //MAGNETO_NORMAL
     //---- Fin Programa Pricipal ----------

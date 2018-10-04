@@ -59,9 +59,7 @@ typedef struct {
 typedef struct {
     signals_struct_t treatment_signal;
     unsigned short treatment_time;
-    unsigned char ch1_enable;
-    unsigned char ch2_enable;
-    unsigned char ch3_enable;    
+    unsigned char channels_in_treatment;
     
 } treatment_conf_t;
 
@@ -99,6 +97,14 @@ typedef enum
 
 
 //--- Exported constants ---//
+#define ENABLE_CH1_FLAG    0x41
+#define ENABLE_CH2_FLAG    0x42
+#define ENABLE_CH3_FLAG    0x44
+
+#define DISABLE_CH1_FLAG    0x81
+#define DISABLE_CH2_FLAG    0x82
+#define DISABLE_CH3_FLAG    0x84
+
 
 //--- Exported macro ---//
 #define SIZEOF_SIGNALS		150
@@ -125,7 +131,9 @@ unsigned short TreatmentGetTime (void);
 void TreatmentGetAllConf (char *);
 resp_t TreatmentTranslateOldMsg (char *);
 resp_t TreatmentAssertParams (void);
-resp_t TreatmentChannelFlags (ch_in_treatment_t);
+void TreatmentSetChannelsFlag (unsigned char);
+unsigned char TreatmentGetChannelsFlag (void);
+
 
 #endif
 //--- END OF FILE ---//

@@ -36,7 +36,7 @@
 
 //--- Exported functions ---//
 void UpdateRaspberryMessages (void);
-void RaspBerry_Report_Errors (unsigned short *);
+void RaspBerry_Report_Errors (unsigned char, unsigned short *);
 
 
 #endif

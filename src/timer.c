@@ -12,12 +12,17 @@
 #include "timer.h"
 #include "stm32f10x.h"
 #include "hard.h"
+#ifdef USE_SYNC_ALL_PLACES
+#include "comms_from_power.h"
+#include "usart.h"
+#endif
 
 
 /* Externals ------------------------------------------------------------------*/
 extern volatile unsigned short wait_ms_var;
-
-
+#ifdef USE_SYNC_ALL_PLACES
+extern volatile unsigned char timer_sync_xxx_ms;
+#endif
 
 /* Globals ------------------------------------------------------------------*/
 
@@ -118,6 +123,16 @@ void Wait_ms (unsigned short a)
     else
         wait_ms_var = a;
 
-    while (wait_ms_var);
+    while (wait_ms_var)
+    {
+#ifdef USE_SYNC_ALL_PLACES
+        //envio sync cada 100ms continuo
+        if (!timer_sync_xxx_ms)
+        {
+            Power_Send_Unsigned((unsigned char *) ".", 1);
+            timer_sync_xxx_ms = 100;
+        }
+#endif
+    }
 }
 

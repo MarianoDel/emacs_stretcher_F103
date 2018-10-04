@@ -24,6 +24,12 @@
 treatment_conf_t treatment_conf;
 unsigned char global_error = 0;
 
+// Private Defines ----------------------------------------
+#define ENABLE_CHX_MASK    0x40
+#define DISABLE_CHX_MASK    0x80
+#define CHX_MASK        0x0F
+
+
 //--- FUNCIONES DEL MODULO ---//
 
 resp_t TreatmentSetSignalType (signal_type_t a)
@@ -57,28 +63,42 @@ resp_t TreatmentSetFrequency (frequency_t a)
     return resp_ok;
 }
 
-resp_t TreatmentChannelFlags (ch_in_treatment_t a)
+void TreatmentSetChannelsFlag (unsigned char  a)
 {
-    if (a == CH1_ENABLE)
-        treatment_conf.ch1_enable = 1;
+    if (a & ENABLE_CHX_MASK)
+        treatment_conf.channels_in_treatment |= (a & CHX_MASK);
 
-    if (a == CH2_ENABLE)
-        treatment_conf.ch2_enable = 1;
-
-    if (a == CH3_ENABLE)
-        treatment_conf.ch3_enable = 1;
-
-    if (a == CH1_DISABLE)
-        treatment_conf.ch1_enable = 0;
-
-    if (a == CH2_DISABLE)
-        treatment_conf.ch2_enable = 0;
-
-    if (a == CH3_DISABLE)
-        treatment_conf.ch3_enable = 0;
-    
-    return resp_ok;
+    if (a & DISABLE_CHX_MASK)
+        treatment_conf.channels_in_treatment &= (~(a & CHX_MASK));
 }
+
+unsigned char TreatmentGetChannelsFlag (void)
+{
+    return (treatment_conf.channels_in_treatment & CHX_MASK);
+}
+
+// resp_t TreatmentChannelFlags (ch_in_treatment_t a)
+// {
+//     if (a == CH1_ENABLE)
+//         treatment_conf.ch1_enable = 1;
+
+//     if (a == CH2_ENABLE)
+//         treatment_conf.ch2_enable = 1;
+
+//     if (a == CH3_ENABLE)
+//         treatment_conf.ch3_enable = 1;
+
+//     if (a == CH1_DISABLE)
+//         treatment_conf.ch1_enable = 0;
+
+//     if (a == CH2_DISABLE)
+//         treatment_conf.ch2_enable = 0;
+
+//     if (a == CH3_DISABLE)
+//         treatment_conf.ch3_enable = 0;
+    
+//     return resp_ok;
+// }
 
 frequency_t TreatmentGetFrequency (void)
 {
@@ -230,6 +250,9 @@ resp_t TreatmentAssertParams (void)
     if ((treatment_conf.treatment_signal.signal != SQUARE_SIGNAL) &&
         (treatment_conf.treatment_signal.signal != TRIANGULAR_SIGNAL) &&
         (treatment_conf.treatment_signal.signal != SINUSOIDAL_SIGNAL))
+        return resp;
+
+    if (!(treatment_conf.channels_in_treatment & CHX_MASK))
         return resp;
 
     return resp_ok;

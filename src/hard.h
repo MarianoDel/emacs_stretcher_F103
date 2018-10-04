@@ -25,13 +25,15 @@
 #define SOFTWARE_VERSION_1_0        //habla contra rpi con programa magneto y traduce a micros potencia
 
 //-------- Type of Program (depending on software version) ----------------
-// #define MAGNETO_NORMAL
-#define GATEWAY_TO_POWER_BOARDS
+#define MAGNETO_NORMAL
+// #define GATEWAY_TO_POWER_BOARDS
 
 
 
 //-------- Type of Program and Features ----------------
 //Si utiliza la proteccion con la int para cortar la corriente
+// #define USE_SYNC_ALL_PLACES    //manda sync incluso en los Wat_ms()
+
 // #define USE_PROTECTION_WITH_INT
 
 //Si utiliza la proteccion de soft overcurrent o no
