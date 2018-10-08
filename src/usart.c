@@ -153,7 +153,16 @@ void USART1_IRQHandler (void)
 
         if (prx1 < &rx1buff[SIZEOF_RXDATA - 1])
         {
+#ifdef MAGNETO_NORMAL
+            //al /r no le doy bola
+            if (dummy == '\r')
+            {
+            }            
+            else if ((dummy == '\n') || (dummy == 26))		//26 es CTRL-Z
+#endif
+#ifdef GATEWAY_TO_POWER_BOARDS
             if ((dummy == '\n') || (dummy == '\r') || (dummy == 26))		//26 es CTRL-Z
+#endif
             {
                 *prx1 = '\0';
                 usart1_have_data = 1;

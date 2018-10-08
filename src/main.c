@@ -278,7 +278,10 @@ int main (void)
         if (!timer_sync_xxx_ms)
         {
             Power_Send_Unsigned((unsigned char *) ".", 1);
-            timer_sync_xxx_ms = 100;
+            if (treatment_conf.timer_synchro < TIMER_SYNCHRO_MIN)
+                timer_sync_xxx_ms = TIMER_SYNCHRO_MIN;
+            else
+                timer_sync_xxx_ms = treatment_conf.timer_synchro;
         }
 #endif
     }
@@ -440,8 +443,14 @@ int main (void)
         //envio sync cada 100ms continuo
         if (!timer_sync_xxx_ms)
         {
+            unsigned short tim_sync;
+            
             Power_Send_Unsigned((unsigned char *) ".", 1);
-            timer_sync_xxx_ms = 100;
+            tim_sync = TreatmentGetSynchroTimer();
+            if (tim_sync < TIMER_SYNCHRO_MIN)
+                timer_sync_xxx_ms = TIMER_SYNCHRO_MIN;
+            else
+                timer_sync_xxx_ms = tim_sync;
         }
 #endif        
     }
@@ -481,9 +490,6 @@ void TimingDelay_Decrement(void)
 
     // if (timer_led_pwm < 0xFFFF)
     //     timer_led_pwm ++;
-
-    if (timer_sync_xxx_ms)
-        timer_sync_xxx_ms--;
 }
 
 //--- end of file ---//

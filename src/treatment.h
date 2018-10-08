@@ -60,6 +60,7 @@ typedef struct {
     signals_struct_t treatment_signal;
     unsigned short treatment_time;
     unsigned char channels_in_treatment;
+    unsigned short timer_synchro;
     
 } treatment_conf_t;
 
@@ -105,6 +106,13 @@ typedef enum
 #define DISABLE_CH2_FLAG    0x82
 #define DISABLE_CH3_FLAG    0x84
 
+//timer synchro cuenta cada 100us
+#define TIMER_SYNCHRO_MIN     100    //minimo en 100Hz
+#define TIMER_SYNCHRO_10HZ    1000
+#define TIMER_SYNCHRO_30HZ    333
+#define TIMER_SYNCHRO_60HZ    166
+
+
 
 //--- Exported macro ---//
 #define SIZEOF_SIGNALS		150
@@ -133,7 +141,7 @@ resp_t TreatmentTranslateOldMsg (char *);
 resp_t TreatmentAssertParams (void);
 void TreatmentSetChannelsFlag (unsigned char);
 unsigned char TreatmentGetChannelsFlag (void);
-
+unsigned short TreatmentGetSynchroTimer (void);
 
 #endif
 //--- END OF FILE ---//

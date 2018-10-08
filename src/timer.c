@@ -15,6 +15,7 @@
 #ifdef USE_SYNC_ALL_PLACES
 #include "comms_from_power.h"
 #include "usart.h"
+#include "treatment.h"
 #endif
 
 
@@ -38,7 +39,10 @@ void TIM7_IRQHandler (void)	//1mS
         LED2_OFF;
     else
         LED2_ON;
-    
+#ifdef USE_SYNC_ALL_PLACES
+    if (timer_sync_xxx_ms)
+        timer_sync_xxx_ms--;
+#endif
 }
 
 
@@ -53,6 +57,7 @@ void TIM7_IRQHandler (void)	//1mS
 
 
 //inicializo el TIM7 para interrupciones
+//int cada 100us
 void TIM7_Init(void)
 {
 //    Counter Register (TIMx_CNT)
@@ -67,8 +72,8 @@ void TIM7_Init(void)
         RCC->APB1ENR |= 0x00000020;
 
     //--- Config ----//
-    TIM7->ARR = 1000;
-    //TIM7->ARR = 100;
+    // TIM7->ARR = 1000;
+    TIM7->ARR = 100;
     TIM7->CNT = 0;
     TIM7->PSC = 71;
     TIM7->EGR = TIM_EGR_UG; //update registers
@@ -129,8 +134,14 @@ void Wait_ms (unsigned short a)
         //envio sync cada 100ms continuo
         if (!timer_sync_xxx_ms)
         {
+            unsigned short tim_sync;
             Power_Send_Unsigned((unsigned char *) ".", 1);
-            timer_sync_xxx_ms = 100;
+
+            tim_sync = TreatmentGetSynchroTimer();
+            if (tim_sync < TIMER_SYNCHRO_MIN)
+                timer_sync_xxx_ms = TIMER_SYNCHRO_MIN;
+            else
+                timer_sync_xxx_ms = tim_sync;
         }
 #endif
     }

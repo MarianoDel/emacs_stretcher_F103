@@ -31,8 +31,7 @@
 
 
 //-------- Type of Program and Features ----------------
-//Si utiliza la proteccion con la int para cortar la corriente
-// #define USE_SYNC_ALL_PLACES    //manda sync incluso en los Wat_ms()
+#define USE_SYNC_ALL_PLACES    //manda sync incluso en los Wait_ms()
 
 // #define USE_PROTECTION_WITH_INT
 

@@ -52,15 +52,35 @@ signal_type_t TreatmentGetSignalType (void)
 
 resp_t TreatmentSetFrequency (frequency_t a)
 {
-    if ((a == TEN_HZ) ||
-        (a == THIRTY_HZ) ||
-        (a == SIXTY_HZ))
-
+    resp_t resp = resp_error;
+    
+    if (a == TEN_HZ)
+    {
         treatment_conf.treatment_signal.frequency = a;
-    else
-        return resp_error;
+        treatment_conf.timer_synchro = TIMER_SYNCHRO_10HZ;
+        resp = resp_ok;
+    }
 
-    return resp_ok;
+    if (a == THIRTY_HZ)
+    {
+        treatment_conf.treatment_signal.frequency = a;
+        treatment_conf.timer_synchro = TIMER_SYNCHRO_30HZ;
+        resp = resp_ok;
+    }
+
+    if (a == SIXTY_HZ)
+    {
+        treatment_conf.treatment_signal.frequency = a;
+        treatment_conf.timer_synchro = TIMER_SYNCHRO_60HZ;
+        resp = resp_ok;
+    }
+    
+    return resp;
+}
+
+unsigned short TreatmentGetSynchroTimer (void)
+{
+    return treatment_conf.timer_synchro;
 }
 
 void TreatmentSetChannelsFlag (unsigned char  a)
