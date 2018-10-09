@@ -22,7 +22,7 @@
 /* Externals ------------------------------------------------------------------*/
 extern volatile unsigned short wait_ms_var;
 #ifdef USE_SYNC_ALL_PLACES
-extern volatile unsigned char timer_sync_xxx_ms;
+extern volatile unsigned short timer_sync_xxx_ms;
 #endif
 
 /* Globals ------------------------------------------------------------------*/
@@ -30,7 +30,7 @@ extern volatile unsigned char timer_sync_xxx_ms;
 
 /* Module Functions -----------------------------------------------------------*/
 
-void TIM7_IRQHandler (void)	//1mS
+void TIM7_IRQHandler (void)	//100us
 {
     if (TIM7->SR & 0x01)
         TIM7->SR = 0x00;    //bajar flag

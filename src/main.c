@@ -93,11 +93,12 @@ volatile unsigned short secs_in_treatment = 0;
 volatile unsigned short millis = 0;
 unsigned short secs_end_treatment;
 unsigned short secs_elapsed_up_to_now;
-volatile unsigned char timer_sync_xxx_ms = 0;
+volatile unsigned short timer_sync_xxx_ms = 0;
 
 //--- FUNCIONES DEL MODULO ---//
 void TimingDelay_Decrement(void);
 
+#define RPI_Flush_Comms (comms_messages_rpi &= ~(COMM_START_TREAT | COMM_STOP_TREAT | COMM_PAUSE_TREAT | COMM_CONF_CHANGE))
 
 int main (void)
 {
@@ -308,10 +309,10 @@ int main (void)
                     {
                         RPI_Send("OK\r\n");
                         PowerSendConf();
-                        PowerSendStart();
                         main_state = TREATMENT_STARTING;                        
                     }
                 }
+                RPI_Flush_Comms;
                 break;
 
             case TREATMENT_STARTING:
@@ -319,6 +320,7 @@ int main (void)
                 secs_in_treatment = 1;    //con 1 arranca el timer
                 secs_elapsed_up_to_now = 0;
                 PowerCommunicationStackReset();
+                PowerSendStart();
                 main_state = TREATMENT_RUNNING;
                 break;
 
@@ -364,7 +366,16 @@ int main (void)
                     (comms_messages_3 & COMM_POWER_ERROR_MASK))
                 {
                     PowerSendStop();
+
                     LED1_ON;
+                    secs_in_treatment = 0;    //con 0 freno el timer
+                    sprintf (buff, "treat err, ch1: 0x%04x, ch2: 0x%04x, ch3: 0x%04x\r\n",
+                             comms_messages_1,
+                             comms_messages_2,
+                             comms_messages_3);
+                    
+                    RPI_Send(buff);
+
                     if (comms_messages_1 & COMM_POWER_ERROR_MASK)
                         RaspBerry_Report_Errors(CH1, &comms_messages_1);
 
@@ -376,13 +387,8 @@ int main (void)
                     
                     LED1_OFF;
                     main_state = TREATMENT_WITH_ERRORS;
-                    sprintf (buff, "treat err, ch1: 0x%04x, ch2: 0x%04x, ch3: 0x%04x\r\n",
-                             comms_messages_1,
-                             comms_messages_2,
-                             comms_messages_3);
-                    
-                    RPI_Send(buff);
                 }
+                RPI_Flush_Comms;
                 break;
 
             case TREATMENT_PAUSED:
@@ -402,10 +408,12 @@ int main (void)
                     RPI_Send("OK\r\n");
                     PowerSendStop();
                     main_state = TREATMENT_STOPPING;
-                }                
+                }
+                RPI_Flush_Comms;
                 break;
                 
             case TREATMENT_STOPPING:
+                secs_in_treatment = 0;    //con 0 freno el timer
                 sprintf (buff, "treat end, ch1: 0x%04x, ch2: 0x%04x, ch3: 0x%04x\r\n",
                          comms_messages_1,
                          comms_messages_2,
