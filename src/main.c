@@ -392,9 +392,10 @@ int main (void)
                 break;
 
             case TREATMENT_PAUSED:
-                if (comms_messages_rpi & COMM_START_TREAT)
+                // un segundo pause, me hace arrancar nuevamente
+                if (comms_messages_rpi & COMM_PAUSE_TREAT)
                 {
-                    comms_messages_rpi &= ~COMM_START_TREAT;
+                    comms_messages_rpi &= ~COMM_PAUSE_TREAT;
                     secs_in_treatment = secs_elapsed_up_to_now;
                     RPI_Send("OK\r\n");
                     PowerSendStart();
