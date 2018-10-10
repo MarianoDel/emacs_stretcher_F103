@@ -139,14 +139,14 @@ enum bool
 #define OUT5_ON GPIOB->BSRR = 0x20000000
 
 //--- PB14 ---//
-#define OUT4 ((GPIOB->ODR & 0x4000) == 0)
-#define OUT4_OFF GPIOB->BSRR = 0x00004000
-#define OUT4_ON GPIOB->BSRR = 0x40000000
+#define OUT4 ((GPIOB->ODR & 0x4000) != 0)
+#define OUT4_ON GPIOB->BSRR = 0x00004000
+#define OUT4_OFF GPIOB->BSRR = 0x40000000
 
 //--- PB15 ---//
-#define OUT1 ((GPIOB->ODR & 0x8000) == 0)
-#define OUT1_OFF GPIOB->BSRR = 0x00008000
-#define OUT1_ON GPIOB->BSRR = 0x80000000
+#define OUT1 ((GPIOB->ODR & 0x8000) != 0)
+#define OUT1_ON GPIOB->BSRR = 0x00008000
+#define OUT1_OFF GPIOB->BSRR = 0x80000000
 
 //--- PC6 ---//
 #define OUT2 ((GPIOC->ODR & 0x0040) != 0)
@@ -306,6 +306,11 @@ typedef enum
 #define TIM_BIP_HALF_WAIT        800
 #define TIM_BIP_LONG        2000
 #define TIM_BIP_LONG_WAIT        2000
+
+//--- Tiempos (TIMEOUT) de salidas
+#define TIMER_OUT4_IN_ON       100
+
+
 
 //--- Exported Module Functions ----
 //--- Clock ---//

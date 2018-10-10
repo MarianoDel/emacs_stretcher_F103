@@ -26,6 +26,10 @@
 #define COMM_STOP_TREAT     0x0002
 #define COMM_PAUSE_TREAT    0x0004
 #define COMM_CONF_CHANGE    0x0008
+#define COMM_STRETCHER_UP   0x0010
+
+#define COMM_RPI_NORMAL_MSG_MASK          0x000F
+#define COMM_RPI_ALL_MSG_MASK          0x00FF
 
 //flags de mensajes placa potencia
 #define COMM_POWER_ERROR_MASK          0x00FF

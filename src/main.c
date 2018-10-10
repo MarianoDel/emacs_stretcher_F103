@@ -94,11 +94,12 @@ volatile unsigned short millis = 0;
 unsigned short secs_end_treatment;
 unsigned short secs_elapsed_up_to_now;
 volatile unsigned short timer_sync_xxx_ms = 0;
+volatile unsigned short timer_out4 = 0;
 
 //--- FUNCIONES DEL MODULO ---//
 void TimingDelay_Decrement(void);
 
-#define RPI_Flush_Comms (comms_messages_rpi &= ~(COMM_START_TREAT | COMM_STOP_TREAT | COMM_PAUSE_TREAT | COMM_CONF_CHANGE))
+#define RPI_Flush_Comms (comms_messages_rpi &= COMM_RPI_NORMAL_MSG_MASK)
 
 int main (void)
 {
@@ -140,8 +141,10 @@ int main (void)
     }
         
 
-// 	//Configuracion led. & Enabled Channels
+    //Configuracion led. & Enabled Channels
     GpioInit();
+    OUT4_OFF;
+    OUT1_OFF;
 
     //enciendo TIM7
     TIM7_Init();
@@ -273,6 +276,15 @@ int main (void)
             else
                 LED1_ON;
         }
+
+        // //en cualquier momento me pueden pedir mover la camilla
+        // if (comms_messages_rpi & COMM_STRETCHER_UP)
+        // {
+        //     comms_messages_rpi &= ~COMM_STRETCHER_UP;
+        //     timer_out4 = TIMER_OUT4_IN_ON;            
+        //     OUT4_ON;
+        // }
+
 
 #ifdef USE_SYNC_ALL_PLACES        
         //envio sync cada 100ms continuo
@@ -448,6 +460,16 @@ int main (void)
         //reviso comunicacion con potencias
         UpdatePowerMessages();
 
+        // en cualquier momento me pueden pedir mover la camilla
+        if (comms_messages_rpi & COMM_STRETCHER_UP)
+        {
+            comms_messages_rpi &= ~COMM_STRETCHER_UP;
+            timer_out4 = TIMER_OUT4_IN_ON;            
+            OUT4_ON;
+            OUT1_ON;
+        }        
+        
+        
 #ifdef USE_SYNC_ALL_PLACES        
         //envio sync cada 100ms continuo
         if (!timer_sync_xxx_ms)
@@ -486,6 +508,14 @@ void TimingDelay_Decrement(void)
             secs_in_treatment++;
             millis = 0;
         }
+    }
+
+    if (timer_out4)
+        timer_out4--;
+    else
+    {
+        OUT4_OFF;
+        OUT1_OFF;
     }
     
     // if (timer_standby)

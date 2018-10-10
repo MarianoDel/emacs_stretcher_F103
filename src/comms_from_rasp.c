@@ -175,6 +175,12 @@ static void RaspBerry_Messages (char * msg)
             RPI_Send((char *)"ERROR\r\n");
             
     }
+
+    else if (!strncmp(msg, (const char *)"stretcher up", (sizeof("stretcher up") - 1)))
+    {
+        comms_messages_rpi |= COMM_STRETCHER_UP;
+        RPI_Send((char *)"OK\r\n");        
+    }
     //fin mensajes nuevos
     
     //mensajes anteriores
