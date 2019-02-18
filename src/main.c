@@ -99,7 +99,7 @@ volatile unsigned short timer_out4 = 0;
 //--- FUNCIONES DEL MODULO ---//
 void TimingDelay_Decrement(void);
 
-#define RPI_Flush_Comms (comms_messages_rpi &= COMM_RPI_NORMAL_MSG_MASK)
+#define RPI_Flush_Comms (comms_messages_rpi &= ~COMM_RPI_ALL_MSG_MASK)
 
 int main (void)
 {

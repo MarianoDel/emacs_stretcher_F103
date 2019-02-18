@@ -28,7 +28,6 @@
 #define COMM_CONF_CHANGE    0x0008
 #define COMM_STRETCHER_UP   0x0010
 
-#define COMM_RPI_NORMAL_MSG_MASK          0x000F
 #define COMM_RPI_ALL_MSG_MASK          0x00FF
 
 //flags de mensajes placa potencia
