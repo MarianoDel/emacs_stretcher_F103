@@ -24,7 +24,6 @@ extern volatile unsigned char usart3_have_data;
 extern volatile unsigned char usart4_have_data;
 extern volatile unsigned char usart5_have_data;
 
-
 /* Globals ------------------------------------------------------------------*/
 //--- Private variables ---//
 //--- USART1 ---//
@@ -64,6 +63,7 @@ volatile unsigned char rx5buff[SIZEOF_RXDATA];
 
 
 volatile unsigned short dummy = 0;
+volatile unsigned char sync_pulse_flag = 0;
 
 
 /* Module Exported Functions -----------------------------------------------------------*/
@@ -153,16 +153,11 @@ void USART1_IRQHandler (void)
 
         if (prx1 < &rx1buff[SIZEOF_RXDATA - 1])
         {
-#ifdef MAGNETO_NORMAL
             //al /r no le doy bola
             if (dummy == '\r')
             {
             }            
             else if ((dummy == '\n') || (dummy == 26))		//26 es CTRL-Z
-#endif
-#ifdef GATEWAY_TO_POWER_BOARDS
-            if ((dummy == '\n') || (dummy == '\r') || (dummy == 26))		//26 es CTRL-Z
-#endif
             {
                 *prx1 = '\0';
                 usart1_have_data = 1;
@@ -318,16 +313,24 @@ void USART2_IRQHandler (void)
     {
         if (USART2->SR & USART_SR_TXE)
         {
-            if ((ptx2 < &tx2buff[SIZEOF_TXDATA]) && (ptx2 < ptx2_pckt_index))
+            if (sync_pulse_flag)
             {
-                USART2->DR = *ptx2;
-                ptx2++;
+                sync_pulse_flag = 0;
+                USART2->DR = '.';
             }
             else
             {
-                ptx2 = tx2buff;
-                ptx2_pckt_index = tx2buff;
-                USART2->CR1 &= ~USART_CR1_TXEIE;
+                if ((ptx2 < &tx2buff[SIZEOF_TXDATA]) && (ptx2 < ptx2_pckt_index))
+                {
+                    USART2->DR = *ptx2;
+                    ptx2++;
+                }
+                else
+                {
+                    ptx2 = tx2buff;
+                    ptx2_pckt_index = tx2buff;
+                    USART2->CR1 &= ~USART_CR1_TXEIE;
+                }
             }
         }
     }
@@ -732,6 +735,12 @@ void UART5_IRQHandler (void)
         dummy = UART5->SR;
         dummy = UART5->DR;
     }
+}
+
+//warpper para el flag
+void SyncPulse_Set (void)
+{
+    sync_pulse_flag = 1;
 }
 
 //---- End of File ----//

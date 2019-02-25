@@ -26,7 +26,7 @@
 
 //-------- Type of Program (depending on software version) ----------------
 #define MAGNETO_NORMAL
-// #define GATEWAY_TO_POWER_BOARDS
+
 
 
 
@@ -123,8 +123,8 @@ enum bool
 
 //PA4, PA5, PA6, PA7  NC
 
-//PC4    Analog
-//PC5    Analog
+//PC4    Analog Channel 14
+//PC5    Analog Channel 15
 
 //PB0, PB1, PB2 NC
 

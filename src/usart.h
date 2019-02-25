@@ -56,6 +56,11 @@
 #define RCC_UART5_CLKEN RCC->APB1ENR |= 0x00100000
 #define RCC_UART5_CLKDIS RCC->APB1ENR &= ~0x00100000
 
+//--- Exported Macros ------------------------------
+#define SEND_SYNC_PULSE    do { \
+        SyncPulse_Set (); \
+        USART2->CR1 |= USART_CR1_TXEIE;         \
+    } while (0)
 
 //--- Exported functions ---//
 void Usart1Config (void);
@@ -87,5 +92,7 @@ void Uart5Send (char *);
 void Uart5SendUnsigned (unsigned char *, unsigned char);
 unsigned char ReadUart5Buffer (unsigned char *, unsigned short);
 void UART5_IRQHandler (void);
+
+void SyncPulse_Set (void);
 
 #endif

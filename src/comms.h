@@ -27,6 +27,7 @@
 #define COMM_PAUSE_TREAT    0x0004
 #define COMM_CONF_CHANGE    0x0008
 #define COMM_STRETCHER_UP   0x0010
+#define COMM_GOTO_BRIDGE    0x0020
 
 #define COMM_RPI_ALL_MSG_MASK          0x00FF
 

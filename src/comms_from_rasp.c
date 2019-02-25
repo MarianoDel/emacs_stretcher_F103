@@ -11,7 +11,6 @@
 /* Includes ------------------------------------------------------------------*/
 // #include "stm32f10x.h"
 #include "hard.h"
-#include "GTK_Signal.h"    //por definiciones de canales
 
 #include "comms_from_rasp.h"
 #include "comms.h"
@@ -181,6 +180,13 @@ static void RaspBerry_Messages (char * msg)
         comms_messages_rpi |= COMM_STRETCHER_UP;
         RPI_Send((char *)"OK\r\n");        
     }
+
+    else if (!strncmp(msg, "goto bridge mode", sizeof("goto bridge mode") - 1))
+    {
+        comms_messages_rpi |= COMM_GOTO_BRIDGE;
+        RPI_Send((char *)"Going to Bridge Mode...\r\n");
+    }
+
     //fin mensajes nuevos
     
     //mensajes anteriores

@@ -67,14 +67,12 @@ UADEFS =
 SRC  = ./src/main.c
 SRC += ./src/gpio.c
 SRC += ./src/it.c
-# SRC += ./src/GTK_Hard.c
-# SRC += ./src/GTK_Signal.c
-# #SRC += ./src/pantallas.c
+SRC += ./src/adc.c
 SRC += ./src/usart.c
 SRC += ./src/timer.c
-# SRC += ./src/pwm.c
+SRC += ./src/dma.c
 # SRC += ./src/flash_program.c
-# SRC += ./src/adc.c
+
 SRC += ./src/comms_from_rasp.c
 SRC += ./src/comms_from_power.c
 SRC += ./src/treatment.c

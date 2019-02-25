@@ -11,9 +11,9 @@
 /* Includes ------------------------------------------------------------------*/
 // #include "stm32f10x.h"
 #include "hard.h"
-#include "GTK_Signal.h"    //definicion de canales
 
 #include "comms_from_power.h"
+#include "comms_from_rasp.h"
 #include "comms.h"
 #include "usart.h"
 #include "treatment.h"

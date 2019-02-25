@@ -97,15 +97,31 @@ void GpioInit (void)
         RCC_GPIOD_CLKEN;
 
     //--- GPIOA Low Side ------------------//
-    temp = GPIOA->CRL;    //PA2-PA3 Alternative (Usart2)
+    //PA0 NC
+    //PA1 NC
+    //PA2 alternative Tx Usart2
+    //PA3 alternative Rx Usart2
+    //PA4 NC
+    //PA5 NC
+    //PA6 NC
+    //PA7 NC
+    temp = GPIOA->CRL;
     temp &= 0xFFFF00FF;
     temp |= 0x00008A00;
     GPIOA->CRL = temp;
 
     //--- GPIOA High Side ------------------//
-    temp = GPIOA->CRH;    //PA9-PA10 Alternative (Usart1)
-    temp &= 0xFFFFF00F;
-    temp |= 0x000008A0;
+    //PA8 IN0
+    //PA9 alternative Tx Usart1
+    //PA10 alternative Rx Usart1
+    //PA11 NC
+    //PA12 NC
+    //PA13 NC
+    //PA14 NC
+    //PA15 NC
+    temp = GPIOA->CRH;
+    temp &= 0xFFFFF000;
+    temp |= 0x000008A4;
     GPIOA->CRH = temp;
 
     //--- GPIOA Pull-Up Pull-Dwn ------------------//
@@ -113,38 +129,75 @@ void GpioInit (void)
     temp &= 0xFFF7;
     temp |= 0x0008;
     GPIOA->ODR = temp;
-    
 
     //--- GPIOB Low Side -------------------//
-    temp = GPIOB->CRL;    //PB5 output
+    //PB0 NC
+    //PB1 NC
+    //PB2 NC
+    //PB3 NC
+    //PB4 NC
+    //PB5 SW_RX_TX    RS485
+    //PB6 
+    //PB7 
+    temp = GPIOB->CRL;
     temp &= 0xFF0FFFFF;
     temp |= 0x00200000;
     GPIOB->CRL = temp;
 
     //--- GPIOB High Side -------------------//
-    temp = GPIOB->CRH;    //PB10-PB11 Alternative (Usart3); PB13-PB15 output
+    //PB8 NC
+    //PB9 NC
+    //PB10 alternative Tx Usart3
+    //PB11 alternative Rx Usart3
+    //PB12 NC
+    //PB13 OUT5
+    //PB14 OUT4
+    //PB15 OUT1  
+    temp = GPIOB->CRH;
     temp &= 0x000F00FF;
     temp |= 0x22208A00;
     GPIOB->CRH = temp;    
     
     //--- GPIOC Low Side -------------------//
-    temp = GPIOC->CRL;    //PC0-PC1 output; PC6-PC7 output
-    temp &= 0x00FFFF00;
+    //PC0 LED1
+    //PC1 LED2
+    //PC2 NC
+    //PC3 NC
+    //PC4 Sense 200V ADC Channel 14
+    //PC5 Sense 15V ADC Channel 15
+    //PC6 OUT2
+    //PC7 OUT3
+    temp = GPIOC->CRL;
+    temp &= 0x0000FF00;
     temp |= 0x22000022;
     GPIOC->CRL = temp;
 
-    //--- GPIOC High Side -------------------//    
-    temp = GPIOC->CRH;    //PC8-PC9 Input; PC10-PC11 Alternative (Uart4); PC12 Alterantive (Uart5)
+    //--- GPIOC High Side -------------------//
+    //PC8 IN2
+    //PC9 IN1
+    //PC10 alternative Tx Uart4
+    //PC11 alternativo Rx Uart4
+    //PC12 alternativo Tx Uart5
+    //PC13 NC
+    //PC14 NC    oscillator
+    //PC15 NC    oscillator
+    temp = GPIOC->CRH;   
     temp &= 0xFFF00000;
     temp |= 0x000A8A88;
     GPIOC->CRH = temp;
 
     //--- GPIOD Low Side -------------------//
-    temp = GPIOD->CRL;    //PD2 Alterantive (Uart5)
+    //PD0 NC
+    //PD1 NC
+    //PD2 alternative Rx Uart5
+    //PD3 No implemented
+    //PD4 No implemented
+    //PD5 No implemented
+    //PD6 No implemented
+    //PD7 No implemented    
+    temp = GPIOD->CRL;   
     temp &= 0xFFFFF0FF;    
     temp |= 0x00000A00;
     GPIOD->CRL = temp;
-
-    
 
 }
