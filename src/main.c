@@ -145,6 +145,10 @@ int main (void)
     //enciendo TIM7
     TIM7_Init();
 
+    //-- DMA configuration.
+    DMAConfig();
+    DMAEnable;
+    
     //Uso ADC con DMA
     AdcConfig();
 
@@ -174,27 +178,17 @@ int main (void)
 #endif
 
     //--- Test ADC Multiple conversion Scanning Continuous Mode and DMA -------------------//
-    //-- DMA configuration.
-    DMAConfig();
-    DMA1_Channel1->CCR |= DMA_CCR1_EN;
-        
-    ADC1->CR1 |= ADC_CR1_SCAN;    //convertir toda la secuencia de canales
-    ADC1->CR2 |= ADC_CR2_CONT;    //convertir en forma continua
-        
-    //activo primera conversion por las dudas        
-    if (ADC1->CR2 & ADC_CR2_ADON)
-    {
-        RPI_Send("Adon is on\n");
-        //activo una primera conversion
-        ADC1->CR2 |= ADC_CR2_SWSTART | ADC_CR2_EXTTRIG;
-    }
-
     unsigned int seq_cnt = 0;
+    ADCStart;
     while (1)
     {
         if (!wait_ms_var)
         {
-            sprintf(buffSendErr, "High supply: %d, Low supply: %d, seq: %d\n", Sense_200V, Sense_15V, seq_cnt);
+            sprintf(buffSendErr, "High supply: %d, Low supply: %d, seq: %d\n",
+                    Sense_200V,
+                    Sense_15V,
+                    seq_cnt);
+            
             RPI_Send(buffSendErr);
             wait_ms_var = 1000;
             seq_cnt = 0;

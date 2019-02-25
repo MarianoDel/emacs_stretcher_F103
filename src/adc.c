@@ -70,10 +70,9 @@ void AdcConfig (void)
     ADC1->SQR1 = 0x00000000;
     ADC1->SQR2 = 0x00000000;    
     
-    //set trigger & Continuos or Discontinuous
-    // ADC1->CR1 |= ADC_CR1_SCAN;
-    // ADC1->CR2 |= ADC_CR2_CONT | ADC_CR2_EXTSEL_2 | ADC_CR2_EXTSEL_1 | ADC_CR2_EXTSEL_0;    //soft trigger continuos
-    // ADC1->CR2 |= ADC_CR2_EXTSEL_2 | ADC_CR2_EXTSEL_1 | ADC_CR2_EXTSEL_0;    //soft trigger discontinuos
+    //set trigger (if it's soft look at the end) & Continuos or Discontinuous
+    ADC1->CR1 |= ADC_CR1_SCAN;
+    ADC1->CR2 |= ADC_CR2_CONT | ADC_CR2_EXTTRIG;
     
     //set sampling time for each channel
     // ADC1->SMPR2 |= ADC_SMPR2_SMP4_2 | ADC_SMPR2_SMP4_1 | ADC_SMPR2_SMP4_0;    //sample time Channel 4
@@ -84,19 +83,16 @@ void AdcConfig (void)
     ADC1->SMPR1 |= ADC_SMPR1_SMP15_2 | ADC_SMPR1_SMP15_1 | ADC_SMPR1_SMP15_0;    //sample time Channel 15   
 
 
-    //set regular channel selection
-    // ADC1->SQR3 |= ADC_SQR3_SQ1_2;                     //Channel 4
-    // ADC1->SQR3 |= ADC_SQR3_SQ2_2 | ADC_SQR3_SQ2_0;    //Channel 5
+    //set regular channel selection, start with 1
+    ADC1->SQR3 |= ADC_SQR3_SQ1_3 | ADC_SQR3_SQ1_2 | ADC_SQR3_SQ1_1;    //first Channel 14
+    ADC1->SQR3 |= ADC_SQR3_SQ2_3 | ADC_SQR3_SQ2_2 | ADC_SQR3_SQ2_1 | ADC_SQR3_SQ2_0;    //second Channel 15
     // ADC1->SQR3 |= ADC_SQR3_SQ3_2 | ADC_SQR3_SQ3_1;    //Channel 6
     // ADC1->SQR3 |= ADC_SQR3_SQ4_2 | ADC_SQR3_SQ4_1 | ADC_SQR3_SQ4_0;    //Channel 7
-    ADC1->SQR3 |= ADC_SQR3_SQ5_3 | ADC_SQR3_SQ5_3 | ADC_SQR3_SQ5_1;    //Channel 14
-    ADC1->SQR3 |= ADC_SQR3_SQ6_3 | ADC_SQR3_SQ6_2 | ADC_SQR3_SQ6_1 | ADC_SQR3_SQ6_0;    //Channel 15   
+    // ADC1->SQR3 |= ADC_SQR3_SQ5_3 | ADC_SQR3_SQ5_2 | ADC_SQR3_SQ5_1;    //Channel 14
+    // ADC1->SQR3 |= ADC_SQR3_SQ6_3 | ADC_SQR3_SQ6_2 | ADC_SQR3_SQ6_1 | ADC_SQR3_SQ6_0;    //Channel 15   
 
     //set the quantity of channels to convert
-    ADC1->SQR1 |=  ADC_SQR1_L_1;    //convert 2 channels
-    
-
-
+    ADC1->SQR1 |=  ADC_SQR1_L_0;    //convert 2 channels
 
     
 #ifdef ADC_WITH_INT        
@@ -123,7 +119,7 @@ void AdcConfig (void)
     while (ADC1->CR2 & ADC_CR2_CAL);
 
     //trigger by soft
-    ADC1->CR2 |= ADC_CR2_EXTSEL;
+    ADC1->CR2 |= ADC_CR2_EXTSEL;    //remember start ADC on main!!!
 
 #ifdef ADC_WITH_DMA
     ADC1->CR2 |= ADC_CR2_DMA;
