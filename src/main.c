@@ -147,7 +147,7 @@ int main (void)
 
     //-- DMA configuration.
     DMAConfig();
-    DMAEnable;
+    DMA_ENABLE;
     
     //Uso ADC con DMA
     AdcConfig();
@@ -178,28 +178,28 @@ int main (void)
 #endif
 
     //--- Test ADC Multiple conversion Scanning Continuous Mode and DMA -------------------//
-    unsigned int seq_cnt = 0;
-    ADCStart;
-    while (1)
-    {
-        if (!wait_ms_var)
-        {
-            sprintf(buffSendErr, "High supply: %d, Low supply: %d, seq: %d\n",
-                    Sense_200V,
-                    Sense_15V,
-                    seq_cnt);
+    // unsigned int seq_cnt = 0;
+    // ADCStart;
+    // while (1)
+    // {
+    //     if (!wait_ms_var)
+    //     {
+    //         sprintf(buffSendErr, "High supply: %d, Low supply: %d, seq: %d\n",
+    //                 Sense_200V,
+    //                 Sense_15V,
+    //                 seq_cnt);
             
-            RPI_Send(buffSendErr);
-            wait_ms_var = 1000;
-            seq_cnt = 0;
-        }
+    //         RPI_Send(buffSendErr);
+    //         wait_ms_var = 1000;
+    //         seq_cnt = 0;
+    //     }
 
-        if (sequence_ready)
-        {
-            seq_cnt++;
-            sequence_ready_reset;
-        }
-    }
+    //     if (sequence_ready)
+    //     {
+    //         seq_cnt++;
+    //         sequence_ready_reset;
+    //     }
+    // }
     //--- End Test ADC Multiple conversion Scanning Continuous Mode and DMA ----------------//        
     
     //---- Prueba Usart3 ----------
@@ -268,6 +268,8 @@ int main (void)
     //---- Fin Prueba Usart3 envia caracter solo 'd' ----------
 
     //---- Programa Principal ----------
+    ADC_START;
+    
     while (1)
     {
         switch (main_state)
@@ -483,10 +485,8 @@ int main (void)
         }
 
         if (sequence_ready)
-        {
             sequence_ready_reset;
-            
-        }
+
         
         
 #ifdef USE_SYNC_ALL_PLACES        

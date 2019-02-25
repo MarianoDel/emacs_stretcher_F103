@@ -11,6 +11,7 @@
 /* Includes ------------------------------------------------------------------*/
 // #include "stm32f10x.h"
 #include "hard.h"
+#include "adc.h"
 
 #include "comms_from_rasp.h"
 #include "comms.h"
@@ -26,6 +27,7 @@
 /* Externals ------------------------------------------------------------------*/
 extern volatile unsigned char rpi_have_data;
 extern unsigned short comms_messages_rpi;
+extern volatile unsigned short adc_ch [];
 
 
 
@@ -187,6 +189,33 @@ static void RaspBerry_Messages (char * msg)
         RPI_Send((char *)"Going to Bridge Mode...\r\n");
     }
 
+    else if (!strncmp(msg, "voltage", sizeof("voltage") - 1))
+    {
+        char to_send [64];
+        float fcalc = 1.0;
+        short volt_int, volt_dec;
+
+        fcalc = Sense_200V;
+        fcalc = fcalc * K_200V;
+        volt_int = (short) fcalc;
+        fcalc = fcalc - volt_int;
+        fcalc = fcalc * 10;
+        volt_dec = (short) fcalc;
+        sprintf(to_send, "High Supply: %3d.%01dV\r\n", volt_int, volt_dec);
+        RPI_Send(to_send);
+
+        fcalc = Sense_15V;
+        fcalc = fcalc * K_15V;
+        volt_int = (short) fcalc;
+        fcalc = fcalc - volt_int;
+        fcalc = fcalc * 10;
+        volt_dec = (short) fcalc;        
+        sprintf(to_send, "Low Supply: %3d.%01dV\r\n", volt_int, volt_dec);
+        RPI_Send(to_send);
+        
+        // sprintf(to_send, "High supply: %d, Low supply: %d\r\n", Sense_200V, Sense_15V);                
+        // RPI_Send(to_send);
+    }    
     //fin mensajes nuevos
     
     //mensajes anteriores

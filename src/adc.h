@@ -28,7 +28,7 @@
 #endif
 //----------- End of ADC Configurations --------------//
 
-#define ADCStart    (ADC1->CR2 |= ADC_CR2_SWSTART)
+#define ADC_START    (ADC1->CR2 |= ADC_CR2_SWSTART)
 
 #ifdef HARDWARE_VERSION_2_0
 #define Sense_200V     adc_ch[0]

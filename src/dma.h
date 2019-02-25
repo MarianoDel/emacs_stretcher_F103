@@ -21,7 +21,7 @@
 #define sequence_ready         (DMA1->ISR & DMA_ISR_TCIF1)
 #define sequence_ready_reset   (DMA1->IFCR = DMA_ISR_TCIF1)
 
-#define DMAEnable    (DMA1_Channel1->CCR |= DMA_CCR1_EN)
+#define DMA_ENABLE    (DMA1_Channel1->CCR |= DMA_CCR1_EN)
 
 //--- Exported constants ---//
 

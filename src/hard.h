@@ -45,6 +45,8 @@
 //-------- Kind of Reports Sended ----------------
 
 //-------- Others Configurations depending on the formers ------------
+#define K_200V    0.0957
+#define K_15V    0.00804
 
 //-------- Hysteresis Conf ------------------------
 
