@@ -56,15 +56,22 @@ const char s_chf [] = {"chf"};
 const char s_set_signal [] = {"signal"};
 const char s_frequency [] = {"frequency"};
 const char s_power [] = {"power"};
+
 const char s_square_0 [] = {"square 0"};
-const char s_square_90 [] = {"square 90"};
+const char s_square_120 [] = {"square 120"};
 const char s_square_180 [] = {"square 180"};
+const char s_square_240 [] = {"square 240"};
+
 const char s_triangular_0 [] = {"triangular 0"};
-const char s_triangular_90 [] = {"triangular 90"};
+const char s_triangular_120 [] = {"triangular 120"};
 const char s_triangular_180 [] = {"triangular 180"};
+const char s_triangular_240 [] = {"triangular 240"};
+
 const char s_sinusoidal_0 [] = {"sinusoidal 0"};
-const char s_sinusoidal_90 [] = {"sinusoidal 90"};
+const char s_sinusoidal_120 [] = {"sinusoidal 120"};
 const char s_sinusoidal_180 [] = {"sinusoidal 180"};
+const char s_sinusoidal_240 [] = {"sinusoidal 240"};
+
 const char s_ten_hz [] = {"10Hz"};
 const char s_thirty_hz [] = {"30Hz"};
 const char s_sixty_hz [] = {"60Hz"};
@@ -123,8 +130,8 @@ void PowerSendConf (void)
         if (ch_in_this_treatment == 3)
         {
             strcpy (s_signal_1, s_square_0);
-            strcpy (s_signal_2, s_square_90);
-            strcpy (s_signal_3, s_square_180);
+            strcpy (s_signal_2, s_square_120);
+            strcpy (s_signal_3, s_square_240);
         }
 
         if (ch_in_this_treatment == 2)
@@ -161,8 +168,8 @@ void PowerSendConf (void)
         if (ch_in_this_treatment == 3)
         {
             strcpy (s_signal_1, s_triangular_0);
-            strcpy (s_signal_2, s_triangular_90);
-            strcpy (s_signal_3, s_triangular_180);
+            strcpy (s_signal_2, s_triangular_120);
+            strcpy (s_signal_3, s_triangular_240);
         }
 
         if (ch_in_this_treatment == 2)
@@ -199,8 +206,8 @@ void PowerSendConf (void)
         if (ch_in_this_treatment == 3)
         {
             strcpy (s_signal_1, s_sinusoidal_0);
-            strcpy (s_signal_2, s_sinusoidal_90);
-            strcpy (s_signal_3, s_sinusoidal_180);
+            strcpy (s_signal_2, s_sinusoidal_120);
+            strcpy (s_signal_3, s_sinusoidal_240);
         }
 
         if (ch_in_this_treatment == 2)

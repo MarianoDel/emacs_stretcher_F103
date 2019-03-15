@@ -62,6 +62,7 @@ unsigned short buzzer_timeout = 0;
 //--- Externals de los timers
 volatile unsigned short wait_ms_var = 0;
 volatile unsigned short comms_timeout = 0;
+volatile unsigned short timer_led = 0;
 
 // //Estructuras.
 // session_typedef session_slot_aux;
@@ -158,7 +159,8 @@ int main (void)
     //usart2 para comunicacion con micros
     Usart2Config();
     
-
+    ChangeLed(LED_NO_BLINKING);
+    
     //-- Welcome Messages --------------------
     Usart1Send("\nGausstek Stretcher Board -- powered by: Kirno Technology\n");
     Wait_ms(100);
@@ -269,7 +271,8 @@ int main (void)
 
     //---- Programa Principal ----------
     ADC_START;
-    
+    ChangeLed(LED_TREATMENT_STANDBY);
+
     while (1)
     {
         switch (main_state)
@@ -288,7 +291,7 @@ int main (void)
                 {
                     RPI_Send("OK\r\n");
                     PowerSendConf();
-                    main_state = TREATMENT_STARTING;                        
+                    main_state = TREATMENT_STARTING;
                 }
             }
             RPI_Flush_Comms;
@@ -301,6 +304,7 @@ int main (void)
             PowerCommunicationStackReset();
             PowerSendStart();
             main_state = TREATMENT_RUNNING;
+            ChangeLed(LED_TREATMENT_GENERATING);
             break;
 
         case TREATMENT_RUNNING:
@@ -312,6 +316,7 @@ int main (void)
                 RPI_Send("OK\r\n");
                 PowerSendStop();
                 main_state = TREATMENT_PAUSED;
+                ChangeLed(LED_TREATMENT_PAUSED);
                 secs_elapsed_up_to_now = secs_in_treatment;
             }
 
@@ -379,6 +384,7 @@ int main (void)
                 RPI_Send("OK\r\n");
                 PowerSendStart();
                 main_state = TREATMENT_RUNNING;
+                ChangeLed(LED_TREATMENT_GENERATING);
             }
 
             if (comms_messages_rpi & COMM_STOP_TREAT)
@@ -401,6 +407,7 @@ int main (void)
                     
             RPI_Send(buff);
             main_state = TREATMENT_STANDBY;
+            ChangeLed(LED_TREATMENT_STANDBY);
             break;
 
         case TREATMENT_WITH_ERRORS:
@@ -438,6 +445,7 @@ int main (void)
                 {
                     RPI_Send((char *)"Going to Normal Mode...\r\n");
                     main_state = TREATMENT_STANDBY;
+                    ChangeLed(LED_TREATMENT_STANDBY);
                 }
                 else if ((bytes_readed + 1) < sizeof(s_to_senda))
                 {
@@ -481,13 +489,14 @@ int main (void)
             {
                 comms_messages_rpi &= ~COMM_GOTO_BRIDGE;
                 main_state = MAIN_IN_BRIDGE_MODE;
+                ChangeLed(LED_TREATMENT_BRIDGE_MODE);
             }            
         }
 
         if (sequence_ready)
             sequence_ready_reset;
 
-        
+        UpdateLed();
         
 #ifdef USE_SYNC_ALL_PLACES        
         //envio sync cada 100ms continuo
@@ -518,7 +527,7 @@ void TimingDelay_Decrement(void)
 
     if (comms_timeout)
         comms_timeout--;
-    
+
     if (secs_in_treatment)
     {
         if (millis < 1000)
@@ -544,8 +553,8 @@ void TimingDelay_Decrement(void)
     // if (timer_filters)
     //     timer_filters--;
     
-    // if (timer_led)
-    //     timer_led--;
+    if (timer_led)
+        timer_led--;
 
     // if (timer_led_pwm < 0xFFFF)
     //     timer_led_pwm ++;

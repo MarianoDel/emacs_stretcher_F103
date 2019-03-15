@@ -71,6 +71,7 @@ SRC += ./src/adc.c
 SRC += ./src/usart.c
 SRC += ./src/timer.c
 SRC += ./src/dma.c
+SRC += ./src/hard.c
 # SRC += ./src/flash_program.c
 
 SRC += ./src/comms_from_rasp.c

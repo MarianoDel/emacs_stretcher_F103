@@ -110,13 +110,13 @@ enum bool
 #ifdef HARDWARE_VERSION_2_0
 //--- PC0 ---//
 #define LED1 ((GPIOC->ODR & 0x0001) == 0)
-#define LED1_OFF GPIOC->BSRR = 0x00000001
-#define LED1_ON GPIOC->BSRR = 0x00010000
+#define LED1_ON GPIOC->BSRR = 0x00000001
+#define LED1_OFF GPIOC->BSRR = 0x00010000
 
 //--- PC1 ---//
 #define LED2 ((GPIOC->ODR & 0x0002) == 0)
-#define LED2_OFF GPIOC->BSRR = 0x00000002
-#define LED2_ON GPIOC->BSRR = 0x00020000
+#define LED2_ON GPIOC->BSRR = 0x00000002
+#define LED2_OFF GPIOC->BSRR = 0x00020000
 
 //PA0, PA1 NC
 
@@ -312,17 +312,36 @@ typedef enum
 //--- Tiempos (TIMEOUT) de salidas
 #define TIMER_OUT4_IN_ON       100
 
+//--- ESTADOS DEL LED -----------
+typedef enum
+{    
+    START_BLINKING = 0,
+    WAIT_TO_OFF,
+    WAIT_TO_ON,
+    WAIT_NEW_CYCLE
+} led_state_t;
+
+//Estados Externos de LED BLINKING
+#define LED_NO_BLINKING    0
+#define LED_TREATMENT_STANDBY    1
+#define LED_TREATMENT_GENERATING    2
+#define LED_TREATMENT_PAUSED    3
+#define LED_TREATMENT_BRIDGE_MODE    5
 
 
-//--- Exported Module Functions ----
+
 //--- Clock ---//
-void RCC_Config (void);
+// void RCC_Config (void);
 //--- Leds ---//
-void Led_Config(void);
-void Led1Toggle(void);
-void Led2Toggle(void);
-void Led3Toggle(void);
-void UpdateBuzzer (void);
-void BuzzerCommands(unsigned char , unsigned char );
+// void Led_Config(void);
+// void Led1Toggle(void);
+// void Led2Toggle(void);
+// void Led3Toggle(void);
+// void UpdateBuzzer (void);
+// void BuzzerCommands(unsigned char , unsigned char );
+//--- Exported Module Functions ----
+void ChangeLed (unsigned char);
+void UpdateLed (void);
+
 
 #endif

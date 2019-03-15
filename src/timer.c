@@ -35,10 +35,10 @@ void TIM7_IRQHandler (void)	//100us
     if (TIM7->SR & 0x01)
         TIM7->SR = 0x00;    //bajar flag
 
-    if (LED2)
-        LED2_OFF;
-    else
-        LED2_ON;
+    // if (LED2)
+    //     LED2_OFF;
+    // else
+    //     LED2_ON;
 #ifdef USE_SYNC_ALL_PLACES
     if (timer_sync_xxx_ms)
         timer_sync_xxx_ms--;
