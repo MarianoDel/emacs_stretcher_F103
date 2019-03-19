@@ -50,28 +50,22 @@ signal_type_t TreatmentGetSignalType (void)
     return treatment_conf.treatment_signal.signal;
 }
 
-resp_t TreatmentSetFrequency (frequency_t a)
+resp_t TreatmentSetFrequency (frequency_t a, unsigned char freq_int, unsigned char freq_dec)
 {
     resp_t resp = resp_error;
-    
-    if (a == TEN_HZ)
-    {
-        treatment_conf.treatment_signal.frequency = a;
-        treatment_conf.timer_synchro = TIMER_SYNCHRO_10HZ;
-        resp = resp_ok;
-    }
+    unsigned int calc = 1000000;
+    unsigned short freq = 0;
 
-    if (a == THIRTY_HZ)
-    {
-        treatment_conf.treatment_signal.frequency = a;
-        treatment_conf.timer_synchro = TIMER_SYNCHRO_30HZ;
-        resp = resp_ok;
-    }
+    //el synchro es un timer con tick cada 100us
+    //la cuenta para 2 decimales da 1M/(freq*100)
+    freq = freq_int * 100;
+    freq += freq_dec;
 
-    if (a == SIXTY_HZ)
+    calc = calc / freq;
+    if ((calc < TIMER_SYNCHRO_MAX) && (calc > TIMER_SYNCHRO_MIN))
     {
         treatment_conf.treatment_signal.frequency = a;
-        treatment_conf.timer_synchro = TIMER_SYNCHRO_60HZ;
+        treatment_conf.timer_synchro = (unsigned short) calc;
         resp = resp_ok;
     }
     
@@ -175,85 +169,6 @@ void TreatmentGetAllConf (char * tosend)
     strcat(tosend, buf);
 }
 
-resp_t TreatmentTranslateOldMsg (char * msg)
-{
-    resp_t resp = resp_error;
-    char num [10];
-    unsigned short power;
-
-    //signal,070,070,0000,0049,0001,0001,0049,0000,0000,1
-    //       *
-    strncpy(num, (msg + 7), 3);
-    power = atoi(num);
-
-    if (power > 100)
-        return resp;
-
-    //signal,070,070,0000,0049,0001,0001,0049,0000,0000,1
-    //               *
-    if (strncmp((msg + 15),
-                (const char *) "0000,0049,0001,0001,0049,0000,0000,1",
-                sizeof("0000,0049,0001,0001,0049,0000,0000,1") - 1) == 0)        
-    {
-        //esto es triangular 10Hz
-        treatment_conf.treatment_signal.signal = TRIANGULAR_SIGNAL;
-        treatment_conf.treatment_signal.frequency = TEN_HZ;
-        treatment_conf.treatment_signal.power = power;        
-    }
-
-    else if (strncmp((msg + 15),
-                (const char *) "0000,0016,0001,0001,0015,0000,0000,1",
-                sizeof("0000,0016,0001,0001,0015,0000,0000,1") - 1) == 0)
-    {
-        //esto es triangular 30Hz
-        treatment_conf.treatment_signal.signal = TRIANGULAR_SIGNAL;
-        treatment_conf.treatment_signal.frequency = THIRTY_HZ;
-        treatment_conf.treatment_signal.power = power;         
-    }
-
-    else if (strncmp((msg + 15),
-                (const char *) "0000,0007,0001,0001,0007,0000,0000,1",
-                sizeof("0000,0007,0001,0001,0007,0000,0000,1") - 1) == 0)
-    {
-        //esto es triangular 60Hz
-        treatment_conf.treatment_signal.signal = TRIANGULAR_SIGNAL;
-        treatment_conf.treatment_signal.frequency = SIXTY_HZ;
-        treatment_conf.treatment_signal.power = power;         
-    }
-
-    else if (strncmp((msg + 15),
-                (const char *) "0000,0001,0049,0001,0049,0000,0000,1",
-                sizeof("0000,0001,0049,0001,0049,0000,0000,1") - 1) == 0)
-    {
-        //esto es cuadrada 10Hz
-        treatment_conf.treatment_signal.signal = SQUARE_SIGNAL;
-        treatment_conf.treatment_signal.frequency = TEN_HZ;
-        treatment_conf.treatment_signal.power = power;         
-    }
-
-    else if (strncmp((msg + 15),
-                (const char *) "0000,0001,0016,0001,0015,0000,0000,1",
-                sizeof("0000,0001,0016,0001,0015,0000,0000,1") - 1) == 0)
-    {
-        //esto es cuadrada 30Hz
-        treatment_conf.treatment_signal.signal = SQUARE_SIGNAL;
-        treatment_conf.treatment_signal.frequency = THIRTY_HZ;
-        treatment_conf.treatment_signal.power = power;         
-    }
-
-    else if (strncmp((msg + 15),
-                (const char *) "0000,0001,0007,0001,0007,0000,0000,1",
-                sizeof("0000,0007,0001,0001,0007,0000,0000,1") - 1) == 0)
-    {
-        //esto es cuadrada 60Hz
-        treatment_conf.treatment_signal.signal = SQUARE_SIGNAL;
-        treatment_conf.treatment_signal.frequency = SIXTY_HZ;
-        treatment_conf.treatment_signal.power = power;         
-    }
-    
-    return resp_ok;
-}
-
 //verifica que se cumplan con todos los parametros para poder enviar una senial coherente
 resp_t TreatmentAssertParams (void)
 {
@@ -262,9 +177,12 @@ resp_t TreatmentAssertParams (void)
     if ((treatment_conf.treatment_signal.power > 100) || (treatment_conf.treatment_signal.power < 10))
         return resp;
 
-    if ((treatment_conf.treatment_signal.frequency != TEN_HZ) &&
-        (treatment_conf.treatment_signal.frequency != THIRTY_HZ) &&
-        (treatment_conf.treatment_signal.frequency != SIXTY_HZ))
+    if ((treatment_conf.treatment_signal.frequency != FREQ_7_83_HZ) &&
+        (treatment_conf.treatment_signal.frequency != FREQ_14_3_HZ) &&
+        (treatment_conf.treatment_signal.frequency != FREQ_20_8_HZ) &&
+        (treatment_conf.treatment_signal.frequency != FREQ_27_3_HZ) &&
+        (treatment_conf.treatment_signal.frequency != FREQ_33_8_HZ) &&
+        (treatment_conf.treatment_signal.frequency != FREQ_62_6_HZ))
         return resp;
 
     if ((treatment_conf.treatment_signal.signal != SQUARE_SIGNAL) &&

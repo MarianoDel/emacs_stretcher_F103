@@ -108,24 +108,60 @@ static void RaspBerry_Messages (char * msg)
             RPI_Send((char *)"ERROR\r\n");
     }
 
+    else if (!strncmp(msg, (const char *)"frequency 7.83Hz", (sizeof("frequency 7.83Hz") - 1)))
+    {
+        TreatmentSetFrequency (FREQ_7_83_HZ, 7, 83);
+        RPI_Send((char *)"OK\r\n");
+    }
+
+    else if (!strncmp(msg, (const char *)"frequency 14.3Hz", (sizeof("frequency 14.3Hz") - 1)))
+    {
+        TreatmentSetFrequency (FREQ_14_3_HZ, 14, 30);
+        RPI_Send((char *)"OK\r\n");
+    }
+
+    else if (!strncmp(msg, (const char *)"frequency 20.8Hz", (sizeof("frequency 20.8Hz") - 1)))
+    {
+        TreatmentSetFrequency (FREQ_20_8_HZ, 20, 80);
+        RPI_Send((char *)"OK\r\n");
+    }
+
+    else if (!strncmp(msg, (const char *)"frequency 27.3Hz", (sizeof("frequency 27.3Hz") - 1)))
+    {
+        TreatmentSetFrequency (FREQ_27_3_HZ, 27, 30);
+        RPI_Send((char *)"OK\r\n");
+    }
+
+    else if (!strncmp(msg, (const char *)"frequency 33.8Hz", (sizeof("frequency 33.8Hz") - 1)))
+    {
+        TreatmentSetFrequency (FREQ_33_8_HZ, 33, 80);
+        RPI_Send((char *)"OK\r\n");
+    }
+
+    else if (!strncmp(msg, (const char *)"frequency 62.6Hz", (sizeof("frequency 62.6Hz") - 1)))
+    {
+        TreatmentSetFrequency (FREQ_62_6_HZ, 62, 60);
+        RPI_Send((char *)"OK\r\n");
+    }
+
     else if (!strncmp(msg, (const char *)"frequency 10Hz", (sizeof("frequency 10Hz") - 1)))
     {
-        TreatmentSetFrequency (TEN_HZ);
+        TreatmentSetFrequency (FREQ_TEN_HZ, 10, 0);
         RPI_Send((char *)"OK\r\n");
     }
 
     else if (!strncmp(msg, (const char *)"frequency 30Hz", (sizeof("frequency 30Hz") - 1)))
     {
-        TreatmentSetFrequency (THIRTY_HZ);
+        TreatmentSetFrequency (FREQ_THIRTY_HZ, 30, 0);
         RPI_Send((char *)"OK\r\n");
     }
 
     else if (!strncmp(msg, (const char *)"frequency 60Hz", (sizeof("frequency 60Hz") - 1)))
     {
-        TreatmentSetFrequency (SIXTY_HZ);
+        TreatmentSetFrequency (FREQ_SIXTY_HZ, 60, 0);
         RPI_Send((char *)"OK\r\n");
     }
-
+    
     else if (!strncmp(msg, (const char *)"enable channel ", (sizeof("enable channel ") - 1)))
     {
         if (*(msg + 15) == '1')
@@ -244,23 +280,6 @@ static void RaspBerry_Messages (char * msg)
         }
     }
 
-    else if (!strncmp(msg, (const char *)"signal,", (sizeof("signal,") - 1)))
-    {
-        //signal,%03d,%03d,0%x%x%d,%04d,%04d,%04d,%04d,%04d,%04d,1\r\n",
-        if (((*(msg + 50) -'0') > 0) && ((*(msg + 50) - '0') < 4) && (*(msg + 49) == ','))
-        {
-            if (TreatmentTranslateOldMsg( msg ) == resp_ok)
-            {
-                RPI_Send((char *)"OK\r\n");
-                comms_messages_rpi |= COMM_CONF_CHANGE;
-            }
-            else
-                RPI_Send((char *)"ERROR\r\n");            
-        }
-        else
-            RPI_Send((char *)"ERROR\r\n");
-
-    }
 //     //example.	duration,00,10,00,1
     else if (!strncmp(msg, (const char *)"duration,", (sizeof("duration,") - 1)))
     {

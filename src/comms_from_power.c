@@ -72,9 +72,13 @@ const char s_sinusoidal_120 [] = {"sinusoidal 120"};
 const char s_sinusoidal_180 [] = {"sinusoidal 180"};
 const char s_sinusoidal_240 [] = {"sinusoidal 240"};
 
-const char s_ten_hz [] = {"10Hz"};
-const char s_thirty_hz [] = {"30Hz"};
-const char s_sixty_hz [] = {"60Hz"};
+const char s_7_83_hz [] = {"7.83Hz"};
+const char s_14_3_hz [] = {"14.3Hz"};
+const char s_20_8_hz [] = {"20.8Hz"};
+const char s_27_3_hz [] = {"27.3Hz"};
+const char s_33_8_hz [] = {"33.8Hz"};
+const char s_62_6_hz [] = {"62.6Hz"};
+
 const char s_start_treatment [] = {"start treatment"};
 const char s_stop_treatment [] = {"stop treatment"};
 const char s_status [] = {"status"};
@@ -260,12 +264,18 @@ void PowerSendConf (void)
     Wait_ms(100);
 
     freq = TreatmentGetFrequency ();
-    if (freq == TEN_HZ)
-        sprintf (buff, "%s %s %s\n",s_chf, s_frequency, s_ten_hz);
-    else if (freq == THIRTY_HZ)
-        sprintf (buff, "%s %s %s\n",s_chf, s_frequency, s_thirty_hz);
-    else //(sig == SIXTY_HZ)
-        sprintf (buff, "%s %s %s\n",s_chf, s_frequency, s_sixty_hz);
+    if (freq == FREQ_7_83_HZ)
+        sprintf (buff, "%s %s %s\n",s_chf, s_frequency, s_7_83_hz);
+    else if (freq == FREQ_14_3_HZ)
+        sprintf (buff, "%s %s %s\n",s_chf, s_frequency, s_14_3_hz);
+    else if (freq == FREQ_20_8_HZ)
+        sprintf (buff, "%s %s %s\n",s_chf, s_frequency, s_20_8_hz);
+    else if (freq == FREQ_27_3_HZ)
+        sprintf (buff, "%s %s %s\n",s_chf, s_frequency, s_27_3_hz);
+    else if (freq == FREQ_33_8_HZ)
+        sprintf (buff, "%s %s %s\n",s_chf, s_frequency, s_33_8_hz);
+    else //(sig == FREQ_62_6_HZ)
+        sprintf (buff, "%s %s %s\n",s_chf, s_frequency, s_62_6_hz);
     
     Power_Send(buff);
     Wait_ms(100);
