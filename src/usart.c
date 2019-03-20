@@ -316,7 +316,7 @@ void USART2_IRQHandler (void)
             if (sync_pulse_flag)
             {
                 sync_pulse_flag = 0;
-                USART2->DR = '.';
+                USART2->DR = '*';
             }
             else
             {

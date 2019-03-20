@@ -110,6 +110,7 @@ static void RaspBerry_Messages (char * msg)
 
     else if (!strncmp(msg, (const char *)"frequency 7.83Hz", (sizeof("frequency 7.83Hz") - 1)))
     {
+        //TODO: ver como hago con el power
         TreatmentSetFrequency (FREQ_7_83_HZ, 7, 83);
         RPI_Send((char *)"OK\r\n");
     }
