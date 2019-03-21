@@ -17,6 +17,7 @@
 #include "comms.h"
 #include "usart.h"
 #include "treatment.h"
+#include "utils.h"
 
 #include <string.h>
 #include <stdio.h>
@@ -60,6 +61,12 @@ static void RaspBerry_Messages (char * msg)
     unsigned short hours = 0;
     unsigned short minutes = 0;
     unsigned short seconds = 0;
+
+    const char s_frequency [] = {"frequency"};
+    unsigned short new_freq_int = 0;
+    unsigned short new_freq_dec = 0;
+    unsigned char decimales = 0;
+
 
     //mensajes nuevos
     if (!strncmp(msg, (const char *)"signal triangular", (sizeof("signal triangular") - 1)))
@@ -108,61 +115,37 @@ static void RaspBerry_Messages (char * msg)
             RPI_Send((char *)"ERROR\r\n");
     }
 
-    else if (!strncmp(msg, (const char *)"frequency 7.83Hz", (sizeof("frequency 7.83Hz") - 1)))
+    //-- Frequency Setting
+    else if (!strncmp(msg, s_frequency, sizeof(s_frequency) - 1))
     {
-        //TODO: ver como hago con el power
-        TreatmentSetFrequency (FREQ_7_83_HZ, 7, 83);
-        RPI_Send((char *)"OK\r\n");
+        // char to_send [64];
+        
+        msg += sizeof(s_frequency);    //normalizo al payload, hay un espacio
+
+        //lo que viene es E.DD o EE.DD, siempre 2 posiciones decimales
+        decimales = StringIsANumber(msg, &new_freq_int);
+        // sprintf(to_send, "dec: %d freq: %d\n", decimales, new_freq_int);
+        // RPI_Send(to_send);
+
+        if ((decimales) && (decimales < 3))
+        {
+            msg += decimales + 1;    //normalizo con el punto
+            decimales = StringIsANumber(msg, &new_freq_dec);
+
+            if ((decimales > 1) && (decimales < 3))
+            {
+                resp = TreatmentSetFrequency ((unsigned char) new_freq_int, (unsigned char) new_freq_dec);
+                if (resp == resp_ok)
+                    comms_messages_rpi |= COMM_CONF_CHANGE;                
+            }
+        }
+
+        if (resp == resp_ok)
+            RPI_Send((char *)"OK\r\n");
+        else
+            RPI_Send((char *)"ERROR\r\n");
     }
 
-    else if (!strncmp(msg, (const char *)"frequency 14.3Hz", (sizeof("frequency 14.3Hz") - 1)))
-    {
-        TreatmentSetFrequency (FREQ_14_3_HZ, 14, 30);
-        RPI_Send((char *)"OK\r\n");
-    }
-
-    else if (!strncmp(msg, (const char *)"frequency 20.8Hz", (sizeof("frequency 20.8Hz") - 1)))
-    {
-        TreatmentSetFrequency (FREQ_20_8_HZ, 20, 80);
-        RPI_Send((char *)"OK\r\n");
-    }
-
-    else if (!strncmp(msg, (const char *)"frequency 27.3Hz", (sizeof("frequency 27.3Hz") - 1)))
-    {
-        TreatmentSetFrequency (FREQ_27_3_HZ, 27, 30);
-        RPI_Send((char *)"OK\r\n");
-    }
-
-    else if (!strncmp(msg, (const char *)"frequency 33.8Hz", (sizeof("frequency 33.8Hz") - 1)))
-    {
-        TreatmentSetFrequency (FREQ_33_8_HZ, 33, 80);
-        RPI_Send((char *)"OK\r\n");
-    }
-
-    else if (!strncmp(msg, (const char *)"frequency 62.6Hz", (sizeof("frequency 62.6Hz") - 1)))
-    {
-        TreatmentSetFrequency (FREQ_62_6_HZ, 62, 60);
-        RPI_Send((char *)"OK\r\n");
-    }
-
-    else if (!strncmp(msg, (const char *)"frequency 10Hz", (sizeof("frequency 10Hz") - 1)))
-    {
-        TreatmentSetFrequency (FREQ_TEN_HZ, 10, 0);
-        RPI_Send((char *)"OK\r\n");
-    }
-
-    else if (!strncmp(msg, (const char *)"frequency 30Hz", (sizeof("frequency 30Hz") - 1)))
-    {
-        TreatmentSetFrequency (FREQ_THIRTY_HZ, 30, 0);
-        RPI_Send((char *)"OK\r\n");
-    }
-
-    else if (!strncmp(msg, (const char *)"frequency 60Hz", (sizeof("frequency 60Hz") - 1)))
-    {
-        TreatmentSetFrequency (FREQ_SIXTY_HZ, 60, 0);
-        RPI_Send((char *)"OK\r\n");
-    }
-    
     else if (!strncmp(msg, (const char *)"enable channel ", (sizeof("enable channel ") - 1)))
     {
         if (*(msg + 15) == '1')
@@ -537,6 +520,20 @@ void RaspBerry_Report_Errors (unsigned char ch, unsigned short * errors)
             RPI_Send("ERROR(0x63)\r\n");
 
         *errors &= ~COMM_ERROR_SOFT_OVERCURRENT;
+    }
+
+    if (*errors & COMM_ERROR_NO_TREATMENT)
+    {
+        if (ch == CH1)
+            RPI_Send("ERROR(0x71)\r\n");
+
+        if (ch == CH2)
+            RPI_Send("ERROR(0x72)\r\n");
+
+        if (ch == CH3)
+            RPI_Send("ERROR(0x73)\r\n");
+
+        *errors &= ~COMM_ERROR_NO_TREATMENT;
     }
 }
 

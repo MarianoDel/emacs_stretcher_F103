@@ -50,7 +50,7 @@ signal_type_t TreatmentGetSignalType (void)
     return treatment_conf.treatment_signal.signal;
 }
 
-resp_t TreatmentSetFrequency (frequency_t a, unsigned char freq_int, unsigned char freq_dec)
+resp_t TreatmentSetFrequency (unsigned char freq_int, unsigned char freq_dec)
 {
     resp_t resp = resp_error;
     unsigned int calc = 1000000;
@@ -64,7 +64,8 @@ resp_t TreatmentSetFrequency (frequency_t a, unsigned char freq_int, unsigned ch
     calc = calc / freq;
     if ((calc < TIMER_SYNCHRO_MAX) && (calc > TIMER_SYNCHRO_MIN))
     {
-        treatment_conf.treatment_signal.frequency = a;
+        treatment_conf.treatment_signal.freq_int = freq_int;
+        treatment_conf.treatment_signal.freq_dec = freq_dec;
         treatment_conf.timer_synchro = (unsigned short) calc;
         resp = resp_ok;
     }
@@ -114,9 +115,10 @@ unsigned char TreatmentGetChannelsFlag (void)
 //     return resp_ok;
 // }
 
-frequency_t TreatmentGetFrequency (void)
+void TreatmentGetFrequency (unsigned char * f_int, unsigned char * f_dec)
 {
-    return treatment_conf.treatment_signal.frequency;
+    *f_int = treatment_conf.treatment_signal.freq_int;
+    *f_dec = treatment_conf.treatment_signal.freq_dec;    
 }
 
 resp_t TreatmentSetPower (unsigned char a)
@@ -159,7 +161,9 @@ void TreatmentGetAllConf (char * tosend)
     
     sprintf(buf, "signal: %d\n", treatment_conf.treatment_signal.signal);
     strcpy(tosend, buf);
-    sprintf(buf, "freq: %d\n", treatment_conf.treatment_signal.frequency);
+    sprintf(buf, "freq: %d.%02dHz\n",
+            treatment_conf.treatment_signal.freq_int,
+            treatment_conf.treatment_signal.freq_dec);
     strcat(tosend, buf);
     sprintf(buf, "power: %d\n", treatment_conf.treatment_signal.power);
     strcat(tosend, buf);
@@ -177,12 +181,9 @@ resp_t TreatmentAssertParams (void)
     if ((treatment_conf.treatment_signal.power > 100) || (treatment_conf.treatment_signal.power < 10))
         return resp;
 
-    if ((treatment_conf.treatment_signal.frequency != FREQ_7_83_HZ) &&
-        (treatment_conf.treatment_signal.frequency != FREQ_14_3_HZ) &&
-        (treatment_conf.treatment_signal.frequency != FREQ_20_8_HZ) &&
-        (treatment_conf.treatment_signal.frequency != FREQ_27_3_HZ) &&
-        (treatment_conf.treatment_signal.frequency != FREQ_33_8_HZ) &&
-        (treatment_conf.treatment_signal.frequency != FREQ_62_6_HZ))
+    if ((treatment_conf.treatment_signal.freq_dec > 99) ||
+        (treatment_conf.treatment_signal.freq_int < FREQ_MIN_ALLOWED) ||
+        (treatment_conf.treatment_signal.freq_int > FREQ_MAX_ALLOWED))
         return resp;
 
     if ((treatment_conf.treatment_signal.signal != SQUARE_SIGNAL) &&

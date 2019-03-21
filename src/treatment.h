@@ -24,22 +24,6 @@ typedef enum {
 } signal_type_t;
 
 typedef enum {
-	FREQ_7_83_HZ = 0,
-	FREQ_14_3_HZ,
-	FREQ_20_8_HZ,
-	FREQ_27_3_HZ,
-	FREQ_33_8_HZ,
-	FREQ_62_6_HZ,
-
-        //las viejas
-        FREQ_TEN_HZ,
-        FREQ_THIRTY_HZ,
-        FREQ_SIXTY_HZ
-        
-
-} frequency_t;
-
-typedef enum {
 	CH1_ENABLE = 1,
 	CH2_ENABLE,
 	CH3_ENABLE,
@@ -53,7 +37,8 @@ typedef enum {
 //si se modifica cambiar las dos!!!
 typedef struct {
 	signal_type_t signal;
-	frequency_t frequency;
+	unsigned char freq_int;
+	unsigned char freq_dec;    
 	// unsigned char freq_table_inc;
 	unsigned char power;
 	unsigned char synchro_needed;
@@ -119,13 +104,8 @@ typedef enum
 //timer synchro cuenta cada 100us
 #define TIMER_SYNCHRO_MIN     100    //minimo en 100Hz
 #define TIMER_SYNCHRO_MAX     2000    //maximo en 5Hz
-#define TIMER_SYNCHRO_7_83HZ    1277
-#define TIMER_SYNCHRO_14_3HZ    699
-#define TIMER_SYNCHRO_20_8HZ    481
-#define TIMER_SYNCHRO_27_3HZ    366
-#define TIMER_SYNCHRO_33_8HZ    296
-#define TIMER_SYNCHRO_62_6HZ    160
-
+#define FREQ_MIN_ALLOWED    5
+#define FREQ_MAX_ALLOWED    100
 
 
 //--- Exported macro ---//
@@ -144,8 +124,8 @@ typedef enum
 //--- Exported functions ---//
 resp_t TreatmentSetSignalType (signal_type_t);
 signal_type_t TreatmentGetSignalType (void);
-resp_t TreatmentSetFrequency (frequency_t, unsigned char, unsigned char);
-frequency_t TreatmentGetFrequency (void);
+resp_t TreatmentSetFrequency (unsigned char, unsigned char);
+void TreatmentGetFrequency (unsigned char *, unsigned char *);
 resp_t TreatmentSetPower (unsigned char);
 unsigned char TreatmentGetPower (void);
 resp_t TreatmentSetTime (unsigned char, unsigned char, unsigned char);

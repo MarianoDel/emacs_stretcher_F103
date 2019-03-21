@@ -12,7 +12,11 @@
 #include "usart.h"
 #include "stm32f10x.h"
 #include "hard.h"
-  
+
+#ifdef USE_SYNC_PULSES
+#include "treatment.h"
+#endif
+
 #include <stdio.h>
 #include <string.h>
 
@@ -23,6 +27,10 @@ extern volatile unsigned char usart2_have_data;
 extern volatile unsigned char usart3_have_data;
 extern volatile unsigned char usart4_have_data;
 extern volatile unsigned char usart5_have_data;
+
+#ifdef USE_SYNC_PULSES
+extern volatile unsigned short timer_sync_xxx_ms;
+#endif
 
 /* Globals ------------------------------------------------------------------*/
 //--- Private variables ---//
@@ -316,7 +324,9 @@ void USART2_IRQHandler (void)
             if (sync_pulse_flag)
             {
                 sync_pulse_flag = 0;
-                USART2->DR = '*';
+#ifdef USE_SYNC_PULSES
+                USART2->DR = SYNC_CHAR;
+#endif
             }
             else
             {
@@ -737,10 +747,20 @@ void UART5_IRQHandler (void)
     }
 }
 
-//warpper para el flag
-void SyncPulse_Set (void)
+void UpdateSyncPulses (void)
 {
-    sync_pulse_flag = 1;
+    if (!timer_sync_xxx_ms)
+    {
+        unsigned short tim_sync;
+
+        sync_pulse_flag = 1;
+        USART2->CR1 |= USART_CR1_TXEIE;
+        tim_sync = TreatmentGetSynchroTimer();
+        if (tim_sync < TIMER_SYNCHRO_MIN)
+            timer_sync_xxx_ms = TIMER_SYNCHRO_MIN;
+        else
+            timer_sync_xxx_ms = tim_sync;
+    }
 }
 
 //---- End of File ----//

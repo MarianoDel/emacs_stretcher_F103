@@ -31,16 +31,11 @@
 
 
 //-------- Type of Program and Features ----------------
-#define USE_SYNC_ALL_PLACES    //manda sync incluso en los Wait_ms()
+#define USE_SYNC_PULSES    //manda sync ver abajo
 
-// #define USE_PROTECTION_WITH_INT
+#define USE_NO_TREATMENT_DETECT    //cuando esta en tratamiento revisa si las potencias tambien
 
-//Si utiliza la proteccion de soft overcurrent o no
-// #define USE_SOFT_OVERCURRENT
 
-//Modo de uso de la USART (placa individual single - placa enganchada bus)
-// #define USART_IN_BUS
-// #define USART_SINGLE
 
 //-------- Kind of Reports Sended ----------------
 
@@ -48,6 +43,11 @@
 #define K_200V    0.0957
 #define K_15V    0.00804
 
+#ifdef USE_SYNC_PULSES
+#define SYNC_CHAR    '*'
+#define USE_SYNC_ALL_PLACES    //manda pulsos incluso en los Wait_ms()
+// #define USE_SYNC_ONLY_ON_TREATMENT    //pulsos solo en tratamiento
+#endif
 //-------- Hysteresis Conf ------------------------
 
 //-------- PWM Conf ------------------------

@@ -35,6 +35,7 @@ typedef enum {
 
 //---- Common Defines --------------------
 #define MAX_NO_COMM_ERRORS        15
+#define MAX_NO_TREAT_ERRORS       15
 #define POWER_COMMS_TT            1000
 
 

@@ -302,6 +302,14 @@ int main (void)
             secs_in_treatment = 1;    //con 1 arranca el timer
             secs_elapsed_up_to_now = 0;
             PowerCommunicationStackReset();
+
+            // sprintf (buff, "treat start, ch1: 0x%04x, ch2: 0x%04x, ch3: 0x%04x\r\n",
+            //          comms_messages_1,
+            //          comms_messages_2,
+            //          comms_messages_3);
+                    
+            // RPI_Send(buff);
+
             PowerSendStart();
             main_state = TREATMENT_RUNNING;
             ChangeLed(LED_TREATMENT_GENERATING);
@@ -412,12 +420,18 @@ int main (void)
 
         case TREATMENT_WITH_ERRORS:
             Wait_ms(1000);
+            Power_Send("chf flush errors\n");
             RPI_Send("STOP\r\n");
             Wait_ms(1000);
             RPI_Send("STOP\r\n");
             Wait_ms(1000);
             RPI_Send("Flushing errors\r\n");
-            Power_Send("chf flush errors\r\n");
+
+            Power_Send("chf flush errors\n");
+            comms_messages_1 &= ~COMM_POWER_ERROR_MASK;
+            comms_messages_2 &= ~COMM_POWER_ERROR_MASK;
+            comms_messages_3 &= ~COMM_POWER_ERROR_MASK;            
+            
             Wait_ms(1000);
             main_state = TREATMENT_STANDBY;
             break;
@@ -499,20 +513,13 @@ int main (void)
         UpdateLed();
         
 #ifdef USE_SYNC_ALL_PLACES        
-        //envio sync cada 100ms continuo
-        if (!timer_sync_xxx_ms)
-        {
-            unsigned short tim_sync;
-            
-            // Power_Send_Unsigned((unsigned char *) ".", 1);
-            SEND_SYNC_PULSE;
-            tim_sync = TreatmentGetSynchroTimer();
-            if (tim_sync < TIMER_SYNCHRO_MIN)
-                timer_sync_xxx_ms = TIMER_SYNCHRO_MIN;
-            else
-                timer_sync_xxx_ms = tim_sync;
-        }
-#endif        
+        UpdateSyncPulses();
+#elif defined USE_SYNC_ONLY_ON_TREATMENT
+        if (main_state == TREATMENT_RUNNING)
+            UpdateSyncPulses();
+#else
+#pragma message "NO SYNC SELECTED"
+#endif
     }
 
 //---- Fin Programa Pricipal ----------

@@ -39,7 +39,7 @@
 #define COMM_ERROR_SOFT_OVERCURRENT    0x0004
 #define COMM_ERROR_OVERTEMP            0x0008
 #define COMM_ERROR_NO_COMM             0x0010
-#define COMM_ERROR_IN_CHANNEL          0x0020
+#define COMM_ERROR_NO_TREATMENT        0x0020
 
 
 

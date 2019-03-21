@@ -38,13 +38,13 @@ extern unsigned short comms_messages_3;
 char local_power_buff [SIZEOF_RXDATA];
 
 unsigned char it_was_feedback_ch;
-unsigned char it_was_feedback_ch1;
-unsigned char it_was_feedback_ch2;
-unsigned char it_was_feedback_ch3;
 
-unsigned char error_counter_ch1 = 0;
-unsigned char error_counter_ch2 = 0;
-unsigned char error_counter_ch3 = 0;
+unsigned char error_counter_no_comm_ch1 = 0;
+unsigned char error_counter_no_comm_ch2 = 0;
+unsigned char error_counter_no_comm_ch3 = 0;
+unsigned char error_counter_no_treat_ch1 = 0;
+unsigned char error_counter_no_treat_ch2 = 0;
+unsigned char error_counter_no_treat_ch3 = 0;
 comm_state_t power_comm_state = ASK_CH1;
 
 
@@ -108,7 +108,6 @@ void PowerSendConf (void)
 {
     char buff [128];
     signal_type_t sig;
-    frequency_t freq;
     unsigned char ch_state;
     unsigned char ch_in_this_treatment = 0;
     char s_signal_1 [20];
@@ -243,6 +242,9 @@ void PowerSendConf (void)
         }
     }
 
+    //limpio buffers serie
+    Power_Send("chf\n");
+    Wait_ms(100);
     //tengo todas la seniales cargadas con sus fases ahora envio los canales    
     if (ch_state & 0x01)
     {
@@ -263,26 +265,23 @@ void PowerSendConf (void)
     }
     Wait_ms(100);
 
-    freq = TreatmentGetFrequency ();
-    if (freq == FREQ_7_83_HZ)
-        sprintf (buff, "%s %s %s\n",s_chf, s_frequency, s_7_83_hz);
-    else if (freq == FREQ_14_3_HZ)
-        sprintf (buff, "%s %s %s\n",s_chf, s_frequency, s_14_3_hz);
-    else if (freq == FREQ_20_8_HZ)
-        sprintf (buff, "%s %s %s\n",s_chf, s_frequency, s_20_8_hz);
-    else if (freq == FREQ_27_3_HZ)
-        sprintf (buff, "%s %s %s\n",s_chf, s_frequency, s_27_3_hz);
-    else if (freq == FREQ_33_8_HZ)
-        sprintf (buff, "%s %s %s\n",s_chf, s_frequency, s_33_8_hz);
-    else //(sig == FREQ_62_6_HZ)
-        sprintf (buff, "%s %s %s\n",s_chf, s_frequency, s_62_6_hz);
-    
-    Power_Send(buff);
-    Wait_ms(100);
-
     sprintf (buff, "%s %s %d\n",s_chf, s_power, TreatmentGetPower());
     Power_Send(buff);
     Wait_ms(100);
+
+    unsigned char freq_int = 0;
+    unsigned char freq_dec = 0;
+    TreatmentGetFrequency (&freq_int, &freq_dec);
+
+    sprintf (buff, "%s %s %d.%02dHz\n",
+             s_chf,
+             s_frequency,
+             freq_int,
+             freq_dec);
+
+    Power_Send(buff);
+    Wait_ms(100);
+
 
 }
 
@@ -343,6 +342,7 @@ static void Power_Messages (char * msg)
     
 }
 
+char s_manager_status [] = {"Manager status:"};
 void Power_Error_Messages (unsigned char ch, char * msg)
 {
     if (!strncmp(msg, (const char *)"Error: Overcurrent", (sizeof("Error: Overcurrent") - 1)))
@@ -393,28 +393,34 @@ void Power_Error_Messages (unsigned char ch, char * msg)
             comms_messages_3 |= COMM_ERROR_OVERTEMP;        
     }
 
-    // sprintf(b, "Manager status: %d\n", GetTreatmentState());
-    //TODO: puede estar clavado en error, despues revisar
-    else if (!strncmp(msg, (const char *)"Manager status: ", (sizeof("Manager status: ") - 1)))
+    else if (!strncmp(msg, s_manager_status, (sizeof(s_manager_status) - 1)))
     {
-        if (ch == CH1)
-            it_was_feedback_ch1 = 1;
+#ifdef USE_NO_TREATMENT_DETECT
+        msg += sizeof(s_manager_status);    //ajusto y tomo en cuenta el espacio
+        if (*msg != '3')    //TREATMENT_GENERATING en la potencia
+        {
+            if (ch == CH1)
+                error_counter_no_treat_ch1++;
 
-        if (ch == CH2)
-            it_was_feedback_ch2 = 1;            
+            if (ch == CH2)
+                error_counter_no_treat_ch2++;
 
-        if (ch == CH3)
-            it_was_feedback_ch3 = 1;
-        
+            if (ch == CH3)
+                error_counter_no_treat_ch3++;
+        }
+#endif
         it_was_feedback_ch = 1;
     }
 }
 
 void PowerCommunicationStackReset (void)
 {
-    error_counter_ch1 = 0;
-    error_counter_ch2 = 0;
-    error_counter_ch3 = 0;
+    error_counter_no_comm_ch1 = 0;
+    error_counter_no_comm_ch2 = 0;
+    error_counter_no_comm_ch3 = 0;
+    error_counter_no_treat_ch1 = 0;
+    error_counter_no_treat_ch2 = 0;
+    error_counter_no_treat_ch3 = 0;
 }
 
 void PowerCommunicationStack (void)
@@ -443,9 +449,9 @@ void PowerCommunicationStack (void)
             if (!comms_timeout)
             {
                 if (it_was_feedback_ch)
-                    error_counter_ch1 = 0;
+                    error_counter_no_comm_ch1 = 0;
                 else
-                    error_counter_ch1++;
+                    error_counter_no_comm_ch1++;
 
                 power_comm_state++;
             }            
@@ -468,9 +474,9 @@ void PowerCommunicationStack (void)
             if (!comms_timeout)
             {
                 if (it_was_feedback_ch)
-                    error_counter_ch2 = 0;
+                    error_counter_no_comm_ch2 = 0;
                 else
-                    error_counter_ch2++;
+                    error_counter_no_comm_ch2++;
 
                 power_comm_state++;
             }            
@@ -493,22 +499,29 @@ void PowerCommunicationStack (void)
             if (!comms_timeout)
             {
                 if (it_was_feedback_ch)
-                    error_counter_ch3 = 0;
+                    error_counter_no_comm_ch3 = 0;
                 else
-                    error_counter_ch3++;
+                    error_counter_no_comm_ch3++;
 
                 power_comm_state++;
             }            
             break;
 
         case CHECK_COUNTERS:
-            if (error_counter_ch1 > MAX_NO_COMM_ERRORS)
+            if (error_counter_no_comm_ch1 > MAX_NO_COMM_ERRORS)
                 comms_messages_1 |= COMM_ERROR_NO_COMM;
-            if (error_counter_ch2 > MAX_NO_COMM_ERRORS)
+            if (error_counter_no_comm_ch2 > MAX_NO_COMM_ERRORS)
                 comms_messages_2 |= COMM_ERROR_NO_COMM;
-            if (error_counter_ch3 > MAX_NO_COMM_ERRORS)
+            if (error_counter_no_comm_ch3 > MAX_NO_COMM_ERRORS)
                 comms_messages_3 |= COMM_ERROR_NO_COMM;
 
+            if (error_counter_no_treat_ch1 > MAX_NO_TREAT_ERRORS)
+                comms_messages_1 |= COMM_ERROR_NO_TREATMENT;
+            if (error_counter_no_treat_ch2 > MAX_NO_TREAT_ERRORS)
+                comms_messages_2 |= COMM_ERROR_NO_TREATMENT;
+            if (error_counter_no_treat_ch3 > MAX_NO_TREAT_ERRORS)
+                comms_messages_3 |= COMM_ERROR_NO_TREATMENT;
+            
             power_comm_state = ASK_CH1;
             break;
             

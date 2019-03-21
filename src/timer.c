@@ -12,16 +12,15 @@
 #include "timer.h"
 #include "stm32f10x.h"
 #include "hard.h"
-#ifdef USE_SYNC_ALL_PLACES
-#include "comms_from_power.h"
+
+#ifdef USE_SYNC_PULSES
 #include "usart.h"
-#include "treatment.h"
 #endif
 
 
 /* Externals ------------------------------------------------------------------*/
 extern volatile unsigned short wait_ms_var;
-#ifdef USE_SYNC_ALL_PLACES
+#ifdef USE_SYNC_PULSES
 extern volatile unsigned short timer_sync_xxx_ms;
 #endif
 
@@ -35,11 +34,7 @@ void TIM7_IRQHandler (void)	//100us
     if (TIM7->SR & 0x01)
         TIM7->SR = 0x00;    //bajar flag
 
-    // if (LED2)
-    //     LED2_OFF;
-    // else
-    //     LED2_ON;
-#ifdef USE_SYNC_ALL_PLACES
+#ifdef USE_SYNC_PULSES
     if (timer_sync_xxx_ms)
         timer_sync_xxx_ms--;
 #endif
@@ -131,18 +126,7 @@ void Wait_ms (unsigned short a)
     while (wait_ms_var)
     {
 #ifdef USE_SYNC_ALL_PLACES
-        //envio sync cada 100ms continuo
-        if (!timer_sync_xxx_ms)
-        {
-            unsigned short tim_sync;
-            Power_Send_Unsigned((unsigned char *) ".", 1);
-
-            tim_sync = TreatmentGetSynchroTimer();
-            if (tim_sync < TIMER_SYNCHRO_MIN)
-                timer_sync_xxx_ms = TIMER_SYNCHRO_MIN;
-            else
-                timer_sync_xxx_ms = tim_sync;
-        }
+        UpdateSyncPulses();
 #endif
     }
 }
