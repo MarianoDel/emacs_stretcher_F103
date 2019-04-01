@@ -60,6 +60,8 @@ resp_t TreatmentSetFrequency (unsigned char freq_int, unsigned char freq_dec)
     //la cuenta para 2 decimales da 1M/(freq*100)
     freq = freq_int * 100;
     freq += freq_dec;
+    freq = freq * K_SYNCHRO_ADJUST;
+    freq = freq / 100;
 
     calc = calc / freq;
     if ((calc < TIMER_SYNCHRO_MAX) && (calc > TIMER_SYNCHRO_MIN))

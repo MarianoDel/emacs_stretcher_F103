@@ -504,7 +504,7 @@ int main (void)
                 comms_messages_rpi &= ~COMM_GOTO_BRIDGE;
                 main_state = MAIN_IN_BRIDGE_MODE;
                 ChangeLed(LED_TREATMENT_BRIDGE_MODE);
-            }            
+            }
         }
 
         if (sequence_ready)

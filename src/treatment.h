@@ -109,7 +109,8 @@ typedef enum
 
 
 //--- Exported macro ---//
-#define SIZEOF_SIGNALS		150
+//esto es 100 mas el ajuste
+#define K_SYNCHRO_ADJUST    108
 
 #define ERROR_OVERCURRENT_MASK			0x01
 #define ERROR_NO_CURRENT_MASK				0x02
