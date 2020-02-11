@@ -54,7 +54,7 @@ resp_t TreatmentSetFrequency (unsigned char freq_int, unsigned char freq_dec)
 {
     resp_t resp = resp_error;
     unsigned int calc = 1000000;
-    unsigned short freq = 0;
+    unsigned int freq = 0;
 
     //el synchro es un timer con tick cada 100us
     //la cuenta para 2 decimales da 1M/(freq*100)
