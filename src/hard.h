@@ -21,7 +21,7 @@
 // #define HARDWARE_VERSION_2_1        //esto seria una placa magneto chico
 //--- Software ------------------//
 // #define SOFTWARE_VERSION_1_2		
-// #define SOFTWARE_VERSION_1_1	     //habla contra pc o rpi con nuevo protocolo camilla
+// #define SOFTWARE_VERSION_1_1	     //pido soft de powers al arrancar
 #define SOFTWARE_VERSION_1_0        //habla contra rpi con programa magneto y traduce a micros potencia
 
 //-------- Type of Program (depending on software version) ----------------

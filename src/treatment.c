@@ -23,6 +23,7 @@
 //--- VARIABLES GLOBALES ---//
 treatment_conf_t treatment_conf;
 unsigned char global_error = 0;
+treatment_t treat_main_state = 0;
 
 // Private Defines ----------------------------------------
 #define ENABLE_CHX_MASK    0x40
@@ -160,18 +161,46 @@ unsigned short TreatmentGetTime (void)
 void TreatmentGetAllConf (char * tosend)
 {
     char buf[30];
-    
+
+    // Selected signal
     sprintf(buf, "signal: %d\n", treatment_conf.treatment_signal.signal);
     strcpy(tosend, buf);
+
+    // Selected Freq
     sprintf(buf, "freq: %d.%02dHz\n",
             treatment_conf.treatment_signal.freq_int,
             treatment_conf.treatment_signal.freq_dec);
     strcat(tosend, buf);
+
+    // Selected power
     sprintf(buf, "power: %d\n", treatment_conf.treatment_signal.power);
     strcat(tosend, buf);
-    sprintf(buf, "synchro: %d\n", treatment_conf.treatment_signal.synchro_needed);
-    strcat(tosend, buf);
+
+    // Treatment duration
     sprintf(buf, "time in s: %d\n", treatment_conf.treatment_time);
+    strcat(tosend, buf);
+
+    // Active channels
+    unsigned char c1 = 0;
+    unsigned char c2 = 0;
+    unsigned char c3 = 0;
+
+    if (treatment_conf.channels_in_treatment & ENABLE_CH1_FLAG)
+        c1 = 1;
+
+    if (treatment_conf.channels_in_treatment & ENABLE_CH2_FLAG)
+        c2 = 1;
+
+    if (treatment_conf.channels_in_treatment & ENABLE_CH3_FLAG)
+        c3 = 1;
+    
+    sprintf(buf, "in treat ch1:%d ch2:%d ch3:%d\n", c1, c2, c3);
+    strcat(tosend, buf);
+
+    //Timer for sync
+    unsigned short tsync = 0;
+    tsync = treatment_conf.timer_synchro / 10;
+    sprintf(buf, "synchro: %dms\n", tsync);
     strcat(tosend, buf);
 }
 
@@ -197,6 +226,17 @@ resp_t TreatmentAssertParams (void)
         return resp;
 
     return resp_ok;
+}
+
+
+void TreatmentUpdateMainState (treatment_t ms)
+{
+    treat_main_state = ms;
+}
+
+treatment_t TreatmentGetMainState (void)
+{
+    return treat_main_state;
 }
 
 

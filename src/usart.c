@@ -266,13 +266,7 @@ unsigned char ReadUsart2Buffer (char * bout, unsigned short max_len)
     len = prx2 - rx2buff;
 
     if (len < max_len)
-    {
-        //el prx2 siempre llega adelantado desde la int, lo corto con un 0
-        *prx2 = '\0';
-        prx2++;
-        len += 1;
         memcpy(bout, (unsigned char *) rx2buff, len);
-    }
     else
     {
         memcpy(bout, (unsigned char *) rx2buff, len);
@@ -296,7 +290,10 @@ void USART2_IRQHandler (void)
 
         if (prx2 < &rx2buff[SIZEOF_RXDATA - 1])
         {
-            if ((dummy == '\n') || (dummy == '\r') || (dummy == 26))		//26 es CTRL-Z
+            if (dummy == '\r')    //no le doy bola
+            {
+            }
+            else if ((dummy == '\n') || (dummy == 26))		//26 es CTRL-Z
             {
                 *prx2 = '\0';
                 usart2_have_data = 1;

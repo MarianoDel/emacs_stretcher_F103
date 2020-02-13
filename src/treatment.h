@@ -12,7 +12,7 @@
 /* Define to prevent recursive inclusion -------------------------------------*/
 #ifndef __TREATMENT_H_
 #define __TREATMENT_H_
-#include "hard.h"		//para respuestas
+#include "hard.h"    //para respuestas
 
 
 //--- Exported types ---//
@@ -136,6 +136,8 @@ resp_t TreatmentAssertParams (void);
 void TreatmentSetChannelsFlag (unsigned char);
 unsigned char TreatmentGetChannelsFlag (void);
 unsigned short TreatmentGetSynchroTimer (void);
+void TreatmentUpdateMainState (treatment_t);
+treatment_t TreatmentGetMainState (void);
 
 #endif
 //--- END OF FILE ---//

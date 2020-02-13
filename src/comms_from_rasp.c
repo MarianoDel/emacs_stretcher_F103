@@ -40,6 +40,7 @@ const char s_getall [] = {"get all conf"};
 /* Module Private Functions -----------------------------------------------------------*/
 static void RaspBerry_Messages (char *);
 static void SendAllConf (void);
+static void SendStatus (void);
 
 /* Module Exported Functions -----------------------------------------------------------*/
 void UpdateRaspberryMessages (void)
@@ -433,6 +434,9 @@ static void RaspBerry_Messages (char * msg)
     else if (strncmp(msg, s_getall, sizeof(s_getall) - 1) == 0)
         SendAllConf();
 
+    else if (strncmp(msg, (const char *) "get status", sizeof("get status") - 1) == 0)
+        SendStatus();
+    
     else
         RPI_Send((char *)"ERROR\r\n");
 
@@ -541,6 +545,16 @@ static void SendAllConf (void)
 {
     char b [128];
     TreatmentGetAllConf(b);
+    RPI_Send(b);
+}
+
+static void SendStatus (void)
+{
+    char b [128];
+    unsigned char st = 0;
+    
+    st = TreatmentGetMainState();
+    sprintf(b, "Main State: %d\r\n", st);
     RPI_Send(b);
 }
 

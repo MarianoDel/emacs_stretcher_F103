@@ -162,7 +162,7 @@ int main (void)
     ChangeLed(LED_NO_BLINKING);
     
     //-- Welcome Messages --------------------
-    Usart1Send("\nGausstek Stretcher Board -- powered by: Kirno Technology\n");
+    Usart1Send("\r\nGausstek Stretcher Board -- powered by: Kirno Technology\r\n");
     Wait_ms(100);
 
 #ifdef HARD
@@ -178,6 +178,51 @@ int main (void)
 #else
 #error	"No Soft Version defined in hard.h file"
 #endif
+
+    //limpio interfase serie
+    //limpio buffers serie
+    Power_Send("chf\n");
+
+    Wait_ms(1000);
+    Power_Send("ch1 soft version\n");
+    Wait_ms(100);
+    if (power_have_data)
+    {
+        power_have_data = 0;
+        ReadPowerBuffer(buff, 64);
+        RPI_Send(buff);
+        RPI_Send("\r\n");
+    }
+    else
+        RPI_Send("no comms with ch1\r\n");
+
+    Wait_ms(1000);
+    Power_Send("ch2 soft version\n");
+    Wait_ms(100);
+    if (power_have_data)
+    {
+        power_have_data = 0;
+        ReadPowerBuffer(buff, 64);
+        RPI_Send(buff);
+        RPI_Send("\r\n");
+    }
+    else
+        RPI_Send("no comms with ch2\r\n");
+
+    Wait_ms(1000);
+    Power_Send("ch3 soft version\n");
+    Wait_ms(100);
+    if (power_have_data)
+    {
+        power_have_data = 0;
+        ReadPowerBuffer(buff, 64);
+        RPI_Send(buff);
+        RPI_Send("\r\n");
+    }
+    else
+        RPI_Send("no comms with ch3\r\n");
+    
+    
 
     //--- Test ADC Multiple conversion Scanning Continuous Mode and DMA -------------------//
     // unsigned int seq_cnt = 0;
@@ -434,6 +479,7 @@ int main (void)
             
             Wait_ms(1000);
             main_state = TREATMENT_STANDBY;
+            ChangeLed(LED_TREATMENT_GENERATING);
             break;
 
         case MAIN_IN_BRIDGE_MODE:
@@ -442,10 +488,11 @@ int main (void)
                 power_have_data = 0;
                 bytes_readed = ReadPowerBuffer(s_to_sendb, sizeof(s_to_sendb));
 
-                if ((bytes_readed + 1) < sizeof(s_to_sendb))
+                if ((bytes_readed + 2) < sizeof(s_to_sendb))
                 {
-                    *(s_to_sendb + bytes_readed - 1) = '\n';
-                    *(s_to_sendb + bytes_readed) = '\0';
+                    *(s_to_sendb + bytes_readed) = '\r';
+                    *(s_to_sendb + bytes_readed + 1) = '\n';                    
+                    *(s_to_sendb + bytes_readed + 2) = '\0';
                     RPI_Send(s_to_sendb);
                 }
             }
@@ -511,6 +558,8 @@ int main (void)
             sequence_ready_reset;
 
         UpdateLed();
+
+        TreatmentUpdateMainState(main_state);
         
 #ifdef USE_SYNC_ALL_PLACES        
         UpdateSyncPulses();
