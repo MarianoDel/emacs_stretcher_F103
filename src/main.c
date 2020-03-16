@@ -359,6 +359,9 @@ int main (void)
             PowerSendStart();
             main_state = TREATMENT_RUNNING;
             ChangeLed(LED_TREATMENT_GENERATING);
+#ifdef USE_BUZZER_ON_OUT3
+            BuzzerCommands(BUZZER_HALF_CMD, 1);
+#endif
             break;
 
         case TREATMENT_RUNNING:
@@ -377,7 +380,8 @@ int main (void)
             if (comms_messages_rpi & COMM_STOP_TREAT)
             {
                 comms_messages_rpi &= ~COMM_STOP_TREAT;
-                //termine el tratamiento
+
+                //termine el tratamiento por stop, o finish_ok,
                 RPI_Send("OK\r\n");
                 PowerSendStop();
                 main_state = TREATMENT_STOPPING;
@@ -395,6 +399,9 @@ int main (void)
                 //termine el tratamiento
                 PowerSendStop();
                 RPI_Send("ended ok\r\n");
+#ifdef USE_BUZZER_ON_OUT3
+                BuzzerCommands(BUZZER_SHORT_CMD, 3);
+#endif                
                 main_state = TREATMENT_STOPPING;
             }
 
@@ -422,7 +429,10 @@ int main (void)
 
                 if (comms_messages_3 & COMM_POWER_ERROR_MASK)
                     RaspBerry_Report_Errors(CH3, &comms_messages_3);
-                    
+
+#ifdef USE_BUZZER_ON_OUT3
+                BuzzerCommands(BUZZER_LONG_CMD, 1);
+#endif                                
                 LED1_OFF;
                 main_state = TREATMENT_WITH_ERRORS;
             }

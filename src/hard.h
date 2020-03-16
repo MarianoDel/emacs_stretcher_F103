@@ -228,12 +228,21 @@ typedef enum
 #define BUZZER_HALF_CMD		BUZZER_MULTIPLE_HALF
 #define BUZZER_SHORT_CMD	BUZZER_MULTIPLE_SHORT
 
-#define TIM_BIP_SHORT		50
-#define TIM_BIP_SHORT_WAIT	100
-#define TIM_BIP_HALF		200
-#define TIM_BIP_HALF_WAIT	500
-#define TIM_BIP_LONG		1200
-#define TIM_BIP_LONG_WAIT	1500
+// tiempos de light treatment
+// #define TIM_BIP_SHORT		50
+// #define TIM_BIP_SHORT_WAIT	100
+// #define TIM_BIP_HALF		200
+// #define TIM_BIP_HALF_WAIT	500
+// #define TIM_BIP_LONG		1200
+// #define TIM_BIP_LONG_WAIT	1500
+
+// tiempos de magneto
+#define TIM_BIP_SHORT		300
+#define TIM_BIP_SHORT_WAIT	500
+#define TIM_BIP_HALF		600
+#define TIM_BIP_HALF_WAIT	800
+#define TIM_BIP_LONG		2000
+#define TIM_BIP_LONG_WAIT	2000
 
 //--- Tiempos (TIMEOUT) de salidas
 #define TIMER_OUT4_IN_ON       100

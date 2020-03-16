@@ -299,6 +299,19 @@ static void RaspBerry_Messages (char * msg)
         else
             resp = resp_error;
     }
+
+    else if (!strncmp(msg, (const char *)"keepalive,", (sizeof("keepalive,") - 1)))
+    {
+        RPI_Send(s_ok);
+    }
+
+    else if (!strncmp(msg, (const char *)"finish_ok,", (sizeof("finish_ok,") - 1)))
+    {
+#ifdef USE_BUZZER_ON_OUT3
+        BuzzerCommands(BUZZER_SHORT_CMD, 3);
+#endif                
+        comms_messages_rpi |= COMM_STOP_TREAT;
+    }
     
     //fin mensajes nuevos
     
