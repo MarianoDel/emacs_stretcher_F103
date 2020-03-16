@@ -59,8 +59,8 @@ void AdcConfig (void)
     // RCC_ADC_PRESCALER_DIV_8;    //72MHz / 8 = 9MHz
     RCC_ADC_PRESCALER_DIV_6;    //72MHz / 6 = 12MHz    
     
-    if (!RCC_ADC_CLK)
-        RCC_ADC_CLK_ON;
+    if (!RCC_ADC1_CLK)
+        RCC_ADC1_CLKEN;
 
     // preseteo los registros a default, la mayoria necesita tener ADC apagado
     ADC1->CR1 = 0x00000000;

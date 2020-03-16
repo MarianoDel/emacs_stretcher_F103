@@ -56,13 +56,10 @@ volatile unsigned char take_current_samples = 0;
 //--- Externals para armar seniales y comprobar el TIM5 en el inicio del programa
 volatile unsigned int session_warming_up_channel_1_stage_time = 0;
 
-//--- Externals para el BUZZER
-unsigned short buzzer_timeout = 0;
-
 //--- Externals de los timers
 volatile unsigned short wait_ms_var = 0;
 volatile unsigned short comms_timeout = 0;
-volatile unsigned short timer_led = 0;
+
 
 // //Estructuras.
 // session_typedef session_slot_aux;
@@ -318,6 +315,10 @@ int main (void)
     ADC_START;
     ChangeLed(LED_TREATMENT_STANDBY);
 
+#ifdef USE_ONE_BIP_INIT
+    BuzzerCommands(BUZZER_SHORT_CMD, 2);
+#endif
+
     while (1)
     {
         switch (main_state)
@@ -558,6 +559,7 @@ int main (void)
             sequence_ready_reset;
 
         UpdateLed();
+        UpdateBuzzer();
 
         TreatmentUpdateMainState(main_state);
         
@@ -609,11 +611,10 @@ void TimingDelay_Decrement(void)
     // if (timer_filters)
     //     timer_filters--;
     
-    if (timer_led)
-        timer_led--;
 
     // if (timer_led_pwm < 0xFFFF)
     //     timer_led_pwm ++;
+    HARD_Timers_Update();
 }
 
 //--- end of file ---//

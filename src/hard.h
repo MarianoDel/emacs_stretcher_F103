@@ -20,12 +20,12 @@
 // #define HARDWARE_VERSION_1_0        //esto seria una placa P1 en realidad
 // #define HARDWARE_VERSION_2_1        //esto seria una placa magneto chico
 //--- Software ------------------//
-// #define SOFTWARE_VERSION_1_2		
-// #define SOFTWARE_VERSION_1_1	     //pido soft de powers al arrancar
 #define SOFTWARE_VERSION_1_0        //habla contra rpi con programa magneto y traduce a micros potencia
+// #define SOFTWARE_VERSION_1_1    //No implemented yet
+// #define SOFTWARE_VERSION_1_2    //No implemented yet
 
 //-------- Type of Program (depending on software version) ----------------
-#define MAGNETO_NORMAL
+// #define MAGNETO_NORMAL
 
 
 
@@ -35,7 +35,7 @@
 
 #define USE_NO_TREATMENT_DETECT    //cuando esta en tratamiento revisa si las potencias tambien
 
-
+#define USE_BUZZER_ON_OUT3
 
 //-------- Kind of Reports Sended ----------------
 
@@ -47,6 +47,10 @@
 #define SYNC_CHAR    '*'
 #define USE_SYNC_ALL_PLACES    //manda pulsos incluso en los Wait_ms()
 // #define USE_SYNC_ONLY_ON_TREATMENT    //pulsos solo en tratamiento
+#endif
+
+#ifdef USE_BUZZER_ON_OUT3
+#define USE_ONE_BIP_INIT
 #endif
 //-------- Hysteresis Conf ------------------------
 
@@ -109,14 +113,14 @@ enum bool
 //--- Configuracion de leds ---//
 #ifdef HARDWARE_VERSION_2_0
 //--- PC0 ---//
-#define LED1 ((GPIOC->ODR & 0x0001) == 0)
-#define LED1_ON GPIOC->BSRR = 0x00000001
-#define LED1_OFF GPIOC->BSRR = 0x00010000
+#define LED1    ((GPIOC->ODR & 0x0001) == 0)
+#define LED1_ON    (GPIOC->BSRR = 0x00000001)
+#define LED1_OFF    (GPIOC->BSRR = 0x00010000)
 
 //--- PC1 ---//
-#define LED2 ((GPIOC->ODR & 0x0002) == 0)
-#define LED2_ON GPIOC->BSRR = 0x00000002
-#define LED2_OFF GPIOC->BSRR = 0x00020000
+#define LED2    ((GPIOC->ODR & 0x0002) == 0)
+#define LED2_ON    (GPIOC->BSRR = 0x00000002)
+#define LED2_OFF    (GPIOC->BSRR = 0x00020000)
 
 //PA0, PA1 NC
 
@@ -136,29 +140,35 @@ enum bool
 //PB12    NC
 
 //--- PB13 ---//
-#define OUT5 ((GPIOB->ODR & 0x2000) == 0)
-#define OUT5_OFF GPIOB->BSRR = 0x00002000
-#define OUT5_ON GPIOB->BSRR = 0x20000000
+#define OUT5    ((GPIOB->ODR & 0x2000) == 0)
+#define OUT5_OFF    (GPIOB->BSRR = 0x00002000)
+#define OUT5_ON    (GPIOB->BSRR = 0x20000000)
 
 //--- PB14 ---//
-#define OUT4 ((GPIOB->ODR & 0x4000) != 0)
-#define OUT4_ON GPIOB->BSRR = 0x00004000
-#define OUT4_OFF GPIOB->BSRR = 0x40000000
+#define OUT4    ((GPIOB->ODR & 0x4000) != 0)
+#define OUT4_ON    (GPIOB->BSRR = 0x00004000)
+#define OUT4_OFF    (GPIOB->BSRR = 0x40000000)
 
 //--- PB15 ---//
-#define OUT1 ((GPIOB->ODR & 0x8000) != 0)
-#define OUT1_ON GPIOB->BSRR = 0x00008000
-#define OUT1_OFF GPIOB->BSRR = 0x80000000
+#define OUT1    ((GPIOB->ODR & 0x8000) != 0)
+#define OUT1_ON    (GPIOB->BSRR = 0x00008000)
+#define OUT1_OFF    (GPIOB->BSRR = 0x80000000)
 
 //--- PC6 ---//
-#define OUT2 ((GPIOC->ODR & 0x0040) != 0)
-#define OUT2_ON GPIOC->BSRR = 0x00000040
-#define OUT2_OFF GPIOC->BSRR = 0x00400000
+#define OUT2    ((GPIOC->ODR & 0x0040) != 0)
+#define OUT2_ON    (GPIOC->BSRR = 0x00000040)
+#define OUT2_OFF    (GPIOC->BSRR = 0x00400000)
 
 //--- PC7 ---//
-#define OUT3 ((GPIOC->ODR & 0x0080) != 0)
-#define OUT3_ON GPIOC->BSRR = 0x00000080
-#define OUT3_OFF GPIOC->BSRR = 0x00800000
+#define OUT3    ((GPIOC->ODR & 0x0080) != 0)
+#define OUT3_ON    (GPIOC->BSRR = 0x00000080)
+#define OUT3_OFF    (GPIOC->BSRR = 0x00800000)
+
+#ifdef USE_BUZZER_ON_OUT3
+#define BUZZER    OUT3
+#define BUZZER_ON    OUT3_ON
+#define BUZZER_OFF    OUT3_OFF
+#endif
 
 //--- PC8 ---//
 #define IN2 ((GPIOC->IDR & 0x0100) != 0)
@@ -183,131 +193,47 @@ enum bool
 //PB3, PB4    NC
 
 //--- PB5 ---//
-#define SW_RX_TX ((GPIOB->ODR & 0x0020) != 0)
-#define SW_RX_TX_ON GPIOB->BSRR = 0x00000020
-#define SW_RX_TX_OFF GPIOB->BSRR = 0x00200000
+#define SW_RX_TX    ((GPIOB->ODR & 0x0020) != 0)
+#define SW_RX_TX_ON    (GPIOB->BSRR = 0x00000020)
+#define SW_RX_TX_OFF    (GPIOB->BSRR = 0x00200000)
 
 //PB6, PB7, PB8, PB9    NC
 
 #endif //HARDWARE_VERSION_2_0
 
 
-#ifdef HARDWARE_VERSION_2_1
-//--- PC13 ---//
-#define BUZZER ((GPIOC->ODR & 0x2000) != 0)
-#define BUZZER_ON GPIOC->BSRR = 0x00002000
-#define BUZZER_OFF GPIOC->BSRR = 0x20000000
-
-//--- PB11 prueba salida por USART3_RX ---//
-#define RX_PIN ((GPIOB->ODR & 0x0800) != 0)
-#define RX_PIN_ON GPIOB->BSRR = 0x00000800
-#define RX_PIN_OFF GPIOB->BSRR = 0x08000000
-
-//--- PB9 ---//
-#define L_ZONA ((GPIOB->ODR & 0x0200) != 0)
-#define L_ZONA_ON GPIOB->BSRR = 0x00000200
-#define L_ZONA_OFF GPIOB->BSRR = 0x02000000
-
-//--- PB8 ---//
-#define L_ALARMA ((GPIOB->ODR & 0x0100) != 0)
-#define L_ALARMA_ON GPIOB->BSRR = 0x00000100
-#define L_ALARMA_OFF GPIOB->BSRR = 0x01000000
-
-//--- PB7 ---//
-#define L_SERV ((GPIOB->ODR & 0x0080) != 0)
-#define L_SERV_ON GPIOB->BSRR = 0x00000080
-#define L_SERV_OFF GPIOB->BSRR = 0x00800000
-
-//--- PB6 ---//
-#define L_NETLIGHT ((GPIOB->ODR & 0x0040) != 0)
-#define L_NETLIGHT_ON GPIOB->BSRR = 0x00000040
-#define L_NETLIGHT_OFF GPIOB->BSRR = 0x00400000
-
-//--- PB5 ---//
-#define L_WIFI ((GPIOB->ODR & 0x0020) != 0)
-#define L_WIFI_ON GPIOB->BSRR = 0x00000020
-#define L_WIFI_OFF GPIOB->BSRR = 0x00200000
-
-//--- PB0 ---//
-#define ENA_CH1 ((GPIOB->ODR & 0x0001) != 0)
-#define ENA_CH1_ON GPIOB->BSRR = 0x00000001
-#define ENA_CH1_OFF GPIOB->BSRR = 0x00010000
-
-//--- PB1 ---//
-#define ENA_CH2 ((GPIOB->ODR & 0x0002) != 0)
-#define ENA_CH2_ON GPIOB->BSRR = 0x00000002
-#define ENA_CH2_OFF GPIOB->BSRR = 0x00020000
-
-//--- PB2 ---//
-#define ENA_CH3 ((GPIOB->ODR & 0x0004) != 0)
-#define ENA_CH3_ON GPIOB->BSRR = 0x00000004
-#define ENA_CH3_OFF GPIOB->BSRR = 0x00040000
-
-//--- PB13 ---//
-#define ENA_CH4 ((GPIOB->ODR & 0x2000) != 0)
-#define ENA_CH4_ON GPIOB->BSRR = 0x00002000
-#define ENA_CH4_OFF GPIOB->BSRR = 0x20000000
-
-#endif    //HARDWARE_VERSION_2_1
-
-//--- RCC clkEnable ---//
-
-#define RCC_TIM1_CLK (RCC->APB2ENR & 0x00000800)
-#define RCC_TIM1_CLKEN RCC->APB2ENR |= 0x00000800
-#define RCC_TIM1_CLKDIS RCC->APB2ENR &= ~0x00000800
-
-#define RCC_TIM2_CLK (RCC->APB1ENR & 0x00000001)
-#define RCC_TIM2_CLKEN RCC->APB1ENR |= 0x00000001
-#define RCC_TIM2_CLKDIS RCC->APB1ENR &= ~0x00000001
-
-#define RCC_TIM3_CLK (RCC->APB1ENR & 0x00000002)
-#define RCC_TIM3_CLKEN RCC->APB1ENR |= 0x00000002
-#define RCC_TIM3_CLKDIS RCC->APB1ENR &= ~0x00000002
-
-#define RCC_TIM4_CLK (RCC->APB1ENR & 0x00000004)
-#define RCC_TIM4_CLKEN RCC->APB1ENR |= 0x00000004
-#define RCC_TIM4_CLKDIS RCC->APB1ENR &= ~0x00000004
-
-#define RCC_TIM5_CLK (RCC->APB1ENR & 0x00000008)
-#define RCC_TIM5_CLKEN RCC->APB1ENR |= 0x00000008
-#define RCC_TIM5_CLKDIS RCC->APB1ENR &= ~0x00000008
-
-
-#define RCC_ADC1_CLK (RCC->APB2ENR & 0x00000200)
-#define RCC_ADC1_CLKEN RCC->APB2ENR |= 0x00000200
-#define RCC_ADC1_CLKDIS RCC->APB2ENR &= ~0x00000200
-
-#define RCC_ADC2_CLK (RCC->APB2ENR & 0x00000400)
-#define RCC_ADC2_CLKEN RCC->APB2ENR |= 0x00000400
-#define RCC_ADC2_CLKDIS RCC->APB2ENR &= ~0x00000400
-
-#define RCC_ADC3_CLK (RCC->APB2ENR & 0x00008000)
-#define RCC_ADC3_CLKEN RCC->APB2ENR |= 0x00008000
-#define RCC_ADC3_CLKDIS RCC->APB2ENR &= ~0x00008000
-
+//ESTADOS DEL BUZZER
 typedef enum
-{
-	BUZZER_INIT = 0,
-	BUZZER_MULTIPLE_SHORT,
-	BUZZER_MULTIPLE_SHORTA,
-	BUZZER_MULTIPLE_SHORTB,
-	BUZZER_MULTIPLE_HALF,
-	BUZZER_MULTIPLE_HALFA,
-	BUZZER_MULTIPLE_HALFB,
-	BUZZER_MULTIPLE_LONG,
-	BUZZER_MULTIPLE_LONGA,
-	BUZZER_MULTIPLE_LONGB,
-	BUZZER_TO_STOP
+{    
+    BUZZER_INIT = 0,
+    BUZZER_TO_STOP,
 
-} tBuzzer;
+    BUZZER_MULTIPLE_LONG,
+    BUZZER_MULTIPLE_LONGA,
+    BUZZER_MULTIPLE_LONGB,
 
-//--- Tiempos (TIMEOUT) del buzzer
-#define TIM_BIP_SHORT       300
-#define TIM_BIP_SHORT_WAIT        500
-#define TIM_BIP_HALF        600
-#define TIM_BIP_HALF_WAIT        800
-#define TIM_BIP_LONG        2000
-#define TIM_BIP_LONG_WAIT        2000
+    BUZZER_MULTIPLE_HALF,
+    BUZZER_MULTIPLE_HALFA,
+    BUZZER_MULTIPLE_HALFB,
+
+    BUZZER_MULTIPLE_SHORT,
+    BUZZER_MULTIPLE_SHORTA,
+    BUZZER_MULTIPLE_SHORTB
+    
+} buzzer_state_t;
+
+//COMANDOS DEL BUZZER	(tienen que ser los del estado de arriba)
+#define BUZZER_STOP_CMD		BUZZER_TO_STOP
+#define BUZZER_LONG_CMD		BUZZER_MULTIPLE_LONG
+#define BUZZER_HALF_CMD		BUZZER_MULTIPLE_HALF
+#define BUZZER_SHORT_CMD	BUZZER_MULTIPLE_SHORT
+
+#define TIM_BIP_SHORT		50
+#define TIM_BIP_SHORT_WAIT	100
+#define TIM_BIP_HALF		200
+#define TIM_BIP_HALF_WAIT	500
+#define TIM_BIP_LONG		1200
+#define TIM_BIP_LONG_WAIT	1500
 
 //--- Tiempos (TIMEOUT) de salidas
 #define TIMER_OUT4_IN_ON       100
@@ -330,18 +256,11 @@ typedef enum
 
 
 
-//--- Clock ---//
-// void RCC_Config (void);
-//--- Leds ---//
-// void Led_Config(void);
-// void Led1Toggle(void);
-// void Led2Toggle(void);
-// void Led3Toggle(void);
-// void UpdateBuzzer (void);
-// void BuzzerCommands(unsigned char , unsigned char );
 //--- Exported Module Functions ----
 void ChangeLed (unsigned char);
 void UpdateLed (void);
-
+void UpdateBuzzer (void);
+void BuzzerCommands(unsigned char , unsigned char );
+void HARD_Timers_Update (void);
 
 #endif

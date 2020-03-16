@@ -36,6 +36,12 @@ extern volatile unsigned short adc_ch [];
 char local_rasp_buff [SIZEOF_RXDATA];
 
 const char s_getall [] = {"get all conf"};
+const char s_buzzer_short [] = {"buzzer short"};
+const char s_buzzer_half [] = {"buzzer half"};
+const char s_buzzer_long [] = {"buzzer long"};
+char s_ok [] = {"OK\r\n"};
+char s_nok [] = {"ERROR\r\n"};
+    
 
 /* Module Private Functions -----------------------------------------------------------*/
 static void RaspBerry_Messages (char *);
@@ -73,19 +79,19 @@ static void RaspBerry_Messages (char * msg)
     if (!strncmp(msg, (const char *)"signal triangular", (sizeof("signal triangular") - 1)))
     {
         TreatmentSetSignalType(TRIANGULAR_SIGNAL);
-        RPI_Send((char *)"OK\r\n");
+        RPI_Send(s_ok);
     }
 
     else if (!strncmp(msg, (const char *)"signal square", (sizeof("signal square") - 1)))
     {
         TreatmentSetSignalType(SQUARE_SIGNAL);
-        RPI_Send((char *)"OK\r\n");
+        RPI_Send(s_ok);
     }
 
     else if (!strncmp(msg, (const char *)"signal sinusoidal", (sizeof("signal sinusoidal") - 1)))
     {
         TreatmentSetSignalType(SINUSOIDAL_SIGNAL);
-        RPI_Send((char *)"OK\r\n");
+        RPI_Send(s_ok);
     }
 
     else if (!strncmp(msg, (const char *)"power", (sizeof("power") - 1)))
@@ -111,9 +117,9 @@ static void RaspBerry_Messages (char * msg)
         }
             
         if (resp == resp_ok)
-            RPI_Send((char *)"OK\r\n");
+            RPI_Send(s_ok);
         else
-            RPI_Send((char *)"ERROR\r\n");
+            RPI_Send(s_nok);
     }
 
     //-- Frequency Setting
@@ -142,9 +148,9 @@ static void RaspBerry_Messages (char * msg)
         }
 
         if (resp == resp_ok)
-            RPI_Send((char *)"OK\r\n");
+            RPI_Send(s_ok);
         else
-            RPI_Send((char *)"ERROR\r\n");
+            RPI_Send(s_nok);
     }
 
     else if (!strncmp(msg, (const char *)"enable channel ", (sizeof("enable channel ") - 1)))
@@ -152,23 +158,23 @@ static void RaspBerry_Messages (char * msg)
         if (*(msg + 15) == '1')
         {
             TreatmentSetChannelsFlag(ENABLE_CH1_FLAG);
-            RPI_Send((char *)"OK\r\n");
+            RPI_Send(s_ok);
         }
 
         else if (*(msg + 15) == '2')
         {
             TreatmentSetChannelsFlag(ENABLE_CH2_FLAG);
-            RPI_Send((char *)"OK\r\n");
+            RPI_Send(s_ok);
         }
 
         else if (*(msg + 15) == '3')
         {
             TreatmentSetChannelsFlag(ENABLE_CH3_FLAG);
-            RPI_Send((char *)"OK\r\n");
+            RPI_Send(s_ok);
         }
 
         else
-            RPI_Send((char *)"ERROR\r\n");
+            RPI_Send(s_nok);
 
         
     }
@@ -178,30 +184,30 @@ static void RaspBerry_Messages (char * msg)
         if (*(msg + 16) == '1')
         {
             TreatmentSetChannelsFlag(DISABLE_CH1_FLAG);
-            RPI_Send((char *)"OK\r\n");
+            RPI_Send(s_ok);
         }
 
         else if (*(msg + 16) == '2')
         {
             TreatmentSetChannelsFlag(DISABLE_CH2_FLAG);
-            RPI_Send((char *)"OK\r\n");
+            RPI_Send(s_ok);
         }
 
         else if (*(msg + 16) == '3')
         {
             TreatmentSetChannelsFlag(DISABLE_CH3_FLAG);
-            RPI_Send((char *)"OK\r\n");
+            RPI_Send(s_ok);
         }
 
         else
-            RPI_Send((char *)"ERROR\r\n");
+            RPI_Send(s_nok);
             
     }
 
     else if (!strncmp(msg, (const char *)"stretcher up", (sizeof("stretcher up") - 1)))
     {
         comms_messages_rpi |= COMM_STRETCHER_UP;
-        RPI_Send((char *)"OK\r\n");        
+        RPI_Send(s_ok);        
     }
 
     else if (!strncmp(msg, "goto bridge mode", sizeof("goto bridge mode") - 1))
@@ -236,7 +242,64 @@ static void RaspBerry_Messages (char * msg)
         
         // sprintf(to_send, "High supply: %d, Low supply: %d\r\n", Sense_200V, Sense_15V);                
         // RPI_Send(to_send);
-    }    
+    }
+    
+    else if (!strncmp(msg, "hard_soft", sizeof("hard_soft") - 1))
+    {
+        char to_send [64];
+        // sprintf(to_send, "Hw: %s\n Fw: %s\n", HARD, SOFT);
+        sprintf(to_send, "%s\n%s\n", HARD, SOFT);
+        RPI_Send(to_send);
+    }
+
+
+    //-- Buzzer Actions
+    else if (strncmp(msg, s_buzzer_short, sizeof(s_buzzer_short) - 1) == 0)
+    {
+        unsigned short bips_qtty = 0;
+        
+        msg += sizeof(s_buzzer_short);		//normalizo al payload, hay un espacio
+
+        //lo que viene es un byte de 1 a 9
+        decimales = StringIsANumber(msg, &bips_qtty);
+        if (decimales == 1)
+            BuzzerCommands(BUZZER_SHORT_CMD, (unsigned char) bips_qtty);
+        else
+            resp = resp_error;
+    }
+
+    else if (strncmp(msg, s_buzzer_half, sizeof(s_buzzer_half) - 1) == 0)
+    {
+        unsigned short bips_qtty = 0;
+        
+        msg += sizeof(s_buzzer_half);		//normalizo al payload, hay un espacio
+
+        //lo que viene es un byte de 1 a 9
+        decimales = StringIsANumber(msg, &bips_qtty);
+        if (decimales == 1)
+        {
+            BuzzerCommands(BUZZER_HALF_CMD, (unsigned char) bips_qtty);
+            RPI_Send(s_ok);
+        }
+        else
+            RPI_Send(s_nok);
+
+    }
+
+    else if (strncmp(msg, s_buzzer_long, sizeof(s_buzzer_long) - 1) == 0)
+    {
+        unsigned short bips_qtty = 0;
+        
+        msg += sizeof(s_buzzer_long);		//normalizo al payload, hay un espacio
+
+        //lo que viene es un byte de 1 a 9
+        decimales = StringIsANumber(msg, &bips_qtty);
+        if (decimales == 1)
+            BuzzerCommands(BUZZER_LONG_CMD, (unsigned char) bips_qtty);
+        else
+            resp = resp_error;
+    }
+    
     //fin mensajes nuevos
     
     //mensajes anteriores
@@ -246,21 +309,21 @@ static void RaspBerry_Messages (char * msg)
         {
         case '1':
             // UART_CH1_Send("get_temp\r\n");
-            RPI_Send("OK\r\n");
+            RPI_Send(s_ok);
             break;
 
         case '2':
             // UART_CH2_Send("get_temp\r\n");
-            RPI_Send("OK\r\n");
+            RPI_Send(s_ok);
             break;
 
         case '3':
             // UART_CH3_Send("get_temp\r\n");
-            RPI_Send("OK\r\n");
+            RPI_Send(s_ok);
             break;
 
         default:
-            RPI_Send("ERROR\r\n");
+            RPI_Send(s_nok);
             break;
         }
     }
@@ -276,14 +339,14 @@ static void RaspBerry_Messages (char * msg)
 
             if (TreatmentSetTime(hours, minutes, seconds) == resp_ok)
             {
-                RPI_Send((char *)"OK\r\n");
+                RPI_Send(s_ok);
                 comms_messages_rpi |= COMM_CONF_CHANGE;
             }
             else
-                RPI_Send((char *)"ERROR\r\n");
+                RPI_Send(s_nok);
         }
         else
-            RPI_Send((char *)"ERROR\r\n");
+            RPI_Send(s_nok);
     }
 
     else if (!strncmp(msg, (const char *)"save,01", (sizeof("save,01") - 1)))
@@ -305,12 +368,12 @@ static void RaspBerry_Messages (char * msg)
         //     //Reset.
         //     NVIC_SystemReset();
         // }
-        RPI_Send((char *)"OK\r\n");
+        RPI_Send(s_ok);
     }
 
     else if (!strncmp(msg, (const char *)"load,01", (sizeof("load,01") - 1)))
     {
-        RPI_Send((char *)"OK\r\n");
+        RPI_Send(s_ok);
     }
 
     else if (!strncmp(msg, (const char *)"stop,", (sizeof("stop,") - 1)))
@@ -338,7 +401,7 @@ static void RaspBerry_Messages (char * msg)
     {
         comms_messages_rpi |= COMM_START_TREAT;
 
-        // RPI_Send((char *)"OK\r\n");
+        // RPI_Send(s_ok);
     }
 
 
@@ -352,17 +415,17 @@ static void RaspBerry_Messages (char * msg)
 
 //             Session_Set_Status (&session_slot_aux, (buffUART1rx2[17] - 48),(buffUART1rx2[15] - 48));
 
-//             RPI_Send((char *)"OK\r\n");
+//             RPI_Send(s_ok);
 //         }
 //         else
-//             RPI_Send((char *)"ERROR\r\n");
+//             RPI_Send(s_nok);
 
 //     }
 
 //     else if (!strncmp(msg, (const char *)"special_function,", (sizeof("special_function,") - 1)))
 //     {
 
-//         RPI_Send((char *)"OK\r\n");
+//         RPI_Send(s_ok);
 //     }
 
 
@@ -382,7 +445,7 @@ static void RaspBerry_Messages (char * msg)
 //         Session_Channel_3_Stop();
 //         Session_Channel_4_Stop();
 
-//         RPI_Send((char *)"OK\r\n");
+//         RPI_Send(s_ok);
 //     }
 
 // #ifdef HARDWARE_VERSION_2_1
@@ -394,7 +457,7 @@ static void RaspBerry_Messages (char * msg)
 //         Session_Channel_4_Stop();
 
 //         BuzzerCommands(BUZZER_MULTIPLE_SHORT, 3);
-//         RPI_Send((char *)"OK\r\n");
+//         RPI_Send(s_ok);
 //     }
 // #endif
 
@@ -407,10 +470,10 @@ static void RaspBerry_Messages (char * msg)
 //             //--- Send slot content ---//
 //             SessionSend(&session_slot_aux);
 
-//             RPI_Send((char *)"OK\r\n");
+//             RPI_Send(s_ok);
 //         }
 //         else
-//             RPI_Send((char *)"ERROR\r\n");
+//             RPI_Send(s_nok);
 //     }
 
 //     else if (!strncmp(msg, (const char *)"read_slot,", (sizeof("read_slot,") - 1)))
@@ -423,14 +486,14 @@ static void RaspBerry_Messages (char * msg)
 //             //--- Send slot content ---//
 //             SessionSend(&session_slot_aux);
 
-//             RPI_Send((char *)"OK\r\n");
+//             RPI_Send(s_ok);
 //         }
 //         else
-//             RPI_Send((char *)"ERROR\r\n");
+//             RPI_Send(s_nok);
 //     }
 
 //     else
-//         RPI_Send((char *)"ERROR\r\n");
+//         RPI_Send(s_nok);
     else if (strncmp(msg, s_getall, sizeof(s_getall) - 1) == 0)
         SendAllConf();
 
@@ -438,7 +501,7 @@ static void RaspBerry_Messages (char * msg)
         SendStatus();
     
     else
-        RPI_Send((char *)"ERROR\r\n");
+        RPI_Send(s_nok);
 
 
 //     //--- end ---//
