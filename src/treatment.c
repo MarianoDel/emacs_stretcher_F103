@@ -153,6 +153,16 @@ resp_t TreatmentSetTime (unsigned char h, unsigned char m, unsigned char s)
     return resp_ok;
 }
 
+resp_t TreatmentSetTimeinMinutes (unsigned short m)
+{
+    if (m > 120)
+        return resp_error;
+
+    treatment_conf.treatment_time = m * 60;
+    
+    return resp_ok;
+}
+
 unsigned short TreatmentGetTime (void)
 {
     return treatment_conf.treatment_time;

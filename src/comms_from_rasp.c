@@ -65,9 +65,6 @@ void UpdateRaspberryMessages (void)
 static void RaspBerry_Messages (char * msg)
 {
     resp_t resp = resp_ok;
-    unsigned short hours = 0;
-    unsigned short minutes = 0;
-    unsigned short seconds = 0;
 
     const char s_frequency [] = {"frequency"};
     unsigned short new_freq_int = 0;
@@ -263,7 +260,10 @@ static void RaspBerry_Messages (char * msg)
         //lo que viene es un byte de 1 a 9
         decimales = StringIsANumber(msg, &bips_qtty);
         if (decimales == 1)
+        {
             BuzzerCommands(BUZZER_SHORT_CMD, (unsigned char) bips_qtty);
+            RPI_Send(s_ok);
+        }
         else
             resp = resp_error;
     }
@@ -305,14 +305,27 @@ static void RaspBerry_Messages (char * msg)
         RPI_Send(s_ok);
     }
 
-    else if (!strncmp(msg, (const char *)"finish_ok,", (sizeof("finish_ok,") - 1)))
+    else if (!strncmp(msg, (const char *)"duration,", (sizeof("duration,") - 1)))
     {
-#ifdef USE_BUZZER_ON_OUT3
-        BuzzerCommands(BUZZER_SHORT_CMD, 3);
-#endif                
-        comms_messages_rpi |= COMM_STOP_TREAT;
-    }
-    
+        unsigned short new_time = 0;
+        
+        msg += sizeof("duration,") - 1;		//normalizo al payload
+
+        //lo que viene son tres bytes con el tiempo de 1 a 120 se supone
+        decimales = StringIsANumber(msg, &new_time);
+        if (decimales == 3)
+        {
+            if (TreatmentSetTimeinMinutes(new_time) == resp_ok)
+            {
+                RPI_Send(s_ok);
+                comms_messages_rpi |= COMM_CONF_CHANGE;
+            }
+            else
+                RPI_Send(s_nok);
+        }
+        else
+            RPI_Send(s_nok);
+    }    
     //fin mensajes nuevos
     
     //mensajes anteriores
@@ -341,172 +354,22 @@ static void RaspBerry_Messages (char * msg)
         }
     }
 
-//     //example.	duration,00,10,00,1
-    else if (!strncmp(msg, (const char *)"duration,", (sizeof("duration,") - 1)))
-    {
-        if ((*(msg + 18) > '0') && ((*(msg + 18)) < '4') && (*(msg + 17) == ','))
-        {
-            hours = (*(msg + 9) - '0') * 10 + *(msg + 10) - '0';
-            minutes = (*(msg + 12) - '0') * 10 + *(msg + 13) - '0';
-            seconds = (*(msg + 15) - '0') * 10 + *(msg + 16) - '0';
-
-            if (TreatmentSetTime(hours, minutes, seconds) == resp_ok)
-            {
-                RPI_Send(s_ok);
-                comms_messages_rpi |= COMM_CONF_CHANGE;
-            }
-            else
-                RPI_Send(s_nok);
-        }
-        else
-            RPI_Send(s_nok);
-    }
-
-    else if (!strncmp(msg, (const char *)"save,01", (sizeof("save,01") - 1)))
-    {
-        // i = FLASH_Program(&session_slot_aux, ((buffUART1rx2[5] - 48) * 10 + (buffUART1rx2[6] - 48)));
-
-        // if (i == FIN_OK)
-        // {
-        //     RPI_Send("Guardado OK\r\n");
-        //     Wait_ms(1000);
-        //     //Reset.
-        //     NVIC_SystemReset();
-        // }
-
-        // if (i == FIN_ERROR)
-        // {
-        //     RPI_Send("Guardado ERROR\r\n");
-        //     Wait_ms(1000);
-        //     //Reset.
-        //     NVIC_SystemReset();
-        // }
-        RPI_Send(s_ok);
-    }
-
-    else if (!strncmp(msg, (const char *)"load,01", (sizeof("load,01") - 1)))
-    {
-        RPI_Send(s_ok);
-    }
-
     else if (!strncmp(msg, (const char *)"stop,", (sizeof("stop,") - 1)))
     {
         comms_messages_rpi |= COMM_STOP_TREAT;
-        
-        // RPI_Send((const char *)"OK\r\n");
     }
 
     else if (!strncmp(msg, (const char *)"pause,", (sizeof("pause,") - 1)))
     {
         comms_messages_rpi |= COMM_PAUSE_TREAT;
-        
-        // RPI_Send((const char *)"OK\r\n");
     }
     
-    else if (!strncmp(msg, (const char *)"reset", (sizeof("reset") - 1)))
-    {
-        RPI_Send((char *) "Restarting...\r\n");
-        // Wait_ms(1000);
-        // NVIC_SystemReset();
-    }
-
     else if (!strncmp(msg,(const char *)"start,", (sizeof("start,") - 1)))
     {
         comms_messages_rpi |= COMM_START_TREAT;
-
-        // RPI_Send(s_ok);
     }
 
 
-
-//     //example. state_of_stage,0,1
-//     else if (!strncmp(msg, (const char *)"state_of_stage,", (sizeof("state_of_stage,") - 1)))
-//     {
-
-//         if (((buffUART1rx2[15] - 48) == 0) || ((buffUART1rx2[15] - 48) == 1))
-//         {
-
-//             Session_Set_Status (&session_slot_aux, (buffUART1rx2[17] - 48),(buffUART1rx2[15] - 48));
-
-//             RPI_Send(s_ok);
-//         }
-//         else
-//             RPI_Send(s_nok);
-
-//     }
-
-//     else if (!strncmp(msg, (const char *)"special_function,", (sizeof("special_function,") - 1)))
-//     {
-
-//         RPI_Send(s_ok);
-//     }
-
-
-//     else if (!strncmp(msg, (const char *)"stop,", (sizeof("stop,") - 1)))
-//     {
-// /*			if((buffUART3rx2[5] - 48) == 1)
-//                         Session_Channel_1_Stop();
-// 			if((buffUART3rx2[5] - 48) == 2)
-//                         Session_Channel_2_Stop();
-// 			if((buffUART3rx2[5] - 48) == 3)
-//                         Session_Channel_3_Stop();
-// 			if((buffUART3rx2[5] - 48) == 4)
-//                         Session_Channel_4_Stop();
-// */
-//         Session_Channel_1_Stop();
-//         Session_Channel_2_Stop();
-//         Session_Channel_3_Stop();
-//         Session_Channel_4_Stop();
-
-//         RPI_Send(s_ok);
-//     }
-
-// #ifdef HARDWARE_VERSION_2_1
-//     else if (!strncmp(msg, (const char *)"finish_ok,", (sizeof("finish_ok,") - 1)))
-//     {
-//         Session_Channel_1_Stop();
-//         Session_Channel_2_Stop();
-//         Session_Channel_3_Stop();
-//         Session_Channel_4_Stop();
-
-//         BuzzerCommands(BUZZER_MULTIPLE_SHORT, 3);
-//         RPI_Send(s_ok);
-//     }
-// #endif
-
-//     else if (!strncmp(msg, (const char *)"read_channel,", (sizeof("read_channel,") - 1)))
-//     {
-//         if (((buffUART1rx2[13] - 48) < 5) && ((buffUART1rx2[13] - 48) > 0))
-//         {
-//             Channel_Load (&session_slot_aux, (buffUART1rx2[13] - 48));
-
-//             //--- Send slot content ---//
-//             SessionSend(&session_slot_aux);
-
-//             RPI_Send(s_ok);
-//         }
-//         else
-//             RPI_Send(s_nok);
-//     }
-
-//     else if (!strncmp(msg, (const char *)"read_slot,", (sizeof("read_slot,") - 1)))
-//     {
-//         //load,slot[2],destino[1]
-//         if ((((buffUART1rx2[11] - 48) + (buffUART1rx2[10] - 48) * 10) < 11))
-//         {
-//             Session_Load (&session_slot_aux, (((buffUART1rx2[10] - 48) * 10) + buffUART1rx2[11] - 48), 0);
-
-//             //--- Send slot content ---//
-//             SessionSend(&session_slot_aux);
-
-//             RPI_Send(s_ok);
-//         }
-//         else
-//             RPI_Send(s_nok);
-//     }
-
-//     else
-//         RPI_Send(s_nok);
     else if (strncmp(msg, s_getall, sizeof(s_getall) - 1) == 0)
         SendAllConf();
 

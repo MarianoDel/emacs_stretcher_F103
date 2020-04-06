@@ -130,6 +130,7 @@ void TreatmentGetFrequency (unsigned char *, unsigned char *);
 resp_t TreatmentSetPower (unsigned char);
 unsigned char TreatmentGetPower (void);
 resp_t TreatmentSetTime (unsigned char, unsigned char, unsigned char);
+resp_t TreatmentSetTimeinMinutes (unsigned short);
 unsigned short TreatmentGetTime (void);
 void TreatmentGetAllConf (char *);
 resp_t TreatmentAssertParams (void);
