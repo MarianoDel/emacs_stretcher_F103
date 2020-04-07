@@ -27,6 +27,10 @@
 //-------- Type of Program (depending on software version) ----------------
 // #define MAGNETO_NORMAL
 
+//--- Serial Number / Device Id Bytes length ----------
+#define USE_DEVICE_ID_4BYTES
+// #define USE_DEVICE_ID_12BYTES
+
 
 
 
@@ -68,19 +72,19 @@
 
 //--- Hardware & Software Messages ------------------//
 #ifdef HARDWARE_VERSION_2_0
-#define HARD "Hardware Version: 2.0\r\n"
+#define HARD "Hardware Version: 2.0"
 #endif
 #ifdef HARDWARE_VERSION_2_1
-#define HARD "Hardware Version: 2.1\r\n"
+#define HARD "Hardware Version: 2.1"
 #endif
 #ifdef SOFTWARE_VERSION_2_2
-#define SOFT "Software Version: 2.2\r\n"
+#define SOFT "Software Version: 2.2"
 #endif
 #ifdef SOFTWARE_VERSION_1_0
-#define SOFT "Software Version: 1.0\r\n"
+#define SOFT "Software Version: 1.0"
 #endif
 #ifdef SOFTWARE_VERSION_1_1
-#define SOFT "Software Version: 1.1\r\n"
+#define SOFT "Software Version: 1.1"
 #endif
 //--- End of Hardware & Software Messages ------------------//
 

@@ -243,9 +243,8 @@ static void RaspBerry_Messages (char * msg)
     
     else if (!strncmp(msg, "hard_soft", sizeof("hard_soft") - 1))
     {
-        char to_send [64];
-        // sprintf(to_send, "Hw: %s\n Fw: %s\n", HARD, SOFT);
-        sprintf(to_send, "%s\n%s\n", HARD, SOFT);
+        char to_send [80];
+        sprintf(to_send, "%s\r\n%s\r\n", HARD, SOFT);
         RPI_Send(to_send);
     }
 
@@ -325,7 +324,33 @@ static void RaspBerry_Messages (char * msg)
         }
         else
             RPI_Send(s_nok);
-    }    
+    }
+
+    else if (!strncmp((const char *)msg, (const char *)"serial num", (sizeof("serial num") - 1)))
+    {
+        char to_send[20] = { 0 };
+        
+#ifdef USE_DEVICE_ID_4BYTES
+        unsigned int device_id = *((unsigned short*)0x1FFFF7E8);
+        device_id <<= 16;
+        device_id |= *((unsigned short*)(0x1FFFF7E8 + 2));
+        device_id ^= *((unsigned int*)(0x1FFFF7E8 + 4));
+        device_id ^= *((unsigned int*)(0x1FFFF7E8 + 8));
+        sprintf(to_send, "0x%08x\r\n", device_id);
+            
+        RPI_Send(to_send);
+#endif
+#ifdef USE_DEVICE_ID_12BYTES
+        sprintf(to_send, "0x%04x%04x%08x%08x\r\n",
+                *((unsigned short*)0x1FFFF7E8),
+                *((unsigned short*)(0x1FFFF7E8 + 2)),
+                *((unsigned int*)(0x1FFFF7E8 + 4)),
+                *((unsigned int*)(0x1FFFF7E8 + 8)));
+        
+        UART_PC_Send(to_send);
+#endif
+    }
+    
     //fin mensajes nuevos
     
     //mensajes anteriores
