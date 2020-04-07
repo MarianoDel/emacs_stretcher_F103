@@ -328,7 +328,7 @@ static void RaspBerry_Messages (char * msg)
 
     else if (!strncmp((const char *)msg, (const char *)"serial num", (sizeof("serial num") - 1)))
     {
-        char to_send[20] = { 0 };
+        char to_send[40] = { 0 };
         
 #ifdef USE_DEVICE_ID_4BYTES
         unsigned int device_id = *((unsigned short*)0x1FFFF7E8);
@@ -336,18 +336,18 @@ static void RaspBerry_Messages (char * msg)
         device_id |= *((unsigned short*)(0x1FFFF7E8 + 2));
         device_id ^= *((unsigned int*)(0x1FFFF7E8 + 4));
         device_id ^= *((unsigned int*)(0x1FFFF7E8 + 8));
-        sprintf(to_send, "0x%08x\r\n", device_id);
+        sprintf(to_send, "Device Id: 0x%08x\r\n", device_id);
             
         RPI_Send(to_send);
 #endif
 #ifdef USE_DEVICE_ID_12BYTES
-        sprintf(to_send, "0x%04x%04x%08x%08x\r\n",
+        sprintf(to_send, "Device Id: 0x%04x%04x%08x%08x\r\n",
                 *((unsigned short*)0x1FFFF7E8),
                 *((unsigned short*)(0x1FFFF7E8 + 2)),
                 *((unsigned int*)(0x1FFFF7E8 + 4)),
                 *((unsigned int*)(0x1FFFF7E8 + 8)));
         
-        UART_PC_Send(to_send);
+        RPI_Send(to_send);
 #endif
     }
     
