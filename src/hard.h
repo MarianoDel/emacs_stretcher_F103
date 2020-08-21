@@ -26,6 +26,7 @@
 
 //-------- Type of Program (depending on software version) ----------------
 // #define MAGNETO_NORMAL
+#define MAGNETO_ESPECIAL_1CH
 
 //--- Serial Number / Device Id Bytes length ----------
 #define USE_DEVICE_ID_4BYTES
@@ -90,7 +91,7 @@
 
 
 
-//--- Exported constants ---//
+// Exported Types --------------------------------------------------------------
 typedef enum {
 	resp_ok = 0,
 	resp_not_own,
@@ -112,6 +113,16 @@ enum bool
 	FALSE = 0,
 	TRUE = !FALSE
 };
+
+#ifdef MAGNETO_ESPECIAL_1CH
+typedef enum {
+    SW_NO = 0,
+    SW_MIN,
+    SW_HALF,
+    SW_FULL
+    
+} resp_sw_t;
+#endif
 
 
 //--- Configuracion de leds ---//
@@ -181,7 +192,7 @@ enum bool
 #define IN1 ((GPIOC->IDR & 0x0200) != 0)
 
 //--- PA8 ---//
-#define IN0 ((GPIOA->IDR & 0x0100) != 0)
+#define IN0 ((GPIOA->IDR & 0x0100) == 0)
 
 //PA9
 //PA10    Usart1
@@ -275,5 +286,10 @@ void UpdateLed (void);
 void UpdateBuzzer (void);
 void BuzzerCommands(unsigned char , unsigned char );
 void HARD_Timers_Update (void);
+
+#ifdef MAGNETO_ESPECIAL_1CH
+resp_sw_t CheckS1 (void);
+void UpdateSwitches (void);
+#endif
 
 #endif

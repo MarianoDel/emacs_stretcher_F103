@@ -70,6 +70,7 @@ void Usart2Send (char *);
 void Usart2SendUnsigned (unsigned char *, unsigned char);
 unsigned char ReadUsart2Buffer (char *, unsigned short);
 void USART2_IRQHandler (void);
+void ReadUsart2BufferFlush (void);
 
 void Usart3Config (void);
 void Usart3Send (char *);

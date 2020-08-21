@@ -266,7 +266,12 @@ unsigned char ReadUsart2Buffer (char * bout, unsigned short max_len)
     len = prx2 - rx2buff;
 
     if (len < max_len)
+    {
+        //el puntero siempre llega adelantado desde la int, lo corto con un 0
+        *prx2 = '\0';
+        len += 1;
         memcpy(bout, (unsigned char *) rx2buff, len);
+    }
     else
     {
         memcpy(bout, (unsigned char *) rx2buff, len);
@@ -278,6 +283,17 @@ unsigned char ReadUsart2Buffer (char * bout, unsigned short max_len)
 
     return (unsigned char) len;
 }
+
+
+void ReadUsart2BufferFlush (void)
+{
+    if (usart2_have_data)
+        usart2_have_data = 0;
+    
+    //ajusto punteros de rx
+    prx2 = rx2buff;
+}
+
 
 void USART2_IRQHandler (void)
 {

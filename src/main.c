@@ -108,7 +108,6 @@ void TimingDelay_Decrement(void);
 int main (void)
 {
     unsigned char i = 0;
-    unsigned long ii = 0;
     char buff [64];
     treatment_t main_state = TREATMENT_STANDBY;
     unsigned short bytes_readed = 0;
@@ -164,6 +163,7 @@ int main (void)
 
 #ifdef HARD
     Usart1Send(HARD);
+    Usart1Send("\r\n");
     Wait_ms(100);    
 #else
 #error	"No Hardware defined in hard.h file"
@@ -171,6 +171,7 @@ int main (void)
 
 #ifdef SOFT
     Usart1Send(SOFT);
+    Usart1Send("\r\n");
     Wait_ms(100);    
 #else
 #error	"No Soft Version defined in hard.h file"
@@ -179,6 +180,8 @@ int main (void)
     //limpio interfase serie
     //limpio buffers serie
     Power_Send("chf\n");
+    Wait_ms(100);
+    ReadPowerBufferFlush();
 
     Wait_ms(1000);
     Power_Send("ch1 soft version\n");
@@ -319,6 +322,11 @@ int main (void)
     BuzzerCommands(BUZZER_SHORT_CMD, 2);
 #endif
 
+#ifdef MAGNETO_ESPECIAL_1CH
+    unsigned char change_power = 0;
+    unsigned char change_power_end = 0;    
+    unsigned char power_output_stage = 1;
+#endif
     while (1)
     {
         switch (main_state)
@@ -341,6 +349,71 @@ int main (void)
                 }
             }
             RPI_Flush_Comms;
+
+#ifdef MAGNETO_ESPECIAL_1CH
+            switch (change_power)
+            {
+            case 0:
+                //cambiar potencia?
+                if (CheckS1() > SW_NO)
+                    change_power++;
+
+                break;
+
+            case 1:
+                if (CheckS1() == SW_NO)
+                {
+                    if (power_output_stage < 3)
+                        power_output_stage++;
+                    else
+                        power_output_stage = 1;
+
+                    BuzzerCommands(BUZZER_SHORT_CMD, power_output_stage);
+                    change_power = 0;
+                }
+
+                //empezar tratamiento?                
+                if (CheckS1() > SW_MIN)
+                {
+                    TreatmentSetSignalType (SINUSOIDAL_SIGNAL);
+                    TreatmentSetFrequency (7, 0);
+                    TreatmentSetChannelsFlag(ENABLE_CH1_FLAG);
+                    TreatmentSetChannelsFlag(DISABLE_CH2_FLAG);
+                    TreatmentSetChannelsFlag(DISABLE_CH3_FLAG);
+                    TreatmentSetTimeinMinutes(30);
+                    if (power_output_stage == 1)
+                        TreatmentSetPower (33);
+                    else if (power_output_stage == 2)
+                        TreatmentSetPower (66);
+                    else
+                        TreatmentSetPower (100);
+
+                    change_power++;
+                    BuzzerCommands(BUZZER_SHORT_CMD, 1);
+                }
+                break;
+
+            case 2:
+                if (CheckS1() == SW_NO)
+                {
+                    if (TreatmentAssertParams() == resp_error)
+                        RPI_Send("ERROR\r\n");
+                    else
+                    {
+                        RPI_Send("OK\r\n");
+                        PowerSendConf();
+                        main_state = TREATMENT_STARTING;
+                    }
+                    
+                    change_power = 0;
+                }
+                break;
+
+            default:
+                change_power = 0;
+                break;
+            }
+#endif
             break;
 
         case TREATMENT_STARTING:
@@ -437,6 +510,35 @@ int main (void)
                 main_state = TREATMENT_WITH_ERRORS;
             }
             RPI_Flush_Comms;
+
+#ifdef MAGNETO_ESPECIAL_1CH
+            //tengo que terminar??
+            switch (change_power_end)
+            {
+            case 0:
+                if (CheckS1() > SW_MIN)
+                {
+                    //termine el tratamiento
+                    PowerSendStop();
+                    RPI_Send("ended ok\r\n");
+                    BuzzerCommands(BUZZER_SHORT_CMD, 3);
+                    change_power_end++;
+                }
+                break;
+                
+            case 1:
+                if (CheckS1() == SW_NO)
+                {
+                    change_power_end = 0;
+                    main_state = TREATMENT_STOPPING;
+                }
+                break;
+                
+            default:
+                change_power_end = 0;
+                break;
+            }
+#endif
             break;
 
         case TREATMENT_PAUSED:
@@ -490,7 +592,7 @@ int main (void)
             
             Wait_ms(1000);
             main_state = TREATMENT_STANDBY;
-            ChangeLed(LED_TREATMENT_GENERATING);
+            ChangeLed(LED_TREATMENT_STANDBY);
             break;
 
         case MAIN_IN_BRIDGE_MODE:
@@ -572,6 +674,11 @@ int main (void)
         UpdateBuzzer();
 
         TreatmentUpdateMainState(main_state);
+
+#ifdef MAGNETO_ESPECIAL_1CH
+        UpdateSwitches();
+#endif
+        
         
 #ifdef USE_SYNC_ALL_PLACES        
         UpdateSyncPulses();
