@@ -179,8 +179,8 @@ int main (void)
 
     //limpio interfase serie
     //limpio buffers serie
+    Wait_ms(3000);
     Power_Send("chf\n");
-    Wait_ms(100);
     ReadPowerBufferFlush();
 
     Wait_ms(1000);
