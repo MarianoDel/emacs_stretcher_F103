@@ -157,9 +157,9 @@ typedef enum {
 //PB12    NC
 
 //--- PB13 ---//
-#define OUT5    ((GPIOB->ODR & 0x2000) == 0)
-#define OUT5_OFF    (GPIOB->BSRR = 0x00002000)
-#define OUT5_ON    (GPIOB->BSRR = 0x20000000)
+#define OUT5    ((GPIOB->ODR & 0x2000) != 0)
+#define OUT5_ON    (GPIOB->BSRR = 0x00002000)
+#define OUT5_OFF    (GPIOB->BSRR = 0x20000000)
 
 //--- PB14 ---//
 #define OUT4    ((GPIOB->ODR & 0x4000) != 0)

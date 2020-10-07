@@ -435,6 +435,8 @@ int main (void)
 #ifdef USE_BUZZER_ON_OUT3
             BuzzerCommands(BUZZER_HALF_CMD, 1);
 #endif
+            OUT5_ON;
+            OUT2_ON;
             break;
 
         case TREATMENT_RUNNING:
@@ -574,6 +576,8 @@ int main (void)
             RPI_Send(buff);
             main_state = TREATMENT_STANDBY;
             ChangeLed(LED_TREATMENT_STANDBY);
+            OUT5_OFF;
+            OUT2_OFF;
             break;
 
         case TREATMENT_WITH_ERRORS:
@@ -593,6 +597,8 @@ int main (void)
             Wait_ms(1000);
             main_state = TREATMENT_STANDBY;
             ChangeLed(LED_TREATMENT_STANDBY);
+            OUT5_OFF;
+            OUT2_OFF;
             break;
 
         case MAIN_IN_BRIDGE_MODE:
