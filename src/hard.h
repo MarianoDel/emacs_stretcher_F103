@@ -25,8 +25,8 @@
 // #define SOFTWARE_VERSION_1_2    //No implemented yet
 
 //-------- Type of Program (depending on software version) ----------------
-// #define MAGNETO_NORMAL
-#define MAGNETO_ESPECIAL_1CH
+#define MAGNETO_NORMAL
+// #define MAGNETO_ESPECIAL_1CH
 
 //--- Serial Number / Device Id Bytes length ----------
 #define USE_DEVICE_ID_4BYTES
@@ -45,8 +45,10 @@
 //-------- Kind of Reports Sended ----------------
 
 //-------- Others Configurations depending on the formers ------------
-#define K_200V    0.0957
-#define K_15V    0.00804
+// #define K_200V    0.0957    //con diodo z prot de 3.1V da error
+#define K_200V    0.0806    //con diodo z 5.1V
+// #define K_15V    0.00804    //con z 3.1V
+#define K_15V    0.00619    //con z 5.1V
 
 #ifdef USE_SYNC_PULSES
 #define SYNC_CHAR    '*'
