@@ -20,8 +20,8 @@
 // #define HARDWARE_VERSION_1_0        //esto seria una placa P1 en realidad
 // #define HARDWARE_VERSION_2_1        //esto seria una placa magneto chico
 //--- Software ------------------//
-#define SOFTWARE_VERSION_1_0        //habla contra rpi con programa magneto y traduce a micros potencia
-// #define SOFTWARE_VERSION_1_1    //No implemented yet
+// #define SOFTWARE_VERSION_1_0        //habla contra rpi con programa magneto y traduce a micros potencia
+#define SOFTWARE_VERSION_1_1    //programa ernesto manda pulso en OUT4 para mover camilla 21-10-2020
 // #define SOFTWARE_VERSION_1_2    //No implemented yet
 
 //-------- Type of Program (depending on software version) ----------------

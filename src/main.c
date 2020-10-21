@@ -436,6 +436,8 @@ int main (void)
             BuzzerCommands(BUZZER_HALF_CMD, 1);
 #endif
             OUT5_ON;
+            //OUT4 pulse to up the stretcher
+            comms_messages_rpi |= COMM_STRETCHER_UP;
             OUT2_ON;
             break;
 
@@ -577,6 +579,8 @@ int main (void)
             main_state = TREATMENT_STANDBY;
             ChangeLed(LED_TREATMENT_STANDBY);
             OUT5_OFF;
+            //OUT4 pulse to down the stretcher
+            comms_messages_rpi |= COMM_STRETCHER_UP;            
             OUT2_OFF;
             break;
 
@@ -598,6 +602,8 @@ int main (void)
             main_state = TREATMENT_STANDBY;
             ChangeLed(LED_TREATMENT_STANDBY);
             OUT5_OFF;
+            //OUT4 pulse to down the stretcher
+            comms_messages_rpi |= COMM_STRETCHER_UP;            
             OUT2_OFF;
             break;
 
@@ -659,7 +665,7 @@ int main (void)
             if (comms_messages_rpi & COMM_STRETCHER_UP)
             {
                 comms_messages_rpi &= ~COMM_STRETCHER_UP;
-                timer_out4 = TIMER_OUT4_IN_ON;            
+                timer_out4 = TIMER_OUT4_IN_ON;
                 OUT4_ON;
                 OUT1_ON;
             }

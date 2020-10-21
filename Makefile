@@ -149,7 +149,7 @@ LDFLAGS = $(MCFLAGS) -mthumb -lm --specs=nano.specs -Wl,--gc-sections -nostartfi
 # makefile rules
 #
 
-aassemblersources = $(ASRC)
+assemblersources = $(ASRC)
 sources = $(SRC)
 OBJS  = $(ASRC:.s=.o) $(SRC:.c=.o)
 
