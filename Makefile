@@ -78,6 +78,7 @@ SRC += ./src/comms_from_rasp.c
 SRC += ./src/comms_from_power.c
 SRC += ./src/treatment.c
 SRC += ./src/utils.c
+SRC += ./src/test_functions.c
 
 ## Core Support
 SRC += ./startup_src/syscalls.c

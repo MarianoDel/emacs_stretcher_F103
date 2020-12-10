@@ -21,8 +21,8 @@
 // #define HARDWARE_VERSION_2_1        //esto seria una placa magneto chico
 //--- Software ------------------//
 // #define SOFTWARE_VERSION_1_0        //habla contra rpi con programa magneto y traduce a micros potencia
-#define SOFTWARE_VERSION_1_1    //programa ernesto manda pulso en OUT4 para mover camilla 21-10-2020
-// #define SOFTWARE_VERSION_1_2    //No implemented yet
+// #define SOFTWARE_VERSION_1_1    //programa ernesto manda pulso en OUT4 para mover camilla 21-10-2020
+#define SOFTWARE_VERSION_1_2    //it permits the auto up or auto dwn of the stretcher
 
 //-------- Type of Program (depending on software version) ----------------
 #define MAGNETO_NORMAL
@@ -88,6 +88,9 @@
 #endif
 #ifdef SOFTWARE_VERSION_1_1
 #define SOFT "Software Version: 1.1"
+#endif
+#ifdef SOFTWARE_VERSION_1_2
+#define SOFT "Software Version: 1.2"
 #endif
 //--- End of Hardware & Software Messages ------------------//
 

@@ -250,4 +250,19 @@ treatment_t TreatmentGetMainState (void)
 }
 
 
+void TreatmentSetUpDwn (updwn_e up_or_dwn)
+{
+    if (up_or_dwn)
+        treatment_conf.updwn_conf = UPDWN_MANUAL;
+    else
+        treatment_conf.updwn_conf = UPDWN_AUTO;
+
+}
+
+updwn_e TreatmentGetUpDwn (void)
+{
+    return treatment_conf.updwn_conf;
+}
+
+
 //--- end of file ---//

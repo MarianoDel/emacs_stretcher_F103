@@ -1,5 +1,5 @@
 //---------------------------------------------------------
-// #### PROYECTO STRETCHER MAGNETO F103 - Custom Board ####
+// #### PROJECT STRETCHER F103 - Custom Board ####
 // ##
 // ## @Author: Med
 // ## @Editor: Emacs - ggtags
@@ -23,6 +23,7 @@
 #include "comms_from_rasp.h"
 #include "comms_from_power.h"
 #include "comms.h"
+#include "test_functions.h"
 
 #include <stdio.h>
 #include <string.h>
@@ -156,6 +157,13 @@ int main (void)
     Usart2Config();
     
     ChangeLed(LED_NO_BLINKING);
+
+    //-- Do some tests here, almost for hardware
+    // TF_Voltages();
+    // TF_Usart3_Tx();
+    // TF_Usart3TxRx();
+    // TF_Usart3Loop();
+    // TF_CommsWithRaspberry();
     
     //-- Welcome Messages --------------------
     Usart1Send("\r\nGausstek Stretcher Board -- powered by: Kirno Technology\r\n");
@@ -223,96 +231,6 @@ int main (void)
         RPI_Send("no comms with ch3\r\n");
     
     
-
-    //--- Test ADC Multiple conversion Scanning Continuous Mode and DMA -------------------//
-    // unsigned int seq_cnt = 0;
-    // ADCStart;
-    // while (1)
-    // {
-    //     if (!wait_ms_var)
-    //     {
-    //         sprintf(buffSendErr, "High supply: %d, Low supply: %d, seq: %d\n",
-    //                 Sense_200V,
-    //                 Sense_15V,
-    //                 seq_cnt);
-            
-    //         RPI_Send(buffSendErr);
-    //         wait_ms_var = 1000;
-    //         seq_cnt = 0;
-    //     }
-
-    //     if (sequence_ready)
-    //     {
-    //         seq_cnt++;
-    //         sequence_ready_reset;
-    //     }
-    // }
-    //--- End Test ADC Multiple conversion Scanning Continuous Mode and DMA ----------------//        
-    
-    //---- Prueba Usart3 ----------
-    // while (1)
-    // {
-    //     // Wait_ms(2000);
-    //     L_ALARMA_OFF;
-    //     Usart3Send("HOLA!!!\n");
-    //     Wait_ms(100);
-
-    //     if (usart3_have_data)
-    //     {
-    //         usart3_have_data = 0;
-    //         L_ALARMA_ON;
-    //         ReadUsart3Buffer(local_buff, 64);
-    //         if (strcmp((const char *) "HOLA!!!", local_buff) == 0)
-    //             L_ZONA_ON;
-    //         else
-    //             L_ZONA_OFF;
-
-    //         Wait_ms(100);
-    //         L_ALARMA_OFF;
-    //         L_ZONA_OFF;
-    //         Wait_ms(1900);
-    //     }
-    // }
-    //---- Fin Prueba Usart3 ----------
-
-    //---- Prueba contra PC o Raspberry ----------
-    // while (1)
-    // {
-    //     UpdateRaspberryMessages();
-    // }
-    //---- Fin Prueba contra PC o Raspberry ----------    
-
-
-    //---- Prueba Usart3 loop en terminal ----------
-    // while (1)
-    // {
-    //     if (usart3_have_data)
-    //     {
-    //         usart3_have_data = 0;
-    //         L_ALARMA_ON;
-    //         ReadUsart3Buffer(local_buff, 64);
-    //         Wait_ms(1000);
-    //         i = strlen(local_buff);
-    //         if (i < 62)
-    //         {
-    //             local_buff[i] = '\n';
-    //             local_buff[i+1] = '\0';
-    //             Usart3Send(local_buff);
-    //         }
-    //         L_ALARMA_OFF;
-    //     }
-    // }
-    //---- Fin Prueba Usart3 loop en terminal ----------
-
-    //---- Prueba Usart3 envia caracter solo 'd' ----------
-    // while (1)
-    // {
-    //     unsigned char snd = 'd';
-    //     Usart3SendUnsigned(&snd, 1);
-    //     // USART3->DR = 'd';
-    //     Wait_ms(100);
-    // }
-    //---- Fin Prueba Usart3 envia caracter solo 'd' ----------
 
     //---- Programa Principal ----------
     ADC_START;
@@ -436,8 +354,11 @@ int main (void)
             BuzzerCommands(BUZZER_HALF_CMD, 1);
 #endif
             OUT5_ON;
+
             //OUT4 pulse to up the stretcher
-            comms_messages_rpi |= COMM_STRETCHER_UP;
+            if (TreatmentGetUpDwn() == UPDWN_AUTO)
+                comms_messages_rpi |= COMM_STRETCHER_UP;
+            
             OUT2_ON;
             break;
 
@@ -499,13 +420,13 @@ int main (void)
                 RPI_Send(buff);
 
                 if (comms_messages_1 & COMM_POWER_ERROR_MASK)
-                    RaspBerry_Report_Errors(CH1, &comms_messages_1);
+                    Raspberry_Report_Errors(CH1, &comms_messages_1);
 
                 if (comms_messages_2 & COMM_POWER_ERROR_MASK)
-                    RaspBerry_Report_Errors(CH2, &comms_messages_2);
+                    Raspberry_Report_Errors(CH2, &comms_messages_2);
 
                 if (comms_messages_3 & COMM_POWER_ERROR_MASK)
-                    RaspBerry_Report_Errors(CH3, &comms_messages_3);
+                    Raspberry_Report_Errors(CH3, &comms_messages_3);
 
 #ifdef USE_BUZZER_ON_OUT3
                 BuzzerCommands(BUZZER_LONG_CMD, 1);
@@ -579,8 +500,11 @@ int main (void)
             main_state = TREATMENT_STANDBY;
             ChangeLed(LED_TREATMENT_STANDBY);
             OUT5_OFF;
+
             //OUT4 pulse to down the stretcher
-            comms_messages_rpi |= COMM_STRETCHER_UP;            
+            if (TreatmentGetUpDwn() == UPDWN_AUTO)
+                comms_messages_rpi |= COMM_STRETCHER_UP;
+            
             OUT2_OFF;
             break;
 
@@ -602,8 +526,11 @@ int main (void)
             main_state = TREATMENT_STANDBY;
             ChangeLed(LED_TREATMENT_STANDBY);
             OUT5_OFF;
+            
             //OUT4 pulse to down the stretcher
-            comms_messages_rpi |= COMM_STRETCHER_UP;            
+            if (TreatmentGetUpDwn() == UPDWN_AUTO)
+                comms_messages_rpi |= COMM_STRETCHER_UP;
+            
             OUT2_OFF;
             break;
 

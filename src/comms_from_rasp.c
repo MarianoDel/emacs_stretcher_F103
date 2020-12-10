@@ -8,7 +8,7 @@
 // #### COMMS_FROM_RASP.C ############################################
 //---------------------------------------------------------
 
-/* Includes ------------------------------------------------------------------*/
+// Includes --------------------------------------------------------------------
 // #include "stm32f10x.h"
 #include "hard.h"
 #include "adc.h"
@@ -25,14 +25,14 @@
 
 
 
-/* Externals ------------------------------------------------------------------*/
+// Externals -------------------------------------------------------------------
 extern volatile unsigned char rpi_have_data;
 extern unsigned short comms_messages_rpi;
 extern volatile unsigned short adc_ch [];
 
 
 
-/* Globals ------------------------------------------------------------------*/
+// Globals ---------------------------------------------------------------------
 char local_rasp_buff [SIZEOF_RXDATA];
 
 const char s_getall [] = {"get all conf"};
@@ -43,12 +43,13 @@ char s_ok [] = {"OK\r\n"};
 char s_nok [] = {"ERROR\r\n"};
     
 
-/* Module Private Functions -----------------------------------------------------------*/
-static void RaspBerry_Messages (char *);
+// Module Private Functions ----------------------------------------------------
+static void Raspberry_Messages (char *);
 static void SendAllConf (void);
 static void SendStatus (void);
 
-/* Module Exported Functions -----------------------------------------------------------*/
+
+// Module Functions ------------------------------------------------------------
 void UpdateRaspberryMessages (void)
 {
     if (rpi_have_data)
@@ -56,13 +57,13 @@ void UpdateRaspberryMessages (void)
         rpi_have_data = 0;
         LED1_ON;
         ReadRPIBuffer(local_rasp_buff, SIZEOF_RXDATA);
-        RaspBerry_Messages(local_rasp_buff);
+        Raspberry_Messages(local_rasp_buff);
         LED1_OFF;
     }
 }
 
 
-static void RaspBerry_Messages (char * msg)
+static void Raspberry_Messages (char * msg)
 {
     resp_t resp = resp_ok;
 
@@ -207,6 +208,22 @@ static void RaspBerry_Messages (char * msg)
         RPI_Send(s_ok);        
     }
 
+    else if (!strncmp(msg,
+                      (const char *)"stretcher autoup on",
+                      (sizeof("stretcher autoup on") - 1)))
+    {
+        TreatmentSetUpDwn(UPDWN_AUTO);
+        RPI_Send(s_ok);        
+    }
+
+    else if (!strncmp(msg,
+                      (const char *)"stretcher autoup off",
+                      (sizeof("stretcher autoup off") - 1)))
+    {
+        TreatmentSetUpDwn(UPDWN_MANUAL);
+        RPI_Send(s_ok);        
+    }
+    
     else if (!strncmp(msg, "goto bridge mode", sizeof("goto bridge mode") - 1))
     {
         comms_messages_rpi |= COMM_GOTO_BRIDGE;
@@ -411,7 +428,7 @@ static void RaspBerry_Messages (char * msg)
 
 //reporta las errores y los limpia
 //TODO: o limpiar en otra funcion???
-void RaspBerry_Report_Errors (unsigned char ch, unsigned short * errors)
+void Raspberry_Report_Errors (unsigned char ch, unsigned short * errors)
 {
     //reporta errores como "ERROR(0xNN)\r\n"
     //0x1N antena desconectada

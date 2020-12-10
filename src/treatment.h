@@ -50,11 +50,18 @@ typedef struct {
 
 } signals_struct_t;
 
+typedef enum {
+    UPDWN_AUTO = 0,
+    UPDWN_MANUAL
+
+} updwn_e;
+
 typedef struct {
     signals_struct_t treatment_signal;
     unsigned short treatment_time;
     unsigned char channels_in_treatment;
     unsigned short timer_synchro;
+    updwn_e updwn_conf;
     
 } treatment_conf_t;
 
@@ -139,6 +146,9 @@ unsigned char TreatmentGetChannelsFlag (void);
 unsigned short TreatmentGetSynchroTimer (void);
 void TreatmentUpdateMainState (treatment_t);
 treatment_t TreatmentGetMainState (void);
+
+void TreatmentSetUpDwn (updwn_e);
+updwn_e TreatmentGetUpDwn (void);
 
 #endif
 //--- END OF FILE ---//
