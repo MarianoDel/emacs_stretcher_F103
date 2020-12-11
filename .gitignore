@@ -6,6 +6,7 @@
 *.o.d
 *.lst
 *.zip
+*.out
 .tags
 GPATH
 GRTAGS

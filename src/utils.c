@@ -41,6 +41,7 @@ unsigned char StringIsANumber (char * pn, unsigned short * number)
 }
 
 
+// get the numeric value from a string before the delimiter character ex. ','
 unsigned short GetValue (unsigned char * pn, char delimiter)
 {
 	unsigned char i;

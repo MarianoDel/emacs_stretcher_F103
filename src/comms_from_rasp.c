@@ -55,10 +55,10 @@ void UpdateRaspberryMessages (void)
     if (rpi_have_data)
     {
         rpi_have_data = 0;
-        LED1_ON;
+        HARD_L1_ON();
         ReadRPIBuffer(local_rasp_buff, SIZEOF_RXDATA);
         Raspberry_Messages(local_rasp_buff);
-        LED1_OFF;
+        HARD_L1_OFF();
     }
 }
 

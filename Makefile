@@ -20,23 +20,24 @@
 TRGT = arm-none-eabi-
 CC   = $(TRGT)gcc
 CP   = $(TRGT)objcopy
-#AS   = $(TRGT)gcc -x assembler-with-cpp
-AS   = $(TRGT)as
+AS   = $(TRGT)gcc -x assembler-with-cpp
 HEX  = $(CP) -O ihex
 BIN  = $(CP) -O binary -S
 MCU  = cortex-m3
 
 # List all default C defines here, like -D_DEBUG=1
-#DDEFS = -DSTM32F10X_HD -DUSE_STDPERIPH_DRIVER -DUSE_STM3210E_EVAL
+# for STM32F103RCT6 micro
 DDEFS = -DSTM32F10X_HD
+# for STM32F051C8T6 micro
+# DDEFS = -DSTM32F051
+# for STM32F030K6T6 micro
+# DDEFS = -DSTM32F030
+
 # List all default ASM defines here, like -D_DEBUG=1
 DADEFS =
 
 # List all default directories to look for include files here
 DINCDIR = ./src
-CORELIBDIR = ./cmsis_core
-STARTUPDIR = ./startup_src
-LINKER = ./startup_src
 
 # List the default directory to look for the libraries here
 DLIBDIR =
@@ -53,15 +54,12 @@ DLIBS =
 #
 
 #
-# Define project name and Ram = 0/Flash = 1 mode here
-PROJECT        = Magneto_GTK
+# Define project name here
+PROJECT = Magneto_GTK
 
-# List all user C define here, like -D_DEBUG=1
-UDEFS =
-
-# Define ASM defines here
-UADEFS =
-
+# List C define here
+CORELIBDIR = ./cmsis_core
+LINKER = ./startup_src
 
 # Sources Files
 SRC  = ./src/main.c
@@ -88,12 +86,11 @@ SRC += ./cmsis_core/core_cm3.c
 # List ASM source files here
 ASRC = ./startup_src/startup_stm32f10x_hd.s
 
-# List all include directories here
-UINCDIR = $(STARTUPDIR) \
-          $(CORELIBDIR) \
-          $(STMSPINCDDIR) \
-          $(DISCOVERY)    \
-          ./inc
+# List all user directories here
+UINCDIR = $(BOOTDIR) \
+          $(CORELIBDIR)
+
+
 # List the user directory to look for the libraries here
 ULIBDIR =
 
@@ -121,14 +118,14 @@ INCDIR  = $(patsubst %,-I%,$(DINCDIR) $(UINCDIR))
 LIBDIR  = $(patsubst %,-L%,$(DLIBDIR) $(ULIBDIR))
 
 ADEFS   = $(DADEFS) $(UADEFS)
-#OBJS  = $(ASRC:.s=.o) $(SRC:.c=.o)
+
 LIBS    = $(DLIBS) $(ULIBS)
 MCFLAGS = -mcpu=$(MCU)
 
-ASFLAGS = $(MCFLAGS) -g -gdwarf-2 -mthumb  -a=$(<:.s=.lst)
+ASFLAGS = $(MCFLAGS) -g -gdwarf-2 -mthumb  -Wa,-amhls=$(<:.s=.lst) $(ADEFS)
 
-# SIN INFO DEL DEBUGGER
-#CPFLAGS = $(MCFLAGS) $(OPT) -gdwarf-2 -mthumb   -fomit-frame-pointer -Wall -Wstrict-prototypes -fverbose-asm -Wa,-ahlms=$(<:.c=.lst) $(DEFS)
+# SIN INFO DEL DEBUGGER + STRIP CODE
+# CPFLAGS = $(MCFLAGS) $(OPT) -gdwarf-2 -mthumb -fomit-frame-pointer -Wall -fdata-sections -ffunction-sections -fverbose-asm -Wa,-ahlms=$(<:.c=.lst)
 
 # CON INFO PARA DEBUGGER
 #CPFLAGS = $(MCFLAGS) $(OPT) -g -gdwarf-2 -mthumb -fomit-frame-pointer -Wall -fverbose-asm -Wa,-ahlms=$(<:.c=.lst) $(DEFS)
@@ -137,11 +134,7 @@ ASFLAGS = $(MCFLAGS) -g -gdwarf-2 -mthumb  -a=$(<:.s=.lst)
 CPFLAGS = $(MCFLAGS) $(OPT) -g -gdwarf-2 -mthumb -fomit-frame-pointer -Wall -fdata-sections -ffunction-sections -fverbose-asm -Wa,-ahlms=$(<:.c=.lst) $(DDEFS)
 
 # SIN DEAD CODE, hace el STRIP
-#LDFLAGS = $(MCFLAGS) -mthumb --specs=nano.specs -Wl,--gc-sections -nostartfiles -T$(LDSCRIPT) -Wl,-Map=$(FULL_PRJ).map,--cref,--no-warn-mismatch $(LIBDIR)
-
-# SIN DEAD CODE, hace el STRIP + FLOAT = SOFT
 LDFLAGS = $(MCFLAGS) -mthumb -lm --specs=nano.specs -Wl,--gc-sections -nostartfiles -T$(LDSCRIPT) -Wl,-Map=$(FULL_PRJ).map,--cref,--no-warn-mismatch $(LIBDIR)
-
 # CON DEAD CODE
 #LDFLAGS = $(MCFLAGS) -mthumb --specs=nano.specs -nostartfiles -T$(LDSCRIPT) -Wl,-Map=$(FULL_PRJ).map,--cref,--no-warn-mismatch $(LIBDIR)
 #LDFLAGS = $(MCFLAGS) -mthumb -T$(LDSCRIPT) -Wl,-Map=$(FULL_PRJ).map,--cref,--no-warn-mismatch $(LIBDIR)
@@ -152,23 +145,20 @@ LDFLAGS = $(MCFLAGS) -mthumb -lm --specs=nano.specs -Wl,--gc-sections -nostartfi
 
 assemblersources = $(ASRC)
 sources = $(SRC)
-OBJS  = $(ASRC:.s=.o) $(SRC:.c=.o)
+OBJS  = $(SRC:.c=.o) $(ASRC:.s=.o)
 
 objects = $(sources:.c=.o)
 assobjects = $(assemblersources:.s=.o)
 
-# all: $(OBJS) $(FULL_PRJ).elf $(FULL_PRJ).bin
-# 	arm-none-eabi-size $(FULL_PRJ).elf
-
-all: $(assobjects) $(objects) $(FULL_PRJ).elf $(FULL_PRJ).bin
+all: $(objects) $(assobjects) $(FULL_PRJ).elf $(FULL_PRJ).bin
 	arm-none-eabi-size $(FULL_PRJ).elf
 	gtags -q
 
-$(assobjects): %.o: %.s
-	$(AS) -c $(ASFLAGS) $< -o $@
-
 $(objects): %.o: %.c
 	$(CC) -c $(CPFLAGS) -I. $(INCDIR) $< -o $@
+
+$(assobjects): %.o: %.s
+	$(AS) -c $(ASFLAGS) $< -o $@
 
 %elf: $(OBJS)
 	$(CC) $(OBJS) $(LDFLAGS) $(LIBS) -o $@
@@ -194,9 +184,30 @@ clean:
 	rm -f $(FULL_PRJ).map
 	rm -f $(FULL_PRJ).hex
 	rm -f $(FULL_PRJ).bin
-#	rm $(SRC:.c=.c.bak)
 	rm -f $(SRC:.c=.lst)
-#   rm $(ASRC:.s=.s.bak)
 	rm -f $(ASRC:.s=.lst)
+	rm -f *.o
+	rm -f *.out
+
+tests:
+	# simple functions tests, copy functions to test into main
+	gcc src/tests.c
+	./a.out
+
+tests_treat_utils:
+	# compile first modules in this test
+	gcc -c src/treatment.c -I. $(INCDIR)
+	gcc -c src/utils.c -I. $(INCDIR)
+	gcc src/tests_treat_utils.c treatment.o utils.o
+	./a.out
+
+tests_comms_rasp:
+	# compile first modules in this test
+	gcc -c src/comms_from_rasp.c -I. $(INCDIR) -DSIZEOF_RXDATA=100
+	gcc -c src/treatment.c -I. $(INCDIR)
+	gcc -c src/utils.c -I. $(INCDIR)
+	gcc src/tests_comms_rasp.c comms_from_rasp.o treatment.o utils.o
+	./a.out
+
 
 # *** EOF ***

@@ -230,6 +230,18 @@ void UpdateBuzzer (void)
     }
 }
 
+void HARD_L1_ON (void)
+{
+    LED1_ON;
+}
+
+
+void HARD_L1_OFF (void)
+{
+    LED1_OFF;
+}
+
+
 #ifdef MAGNETO_ESPECIAL_1CH
 #define SWITCHES_TIMER_RELOAD    5
 #define SWITCHES_THRESHOLD_FULL	1000		//5 segundos
