@@ -30,8 +30,8 @@
 
 
 
-/* Externals ------------------------------------------------------------------*/
-//--- Externals para avisar data ready en usart
+// Externals -------------------------------------------------------------------
+//-- Externals to acknowledge data ready on usarts
 volatile unsigned char usart1_have_data;
 volatile unsigned char usart2_have_data;
 volatile unsigned char usart3_have_data;
@@ -46,54 +46,19 @@ unsigned short comms_messages_rpi = 0;
 
 char buffSendErr[64];
 
-//--- Externals para enviar keepalive por UART
+//--- Externals for keepalives on usarts
 #define TIME_RUN_DEF 250
 volatile unsigned short timeRun = TIME_RUN_DEF;
-
-//--- Externals para muestreos de corriente con el ADC
-volatile unsigned char flagMuestreo = 0;
-volatile unsigned char take_current_samples = 0;
-
-//--- Externals para armar seniales y comprobar el TIM5 en el inicio del programa
-volatile unsigned int session_warming_up_channel_1_stage_time = 0;
 
 //--- Externals de los timers
 volatile unsigned short wait_ms_var = 0;
 volatile unsigned short comms_timeout = 0;
 
-
-// //Estructuras.
-// session_typedef session_slot_aux;
-
-// session_typedef session_ch_1;
-// session_typedef session_ch_2;
-// session_typedef session_ch_3;
-// session_typedef session_ch_4;
-
-unsigned char temp_actual_channel_1_int = 0;
-unsigned char temp_actual_channel_1_dec = 0;
-unsigned char temp_actual_channel_2_int = 0;
-unsigned char temp_actual_channel_2_dec = 0;
-unsigned char temp_actual_channel_3_int = 0;
-unsigned char temp_actual_channel_3_dec = 0;
-unsigned char temp_actual_channel_4_int = 0;
-unsigned char temp_actual_channel_4_dec = 0;
-
-//session_typedef session_slot_1;
-//session_typedef session_slot_2;
-//session_typedef session_slot_3;
-//session_typedef session_slot_4;
-//session_typedef session_slot_5;
-
-unsigned char channel_1_pause = 0;
-unsigned char channel_2_pause = 0;
-unsigned char channel_3_pause = 0;
-unsigned char channel_4_pause = 0;
-
 //--- Externals de los timers
 volatile unsigned short adc_ch [ADC_CHANNEL_QUANTITY];
 
-/* Globals ------------------------------------------------------------------*/
+
+// Globals ---------------------------------------------------------------------
 volatile unsigned short secs_in_treatment = 0;
 volatile unsigned short millis = 0;
 unsigned short secs_end_treatment;
@@ -101,46 +66,33 @@ unsigned short secs_elapsed_up_to_now;
 volatile unsigned short timer_sync_xxx_ms = 0;
 volatile unsigned short timer_out4 = 0;
 
-//--- FUNCIONES DEL MODULO ---//
+
+// Module Private Functions ----------------------------------------------------
 void TimingDelay_Decrement(void);
+void SysTickError (void);
 
 #define RPI_Flush_Comms (comms_messages_rpi &= ~COMM_RPI_ALL_MSG_MASK)
 
+
+// Module Functions ------------------------------------------------------------
 int main (void)
 {
-    unsigned char i = 0;
     char buff [64];
     treatment_t main_state = TREATMENT_STANDBY;
     unsigned short bytes_readed = 0;
     char s_to_senda [100];
     char s_to_sendb [100];
 
-    //Configuracion systick    
-    if (SysTick_Config(72000))
-    {
-        while (1)	/* Capture error */
-        {
-            if (LED1)
-                LED1_OFF;
-            else
-                LED1_ON;
-
-            for (i = 0; i < 255; i++)
-            {
-                asm (	"nop \n\t"
-                        "nop \n\t"
-                        "nop \n\t" );
-            }
-        }
-    }
-        
-
-    //Configuracion led. & Enabled Channels
+    // Gpio Configuration.
     GpioInit();
     OUT4_OFF;
     OUT1_OFF;
+    
+    // Systick Timer Activation
+    if (SysTick_Config(72000))
+        SysTickError();
 
-    //enciendo TIM7
+    // Peripherals Activation    
     TIM7_Init();
 
     //-- DMA configuration.
@@ -671,6 +623,26 @@ void TimingDelay_Decrement(void)
     // if (timer_led_pwm < 0xFFFF)
     //     timer_led_pwm ++;
     HARD_Timers_Update();
+}
+
+
+void SysTickError (void)
+{
+    //Capture systick error...
+    while (1)
+    {
+        if (LED1)
+            LED1_OFF;
+        else
+            LED1_ON;
+
+        for (unsigned char i = 0; i < 255; i++)
+        {
+            asm ("nop \n\t"
+                 "nop \n\t"
+                 "nop \n\t" );
+        }
+    }
 }
 
 //--- end of file ---//
