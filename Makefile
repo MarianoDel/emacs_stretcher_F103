@@ -203,7 +203,7 @@ tests_treat_utils:
 
 tests_comms_rasp:
 	# compile first modules in this test
-	gcc -c src/comms_from_rasp.c -I. $(INCDIR) -DSIZEOF_RXDATA=100
+	gcc -c src/comms_from_rasp.c -I. $(INCDIR) -DSTM32F10X_HD
 	gcc -c src/treatment.c -I. $(INCDIR)
 	gcc -c src/utils.c -I. $(INCDIR)
 	gcc src/tests_comms_rasp.c comms_from_rasp.o treatment.o utils.o
