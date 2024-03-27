@@ -308,8 +308,10 @@ int main (void)
             OUT5_ON;
 
             //OUT4 pulse to up the stretcher
+#ifndef USE_SYNC_PULSES_ON_OUT4
             if (TreatmentGetUpDwn() == UPDWN_AUTO)
                 comms_messages_rpi |= COMM_STRETCHER_UP;
+#endif
             
             OUT2_ON;
             break;
@@ -454,8 +456,10 @@ int main (void)
             OUT5_OFF;
 
             //OUT4 pulse to down the stretcher
+#ifndef USE_SYNC_PULSES_ON_OUT4
             if (TreatmentGetUpDwn() == UPDWN_AUTO)
                 comms_messages_rpi |= COMM_STRETCHER_UP;
+#endif
             
             OUT2_OFF;
             break;
@@ -480,8 +484,10 @@ int main (void)
             OUT5_OFF;
             
             //OUT4 pulse to down the stretcher
+#ifndef USE_SYNC_PULSES_ON_OUT4
             if (TreatmentGetUpDwn() == UPDWN_AUTO)
                 comms_messages_rpi |= COMM_STRETCHER_UP;
+#endif
             
             OUT2_OFF;
             break;
@@ -544,8 +550,10 @@ int main (void)
             if (comms_messages_rpi & COMM_STRETCHER_UP)
             {
                 comms_messages_rpi &= ~COMM_STRETCHER_UP;
+#ifndef USE_SYNC_PULSES_ON_OUT4
                 timer_out4 = TIMER_OUT4_IN_ON;
                 OUT4_ON;
+#endif
                 OUT1_ON;
             }
 

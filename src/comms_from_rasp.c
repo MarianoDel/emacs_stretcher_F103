@@ -431,11 +431,12 @@ static void Raspberry_Messages (char * msg)
 void Raspberry_Report_Errors (unsigned char ch, unsigned short * errors)
 {
     //reporta errores como "ERROR(0xNN)\r\n"
-    //0x1N antena desconectada
-    //0x2N antena perdida
-    //0x4N sobre temperatura
-    //0x5N sobre corriente
-    //N num de canal 1-4
+    //0x1N etapa de potencia no responde - desconectada
+    //0x2N antena perdida - no hay corriente en antena
+    //0x4N sobre temperatura (no se usa ni se reporta)
+    //0x5N over corriente
+    //0x6N soft over corriente
+    //N num de canal 1-3
 
     if (*errors & COMM_ERROR_NO_COMM)
     {

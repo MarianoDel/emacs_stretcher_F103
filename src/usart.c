@@ -760,11 +760,17 @@ void UART5_IRQHandler (void)
     }
 }
 
+extern volatile unsigned short timer_out4;
 void UpdateSyncPulses (void)
 {
     if (!timer_sync_xxx_ms)
     {
         unsigned short tim_sync;
+        // new on version 1.3 send sync on out4
+#ifdef USE_SYNC_PULSES_ON_OUT4
+        OUT4_ON;
+        timer_out4 = 2;
+#endif
 
         sync_pulse_flag = 1;
         USART2->CR1 |= USART_CR1_TXEIE;

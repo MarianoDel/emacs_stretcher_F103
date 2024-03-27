@@ -21,8 +21,9 @@
 // #define HARDWARE_VERSION_2_1        //esto seria una placa magneto chico
 //--- Software ------------------//
 // #define SOFTWARE_VERSION_1_0        //habla contra rpi con programa magneto y traduce a micros potencia
-// #define SOFTWARE_VERSION_1_1    //programa ernesto manda pulso en OUT4 para mover camilla 21-10-2020
-#define SOFTWARE_VERSION_1_2    //it permits the auto up or auto dwn of the stretcher
+// #define SOFTWARE_VERSION_1_1    //programa ernesto manda pulso enOUT4 para mover camilla 21-10-2020
+// #define SOFTWARE_VERSION_1_2    //it permits the auto up or auto dwn of the stretcher
+#define SOFTWARE_VERSION_1_3    //sends sync pulses on OUT4
 
 //-------- Type of Program (depending on software version) ----------------
 #define MAGNETO_NORMAL
@@ -52,8 +53,9 @@
 
 #ifdef USE_SYNC_PULSES
 #define SYNC_CHAR    '*'
-#define USE_SYNC_ALL_PLACES    //manda pulsos incluso en los Wait_ms()
+#define USE_SYNC_ALL_PLACES    //manda pulsos incluso en los Wait_ms() this or the next one
 // #define USE_SYNC_ONLY_ON_TREATMENT    //pulsos solo en tratamiento
+#define USE_SYNC_PULSES_ON_OUT4
 #endif
 
 #ifdef USE_BUZZER_ON_OUT3
@@ -91,6 +93,9 @@
 #endif
 #ifdef SOFTWARE_VERSION_1_2
 #define SOFT "Software Version: 1.2"
+#endif
+#ifdef SOFTWARE_VERSION_1_3
+#define SOFT "Software Version: 1.3"
 #endif
 //--- End of Hardware & Software Messages ------------------//
 
@@ -277,7 +282,7 @@ typedef enum
 } led_state_t;
 
 //Estados Externos de LED BLINKING
-#define LED_NO_BLINKING    0
+#define LED_NO_BLINKING    0     
 #define LED_TREATMENT_STANDBY    1
 #define LED_TREATMENT_GENERATING    2
 #define LED_TREATMENT_PAUSED    3
