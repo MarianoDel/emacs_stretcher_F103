@@ -24,16 +24,18 @@
 #include <stdlib.h>
 
 
+// Module Private Types Constants and Macros -----------------------------------
+#define SIZEOF_RX1DATA        256
+
 
 // Externals -------------------------------------------------------------------
-extern volatile unsigned char rpi_have_data;
 extern unsigned short comms_messages_rpi;
 extern volatile unsigned short adc_ch [];
 
 
 
 // Globals ---------------------------------------------------------------------
-char local_rasp_buff [SIZEOF_RXDATA];
+char local_rasp_buff [SIZEOF_RX1DATA];
 
 const char s_getall [] = {"get all conf"};
 const char s_buzzer_short [] = {"buzzer short"};
@@ -52,11 +54,11 @@ static void SendStatus (void);
 // Module Functions ------------------------------------------------------------
 void UpdateRaspberryMessages (void)
 {
-    if (rpi_have_data)
+    if (RPI_HaveData())
     {
-        rpi_have_data = 0;
+        RPI_HaveDataReset();
         HARD_L1_ON();
-        ReadRPIBuffer(local_rasp_buff, SIZEOF_RXDATA);
+        RPI_ReadBuffer(local_rasp_buff, SIZEOF_RX1DATA);
         Raspberry_Messages(local_rasp_buff);
         HARD_L1_OFF();
     }
@@ -316,7 +318,7 @@ static void Raspberry_Messages (char * msg)
             resp = resp_error;
     }
 
-    else if (!strncmp(msg, (const char *)"keepalive,", (sizeof("keepalive,") - 1)))
+    else if (!strncmp(msg, (const char *)"keepalive", (sizeof("keepalive") - 1)))
     {
         RPI_Send(s_ok);
     }

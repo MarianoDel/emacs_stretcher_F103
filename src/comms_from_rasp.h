@@ -17,8 +17,9 @@
 
 //---- Configurations Defines --------------------
 #define RPI_Send(X)    Usart1Send(X)
-#define rpi_have_data    usart1_have_data
-#define ReadRPIBuffer(X,Y)    ReadUsart1Buffer(X,Y)
+#define RPI_HaveData()    Usart1HaveData()
+#define RPI_HaveDataReset()    Usart1HaveDataReset()
+#define RPI_ReadBuffer(X,Y)    Usart1ReadBuffer(X,Y)
 
 //---- Common Defines --------------------
 // #define COMM_NONE_TREAT     0x0000

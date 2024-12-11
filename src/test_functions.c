@@ -11,11 +11,12 @@
 
 // Includes --------------------------------------------------------------------
 #include "test_functions.h"
+#include "stm32f10x.h"
 #include "hard.h"
 #include "adc.h"
 #include "usart.h"
 #include "dma.h"
-#include "timer.h"
+#include "tim.h"
 
 #include "comms_from_rasp.h"
 
@@ -26,7 +27,6 @@
 // Externals -------------------------------------------------------------------
 extern volatile unsigned short adc_ch [];
 extern volatile unsigned short wait_ms_var;
-extern volatile unsigned char usart3_have_data;
 
 
 // Globals ---------------------------------------------------------------------
@@ -36,9 +36,20 @@ extern volatile unsigned char usart3_have_data;
 
 
 // Module Private Functions ----------------------------------------------------
+void TF_Voltages (void);
+void TF_Usart3_Tx (void);
+void TF_Usart3Loop (void);
+void TF_Usart3TxRx (void);
+void TF_CommsWithRaspberry (void);
 
 
 // Module Functions ------------------------------------------------------------
+void TF_Hardware_Tests (void)
+{
+    TF_Voltages();
+}
+
+
 void TF_Voltages (void)
 {
     //--- Test ADC Multiple conversion Scanning Continuous Mode and DMA -------------------//
@@ -88,11 +99,11 @@ void TF_Usart3Loop (void)
     
     while (1)
     {
-        if (usart3_have_data)
+        if (Usart3HaveData())
         {
-            usart3_have_data = 0;
+            Usart3HaveDataReset();
             LED1_ON;
-            ReadUsart3Buffer((unsigned char *)local_buff, 64);
+            Usart3ReadBuffer((char *)local_buff, 64);
             Wait_ms(1000);
             i = strlen(local_buff);
             if (i < 62)
@@ -118,11 +129,11 @@ void TF_Usart3TxRx (void)
         Usart3Send("HOLA!!!\n");
         Wait_ms(100);
 
-        if (usart3_have_data)
+        if (Usart3HaveData())
         {
-            usart3_have_data = 0;
+            Usart3HaveDataReset();
             LED1_ON;
-            ReadUsart3Buffer((unsigned char *)local_buff, 64);
+            Usart3ReadBuffer((char *)local_buff, 64);
             if (strcmp((const char *) "HOLA!!!", local_buff) == 0)
                 LED2_ON;
             else

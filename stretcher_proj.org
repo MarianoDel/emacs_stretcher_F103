@@ -1,1 +1,1 @@
-../../Projects/Gausstek/Camilla/stretcher_proj.org
+../../Projects/Common/Stretcher_ver_3_0/stretcher_proj.org

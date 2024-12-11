@@ -8,13 +8,32 @@
 // #### ADC.C #################################
 //---------------------------------------------
 
-/* Includes ------------------------------------------------------------------*/
+// Includes --------------------------------------------------------------------
 #include "adc.h"
 #include "stm32f10x.h"
 #include "hard.h"
 
 
-/* Externals ------------------------------------------------------------------*/
+// Private Types Constants and Macros ------------------------------------------
+#define RCC_ADC1_CLK    (RCC->APB2ENR & 0x00000200)
+#define RCC_ADC1_CLKEN    (RCC->APB2ENR |= 0x00000200)
+#define RCC_ADC1_CLKDIS    (RCC->APB2ENR &= ~0x00000200)
+
+#define RCC_ADC2_CLK    (RCC->APB2ENR & 0x00000400)
+#define RCC_ADC2_CLKEN    (RCC->APB2ENR |= 0x00000400)
+#define RCC_ADC2_CLKDIS    (RCC->APB2ENR &= ~0x00000400)
+
+#define RCC_ADC3_CLK    (RCC->APB2ENR & 0x00008000)
+#define RCC_ADC3_CLKEN    (RCC->APB2ENR |= 0x00008000)
+#define RCC_ADC3_CLKDIS    (RCC->APB2ENR &= ~0x00008000)
+
+#define RCC_ADC_PRESCALER_DIV_2    (RCC->CFGR &= ~RCC_CFGR_ADCPRE)
+#define RCC_ADC_PRESCALER_DIV_4    (RCC->CFGR |= RCC_CFGR_ADCPRE_0)
+#define RCC_ADC_PRESCALER_DIV_6    (RCC->CFGR |= RCC_CFGR_ADCPRE_1)
+#define RCC_ADC_PRESCALER_DIV_8    (RCC->CFGR |= RCC_CFGR_ADCPRE_1 | RCC_CFGR_ADCPRE_0)
+
+
+// Externals -------------------------------------------------------------------
 extern volatile unsigned short adc_ch [];
 
 

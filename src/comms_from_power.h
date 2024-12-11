@@ -11,16 +11,14 @@
 #ifndef _COMMS_FROM_POWER_H_
 #define _COMMS_FROM_POWER_H_
 
-//---- Includes to help the Defines ----------
-
-
 
 //---- Configurations Defines --------------------
 #define Power_Send(X)    Usart2Send(X)
 #define Power_Send_Unsigned(X,Y)    Usart2SendUnsigned(X,Y)
-#define power_have_data    usart2_have_data
-#define ReadPowerBuffer(X,Y)    ReadUsart2Buffer(X,Y)
-#define ReadPowerBufferFlush()    ReadUsart2BufferFlush()
+#define Power_HaveData()    Usart2HaveData()
+#define Power_HaveDataReset()    Usart2HaveDataReset()
+#define Power_ReadBuffer(X,Y)    Usart2ReadBuffer(X,Y)
+#define Power_ReadBufferFlush()    Usart2ReadBufferFlush()
 
 typedef enum {
     ASK_CH1 = 0,

@@ -18,7 +18,6 @@
 // #define USE_ADC_SAMPLE_BY_SAMPLE
 #define ADC_WITH_DMA
 
-
 #ifdef WITH_TEMP_CONTROL
 #define ADC_WITH_TEMP_SENSE
 #endif
@@ -28,9 +27,7 @@
 #endif
 //----------- End of ADC Configurations --------------//
 
-#define ADC_START    (ADC1->CR2 |= ADC_CR2_SWSTART)
-
-#ifdef HARDWARE_VERSION_2_0
+#if (defined HARDWARE_VERSION_2_0) || (defined HARDWARE_VERSION_3_0)
 #define Sense_200V     adc_ch[0]
 #define Sense_15V    adc_ch[1]
 #define ADC_CHANNEL_QUANTITY         2
@@ -38,27 +35,8 @@
 #endif
 
 //-- Exported Hardware Macros ---------------------
-#define RCC_ADC1_CLK (RCC->APB2ENR & 0x00000200)
-#define RCC_ADC1_CLKEN RCC->APB2ENR |= 0x00000200
-#define RCC_ADC1_CLKDIS RCC->APB2ENR &= ~0x00000200
+#define ADC_START    (ADC1->CR2 |= ADC_CR2_SWSTART)
 
-#define RCC_ADC2_CLK (RCC->APB2ENR & 0x00000400)
-#define RCC_ADC2_CLKEN RCC->APB2ENR |= 0x00000400
-#define RCC_ADC2_CLKDIS RCC->APB2ENR &= ~0x00000400
-
-#define RCC_ADC3_CLK (RCC->APB2ENR & 0x00008000)
-#define RCC_ADC3_CLKEN RCC->APB2ENR |= 0x00008000
-#define RCC_ADC3_CLKDIS RCC->APB2ENR &= ~0x00008000
-
-
-#define RCC_ADC_PRESCALER_DIV_2    (RCC->CFGR &= ~RCC_CFGR_ADCPRE)
-#define RCC_ADC_PRESCALER_DIV_4    (RCC->CFGR |= RCC_CFGR_ADCPRE_0)
-#define RCC_ADC_PRESCALER_DIV_6    (RCC->CFGR |= RCC_CFGR_ADCPRE_1)
-#define RCC_ADC_PRESCALER_DIV_8    (RCC->CFGR |= RCC_CFGR_ADCPRE_1 | RCC_CFGR_ADCPRE_0)
-
-/** @defgroup ADC_channels 
-  * @{
-  */
 #define ADC_Channel_0                               ((uint8_t)0x00)
 #define ADC_Channel_1                               ((uint8_t)0x01)
 #define ADC_Channel_2                               ((uint8_t)0x02)

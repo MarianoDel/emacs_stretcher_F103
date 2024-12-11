@@ -15,15 +15,20 @@
 //----------- Defines For Configuration -------------
 
 //----- Board Configuration -------------------//
+#define STRETCHER_INFINITY    // infinity welcome code
+// #define STRETCHER_GAUSSTEK    // gausstek welcome code
+
 //--- Hardware ------------------//
-#define HARDWARE_VERSION_2_0
+#define HARDWARE_VERSION_3_0    //buzzer on board, main xtal 8 or 12mhz
+// #define HARDWARE_VERSION_2_0    //no buzzer on board, rtc with xtal 32khz (never implemented)
 // #define HARDWARE_VERSION_1_0        //esto seria una placa P1 en realidad
 // #define HARDWARE_VERSION_2_1        //esto seria una placa magneto chico
 //--- Software ------------------//
 // #define SOFTWARE_VERSION_1_0        //habla contra rpi con programa magneto y traduce a micros potencia
 // #define SOFTWARE_VERSION_1_1    //programa ernesto manda pulso enOUT4 para mover camilla 21-10-2020
 // #define SOFTWARE_VERSION_1_2    //it permits the auto up or auto dwn of the stretcher
-#define SOFTWARE_VERSION_1_3    //sends sync pulses on OUT4
+// #define SOFTWARE_VERSION_1_3    //sends sync pulses on OUT4
+#define SOFTWARE_VERSION_1_4    //fix freq offset, extend min freq to 0.5Hz, hsi internal selected
 
 //-------- Type of Program (depending on software version) ----------------
 #define MAGNETO_NORMAL
@@ -41,7 +46,7 @@
 
 #define USE_NO_TREATMENT_DETECT    //cuando esta en tratamiento revisa si las potencias tambien
 
-#define USE_BUZZER_ON_OUT3
+#define USE_BUZZER_ON_OUT3    // keep on ver3.0 for backwards compativility
 
 //-------- Kind of Reports Sended ----------------
 
@@ -69,6 +74,31 @@
 #define HSI_INTERNAL_RC
 // #define HSE_CRYSTAL_OSC
 
+#ifdef HSE_CRYSTAL_OSC
+// #define CRYSTAL_8MHZ
+#define CRYSTAL_12MHZ
+#endif
+
+// #define SYSCLK_FREQ_72MHz
+#define SYSCLK_FREQ_64MHz
+// #define SYSCLK_FREQ_8MHz
+
+
+//-------- Sanity Checks -------------------------
+#if ((!defined STRETCHER_INFINITY) && \
+     (!defined STRETCHER_GAUSSTEK))
+#error "Must define type of board in hard.h"
+#endif
+
+#if ((defined STRETCHER_INFINITY) || \
+     (defined STRETCHER_GAUSSTEK))
+#ifndef HARDWARE_VERSION_3_0
+#error "For this config min hardware is 3.0"
+#endif
+#endif
+
+//-------- End of Sanity Checks ------------------
+
 
 //-------- End Of Defines For Configuration ------
 
@@ -76,6 +106,9 @@
 
 
 //--- Hardware & Software Messages ------------------//
+#ifdef HARDWARE_VERSION_3_0
+#define HARD "Hardware Version: 3.0"
+#endif
 #ifdef HARDWARE_VERSION_2_0
 #define HARD "Hardware Version: 2.0"
 #endif
@@ -96,6 +129,9 @@
 #endif
 #ifdef SOFTWARE_VERSION_1_3
 #define SOFT "Software Version: 1.3"
+#endif
+#ifdef SOFTWARE_VERSION_1_4
+#define SOFT "Software Version: 1.4"
 #endif
 //--- End of Hardware & Software Messages ------------------//
 
@@ -135,7 +171,90 @@ typedef enum {
 #endif
 
 
-//--- Configuracion de leds ---//
+// Gpios Configs --------------------
+#ifdef HARDWARE_VERSION_3_0
+//--- PC0 ---//
+#define LED1    ((GPIOC->ODR & 0x0001) == 0)
+#define LED1_ON    (GPIOC->BSRR = 0x00000001)
+#define LED1_OFF    (GPIOC->BSRR = 0x00010000)
+
+//--- PC1 ---//
+#define LED2    ((GPIOC->ODR & 0x0002) == 0)
+#define LED2_ON    (GPIOC->BSRR = 0x00000002)
+#define LED2_OFF    (GPIOC->BSRR = 0x00020000)
+
+//PA0, PA1 NC
+
+//PA2
+//PA3    Usart2
+
+//PA4, PA5, PA6, PA7  NC
+
+//PC4    Analog Channel 14
+//PC5    Analog Channel 15
+
+//PB0, PB1, PB2 NC
+
+//--- PB6 ---//
+#define SYNC_CH1    ((GPIOB->ODR & 0x0040) != 0)
+#define SYNC_CH1_ON    (GPIOB->BSRR = 0x00000040)
+#define SYNC_CH1_OFF    (GPIOB->BSRR = 0x00400000)
+
+//--- PB7 ---//
+#define SYNC_CH2    ((GPIOB->ODR & 0x0080) != 0)
+#define SYNC_CH2_ON    (GPIOB->BSRR = 0x00000080)
+#define SYNC_CH2_OFF    (GPIOB->BSRR = 0x00800000)
+
+//PB10
+//PB11    Usart3
+
+//PB12    NC
+
+//--- PB13 ---//
+#define OUT5    ((GPIOB->ODR & 0x2000) != 0)
+#define OUT5_ON    (GPIOB->BSRR = 0x00002000)
+#define OUT5_OFF    (GPIOB->BSRR = 0x20000000)
+
+//--- PB14 ---//
+#define OUT4    ((GPIOB->ODR & 0x4000) != 0)
+#define OUT4_ON    (GPIOB->BSRR = 0x00004000)
+#define OUT4_OFF    (GPIOB->BSRR = 0x40000000)
+
+//--- PB15 ---//
+#define SYNC_CH3    ((GPIOB->ODR & 0x8000) != 0)
+#define SYNC_CH3_ON    (GPIOB->BSRR = 0x00008000)
+#define SYNC_CH3_OFF    (GPIOB->BSRR = 0x80000000)
+
+//--- PC6 ---//
+
+//--- PC7 ---//
+#define BUZZER    ((GPIOC->ODR & 0x0080) != 0)
+#define BUZZER_ON    (GPIOC->BSRR = 0x00000080)
+#define BUZZER_OFF    (GPIOC->BSRR = 0x00800000)
+
+//--- PC8 ---//
+//--- PC9 ---//
+//--- PA8 ---//
+
+//PA9
+//PA10    Usart1
+
+//PA11, PA12, PA13, PA14, PA15    NC
+
+//PC10
+//PC11    Uart4
+
+//PC12
+//PD2    Uart5
+
+//PB3, PB4    NC
+
+//--- PB5 ---//
+
+//PB6, PB7, PB8, PB9    NC
+
+#endif //HARDWARE_VERSION_3_0
+
 #ifdef HARDWARE_VERSION_2_0
 //--- PC0 ---//
 #define LED1    ((GPIOC->ODR & 0x0001) == 0)

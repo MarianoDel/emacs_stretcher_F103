@@ -14,7 +14,7 @@
 #include "hard.h"
 
 #include "adc.h"
-#include "timer.h"
+#include "tim.h"
 #include "gpio.h"
 #include "usart.h"
 #include "dma.h"
@@ -31,13 +31,6 @@
 
 
 // Externals -------------------------------------------------------------------
-//-- Externals to acknowledge data ready on usarts
-volatile unsigned char usart1_have_data;
-volatile unsigned char usart2_have_data;
-volatile unsigned char usart3_have_data;
-volatile unsigned char usart4_have_data;
-volatile unsigned char usart5_have_data;
-
 unsigned short comms_messages_1 = 0;
 unsigned short comms_messages_2 = 0;
 unsigned short comms_messages_3 = 0;
@@ -86,12 +79,23 @@ int main (void)
     // Gpio Configuration.
     GpioInit();
     OUT4_OFF;
-    OUT1_OFF;
+    OUT5_OFF;
     
     // Systick Timer Activation
+#ifdef SYSCLK_FREQ_72MHz
     if (SysTick_Config(72000))
         SysTickError();
+#elif defined SYSCLK_FREQ_64MHz
+    if (SysTick_Config(64000))
+        SysTickError();
+#else
+#error "Check sysclk freq on main.c"
+#endif
 
+    // Hardware Tests
+    // TF_Hardware_Tests ();
+
+    // --- main program inits. ---
     // Peripherals Activation    
     TIM7_Init();
 
@@ -99,26 +103,27 @@ int main (void)
     DMAConfig();
     DMA_ENABLE;
     
-    //Uso ADC con DMA
+    // ADC with DMA
     AdcConfig();
 
-    //usart1 para comunicacion con raspberry
+    //usart1 comms with rasp
     Usart1Config();
 
-    //usart2 para comunicacion con micros
+    //usart2 comms with internal micros
     Usart2Config();
     
     ChangeLed(LED_NO_BLINKING);
 
-    //-- Do some tests here, almost for hardware
-    // TF_Voltages();
-    // TF_Usart3_Tx();
-    // TF_Usart3TxRx();
-    // TF_Usart3Loop();
-    // TF_CommsWithRaspberry();
-    
     //-- Welcome Messages --------------------
+#if (defined STRETCHER_INFINITY)
+    Usart1Send("\r\nInfinity Stretcher Board -- powered by: Kirno Technology\r\n");
+#pragma message "Infinity Stretcher Board Selected!"
+#elif (defined STRETCHER_GAUSSTEK)
     Usart1Send("\r\nGausstek Stretcher Board -- powered by: Kirno Technology\r\n");
+#pragma message "Gausstek Stretcher Board Selected!"    
+#else
+#error "No welcome code configured!!!"
+#endif
     Wait_ms(100);
 
 #ifdef HARD
@@ -141,15 +146,15 @@ int main (void)
     //limpio buffers serie
     Wait_ms(3000);
     Power_Send("chf\n");
-    ReadPowerBufferFlush();
+    Power_ReadBufferFlush();
 
     Wait_ms(1000);
     Power_Send("ch1 soft version\n");
     Wait_ms(100);
-    if (power_have_data)
+    if (Power_HaveData())
     {
-        power_have_data = 0;
-        ReadPowerBuffer(buff, 64);
+	Power_HaveDataReset();
+        Power_ReadBuffer(buff, 64);
         RPI_Send(buff);
         RPI_Send("\r\n");
     }
@@ -159,10 +164,10 @@ int main (void)
     Wait_ms(1000);
     Power_Send("ch2 soft version\n");
     Wait_ms(100);
-    if (power_have_data)
+    if (Power_HaveData())
     {
-        power_have_data = 0;
-        ReadPowerBuffer(buff, 64);
+        Power_HaveDataReset();
+        Power_ReadBuffer(buff, 64);
         RPI_Send(buff);
         RPI_Send("\r\n");
     }
@@ -172,10 +177,10 @@ int main (void)
     Wait_ms(1000);
     Power_Send("ch3 soft version\n");
     Wait_ms(100);
-    if (power_have_data)
+    if (Power_HaveData())
     {
-        power_have_data = 0;
-        ReadPowerBuffer(buff, 64);
+        Power_HaveDataReset();
+        Power_ReadBuffer(buff, 64);
         RPI_Send(buff);
         RPI_Send("\r\n");
     }
@@ -312,8 +317,6 @@ int main (void)
             if (TreatmentGetUpDwn() == UPDWN_AUTO)
                 comms_messages_rpi |= COMM_STRETCHER_UP;
 #endif
-            
-            OUT2_ON;
             break;
 
         case TREATMENT_RUNNING:
@@ -460,8 +463,6 @@ int main (void)
             if (TreatmentGetUpDwn() == UPDWN_AUTO)
                 comms_messages_rpi |= COMM_STRETCHER_UP;
 #endif
-            
-            OUT2_OFF;
             break;
 
         case TREATMENT_WITH_ERRORS:
@@ -488,15 +489,13 @@ int main (void)
             if (TreatmentGetUpDwn() == UPDWN_AUTO)
                 comms_messages_rpi |= COMM_STRETCHER_UP;
 #endif
-            
-            OUT2_OFF;
             break;
 
         case MAIN_IN_BRIDGE_MODE:
-            if (power_have_data)
+            if (Power_HaveData())
             {
-                power_have_data = 0;
-                bytes_readed = ReadPowerBuffer(s_to_sendb, sizeof(s_to_sendb));
+                Power_HaveDataReset();
+                bytes_readed = Power_ReadBuffer(s_to_sendb, sizeof(s_to_sendb));
 
                 if ((bytes_readed + 2) < sizeof(s_to_sendb))
                 {
@@ -507,10 +506,10 @@ int main (void)
                 }
             }
 
-            if (rpi_have_data)
+            if (RPI_HaveData())
             {
-                rpi_have_data = 0;
-                bytes_readed = ReadRPIBuffer(s_to_senda, sizeof(s_to_senda));
+                RPI_HaveDataReset();
+                bytes_readed = RPI_ReadBuffer(s_to_senda, sizeof(s_to_senda));
                     
                 if (strncmp(s_to_senda, "goto normal mode", sizeof("goto normal mode") - 1) == 0)
                 {
@@ -554,7 +553,6 @@ int main (void)
                 timer_out4 = TIMER_OUT4_IN_ON;
                 OUT4_ON;
 #endif
-                OUT1_ON;
             }
 
             //reviso si tengo que ir al modo bridge
@@ -618,7 +616,6 @@ void TimingDelay_Decrement(void)
     else
     {
         OUT4_OFF;
-        OUT1_OFF;
     }
     
     // if (timer_standby)

@@ -17,14 +17,17 @@
 #include "comms.h"
 #include "usart.h"
 #include "treatment.h"
-#include "timer.h"
+#include "tim.h"
 
 #include <string.h>
 #include <stdio.h>
 
 
-/* Externals ------------------------------------------------------------------*/
-extern volatile unsigned char power_have_data;
+// Module Private Types Constants and Macros -----------------------------------
+#define SIZEOF_RXDATA        128
+
+
+// Externals -------------------------------------------------------------------
 extern volatile unsigned short comms_timeout;
 extern unsigned short comms_messages_1;
 extern unsigned short comms_messages_2;
@@ -93,13 +96,11 @@ static void Power_Error_Messages (unsigned char, char *);
 /* Module Exported Functions -----------------------------------------------------------*/
 void UpdatePowerMessages (void)
 {
-    if (power_have_data)
+    if (Power_HaveData())
     {
-        power_have_data = 0;
-        // L_ALARMA_ON;
-        ReadPowerBuffer(local_power_buff, SIZEOF_RXDATA);
+        Power_HaveDataReset();
+        Power_ReadBuffer(local_power_buff, SIZEOF_RXDATA);
         Power_Messages(local_power_buff);
-        // L_ALARMA_OFF;
     }
 }
 

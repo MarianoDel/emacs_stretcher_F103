@@ -110,8 +110,8 @@ typedef enum
 
 //timer synchro cuenta cada 100us
 #define TIMER_SYNCHRO_MIN     100    //minimo en 100Hz
-#define TIMER_SYNCHRO_MAX     2000    //maximo en 5Hz
-#define FREQ_MIN_ALLOWED    5
+#define TIMER_SYNCHRO_MAX     20000    //maximo en 0.5Hz
+#define FREQ_MIN_ALLOWED    0
 #define FREQ_MAX_ALLOWED    100
 
 

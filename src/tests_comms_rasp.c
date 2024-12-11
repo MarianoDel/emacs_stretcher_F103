@@ -22,7 +22,6 @@
 
 // Externals -------------------------------------------------------------------
 volatile unsigned short adc_ch [2];
-volatile unsigned char usart1_have_data = 0;
 unsigned short comms_messages_rpi = 0;
 
 // Globals ---------------------------------------------------------------------
