@@ -47,6 +47,9 @@
 #define USE_NO_TREATMENT_DETECT    //cuando esta en tratamiento revisa si las potencias tambien
 
 #define USE_BUZZER_ON_OUT3    // keep on ver3.0 for backwards compativility
+#define USE_BUZZER_ON_START
+#define USE_BUZZER_ON_ERROR_STOP
+// #define USE_BUZZER_ON_END
 
 //-------- Kind of Reports Sended ----------------
 

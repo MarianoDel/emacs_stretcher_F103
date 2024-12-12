@@ -58,6 +58,7 @@ unsigned short secs_end_treatment;
 unsigned short secs_elapsed_up_to_now;
 volatile unsigned short timer_sync_xxx_ms = 0;
 volatile unsigned short timer_out4 = 0;
+volatile unsigned short timer_standby = 0;
 
 
 // Module Private Functions ----------------------------------------------------
@@ -307,7 +308,7 @@ int main (void)
             PowerSendStart();
             main_state = TREATMENT_RUNNING;
             ChangeLed(LED_TREATMENT_GENERATING);
-#ifdef USE_BUZZER_ON_OUT3
+#ifdef USE_BUZZER_ON_START
             BuzzerCommands(BUZZER_HALF_CMD, 1);
 #endif
             OUT5_ON;
@@ -354,7 +355,7 @@ int main (void)
                 //termine el tratamiento
                 PowerSendStop();
                 RPI_Send("ended ok\r\n");
-#ifdef USE_BUZZER_ON_OUT3
+#ifdef USE_BUZZER_ON_END
                 BuzzerCommands(BUZZER_SHORT_CMD, 3);
 #endif                
                 main_state = TREATMENT_STOPPING;
@@ -385,11 +386,13 @@ int main (void)
                 if (comms_messages_3 & COMM_POWER_ERROR_MASK)
                     Raspberry_Report_Errors(CH3, &comms_messages_3);
 
-#ifdef USE_BUZZER_ON_OUT3
+#ifdef USE_BUZZER_ON_ERROR_STOP
                 BuzzerCommands(BUZZER_LONG_CMD, 1);
 #endif                                
                 LED1_OFF;
-                main_state = TREATMENT_WITH_ERRORS;
+		RPI_Send("STOP\r\n");
+                main_state = TREATMENT_WITH_ERRORS_1;
+		timer_standby = 1000;
             }
             RPI_Flush_Comms;
 
@@ -465,31 +468,69 @@ int main (void)
 #endif
             break;
 
-        case TREATMENT_WITH_ERRORS:
-            Wait_ms(1000);
-            Power_Send("chf flush errors\n");
-            RPI_Send("STOP\r\n");
-            Wait_ms(1000);
-            RPI_Send("STOP\r\n");
-            Wait_ms(1000);
-            RPI_Send("Flushing errors\r\n");
+	case TREATMENT_WITH_ERRORS_1:
+	    if (timer_standby)
+		break;
 
-            Power_Send("chf flush errors\n");
+            Power_Send("chf flush errors\n");	    
+	    RPI_Send("STOP\r\n");
+	    main_state = TREATMENT_WITH_ERRORS_2;
+	    timer_standby = 1000;
+	    break;
+
+	case TREATMENT_WITH_ERRORS_2:
+	    if (timer_standby)
+		break;
+
+	    RPI_Send("Flushing errors\r\n");
+	    main_state = TREATMENT_WITH_ERRORS_3;
+	    timer_standby = 1000;
+	    break;
+	
+	case TREATMENT_WITH_ERRORS_3:
+	    if (timer_standby)
+		break;
+	    
+	    Power_Send("chf flush errors\n");
             comms_messages_1 &= ~COMM_POWER_ERROR_MASK;
             comms_messages_2 &= ~COMM_POWER_ERROR_MASK;
             comms_messages_3 &= ~COMM_POWER_ERROR_MASK;            
-            
-            Wait_ms(1000);
-            main_state = TREATMENT_STANDBY;
-            ChangeLed(LED_TREATMENT_STANDBY);
-            OUT5_OFF;
-            
+
+	    main_state = TREATMENT_STANDBY;
+	    ChangeLed(LED_TREATMENT_STANDBY);
+
             //OUT4 pulse to down the stretcher
 #ifndef USE_SYNC_PULSES_ON_OUT4
             if (TreatmentGetUpDwn() == UPDWN_AUTO)
                 comms_messages_rpi |= COMM_STRETCHER_UP;
 #endif
-            break;
+	    break;
+	    
+//         case TREATMENT_WITH_ERRORS:
+//             Wait_ms(1000);
+//             Power_Send("chf flush errors\n");
+//             RPI_Send("STOP\r\n");
+//             Wait_ms(1000);
+//             RPI_Send("STOP\r\n");
+//             Wait_ms(1000);
+//             RPI_Send("Flushing errors\r\n");
+
+//             Power_Send("chf flush errors\n");
+//             comms_messages_1 &= ~COMM_POWER_ERROR_MASK;
+//             comms_messages_2 &= ~COMM_POWER_ERROR_MASK;
+//             comms_messages_3 &= ~COMM_POWER_ERROR_MASK;            
+            
+//             Wait_ms(1000);
+//             main_state = TREATMENT_STANDBY;
+//             ChangeLed(LED_TREATMENT_STANDBY);
+//             OUT5_OFF;
+            
+//             //OUT4 pulse to down the stretcher
+// #ifndef USE_SYNC_PULSES_ON_OUT4
+//             if (TreatmentGetUpDwn() == UPDWN_AUTO)
+//                 comms_messages_rpi |= COMM_STRETCHER_UP;
+// #endif
+//             break;
 
         case MAIN_IN_BRIDGE_MODE:
             if (Power_HaveData())
@@ -618,8 +659,8 @@ void TimingDelay_Decrement(void)
         OUT4_OFF;
     }
     
-    // if (timer_standby)
-    //     timer_standby--;
+    if (timer_standby)
+        timer_standby--;
 
     // if (timer_filters)
     //     timer_filters--;
